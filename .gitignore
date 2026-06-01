@@ -1,0 +1,32 @@
+# ===== 秘密情報 / 環境依存 =====
+# DB接続情報などを含むため、本体はコミットしない（.example を配布）
+noa/src/main/resources/application.properties
+.env
+*.local
+
+# ===== バックエンド (Maven / Java) =====
+noa/target/
+noa/.mvn/
+noa/!**/src/main/**/target/
+noa/!**/src/test/**/target/
+*.class
+
+# ===== フロントエンド (Node / Vite) =====
+noa-frontend/node_modules/
+noa-frontend/dist/
+noa-frontend/dist-ssr/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# ===== IDE / エディタ =====
+.idea/
+*.iml
+.vscode/*
+!.vscode/extensions.json
+.DS_Store
+Thumbs.db
+
+# ===== ログ =====
+*.log
