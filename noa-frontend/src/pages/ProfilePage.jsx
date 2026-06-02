@@ -8,21 +8,39 @@ function ProfilePage() {
     };
 
     return (
+    <div>
+      <div>
+        <img
+          src={profile.icon}
+          alt="プロフィール画像"
+        />
+
+        <div>{profile.name}</div>
+      </div>
+
+      <div>
+        <div>{profile.bio}</div>
+
         <div>
-            <div>
-                <div>アイコン</div>
-                <div>名前</div>
-            </div>
+          <h3>技術タグ</h3>
 
-            <div>
-                <div>自己紹介</div>
-                <div>技術タグ</div>
-                <div>趣味タグ</div>
-
-                <button>プロフィールを編集</button>
-            </div>
+          {profile.techTags.map((tag) => (
+            <div key={tag}>{tag}</div>
+          ))}
         </div>
-    );
+
+        <div>
+          <h3>趣味タグ</h3>
+
+          {profile.hobbyTags.map((tag) => (
+            <div key={tag}>{tag}</div>
+          ))}
+        </div>
+
+        <button>プロフィールを編集</button>
+      </div>
+    </div>
+  );
 }
 
 export default ProfilePage;
