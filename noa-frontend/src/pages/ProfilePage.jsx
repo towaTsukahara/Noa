@@ -7,7 +7,22 @@ function ProfilePage() {
         hobbyTags: ["ゲーム", "読書", "旅行"],
     };
 
-    return <div>Profile Page</div>
+    return (
+        <div>
+            <div>
+                <div>アイコン</div>
+                <div>名前</div>
+            </div>
+
+            <div>
+                <div>自己紹介</div>
+                <div>技術タグ</div>
+                <div>趣味タグ</div>
+
+                <button>プロフィールを編集</button>
+            </div>
+        </div>
+    );
 }
 
 export default ProfilePage;
