@@ -4,6 +4,7 @@ import LoginPage from './pages/LoginPage';
 import ProfilePage from './pages/ProfilePage';
 import ProfileEditPage from './pages/ProfileEditPage';
 import PostCard from './components/post/PostCard';
+import ProfileDitailPage from './pages/ProfileDitailPage';
 
 function App() {
   return (
@@ -20,6 +21,7 @@ function App() {
         <Route path="/profile" element={<ProfilePage />} />
         <Route path="/profile/edit" element={<ProfileEditPage />} />
         <Route path="/postcard" element={<PostCard />} />
+        <Route path="/profileditail" element={<ProfileDitailPage />} />
       </Routes>
     </BrowserRouter>
 
