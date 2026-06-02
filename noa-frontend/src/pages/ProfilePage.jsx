@@ -10,13 +10,19 @@ function ProfilePage() {
     return (
         <div>
             <div>
-                <div>アイコン</div>
-                <div>名前</div>
+                <img
+                    src={profile.icon}
+                    alt="プロフィール画像"
+                />
+
+                <div>{profile.name}</div>
             </div>
 
             <div>
-                <div>自己紹介</div>
+                <div>{profile.bio}</div>
+
                 <div>技術タグ</div>
+
                 <div>趣味タグ</div>
 
                 <button>プロフィールを編集</button>
