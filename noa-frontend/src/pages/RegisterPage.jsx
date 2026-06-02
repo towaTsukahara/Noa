@@ -70,7 +70,7 @@ function RegisterPage() {
             {/*ボタン*/}
             <div>
                 <button>キャンセル</button>
-                <button>登録</button>
+                <button onClick={handleSubmit}>登録</button>
             </div>
         </div>
     )
