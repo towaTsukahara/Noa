@@ -1,4 +1,8 @@
+import { useNavigate } from "react-router-dom";
+
 function ProfilePage() {
+    const navigate = useNavigate();
+
     const profile = {
         name: "20260027",
         icon: "https://via.placeholder.com/150",
@@ -7,40 +11,44 @@ function ProfilePage() {
         hobbyTags: ["ゲーム", "読書", "旅行"],
     };
 
+    const handleEditClick = () => {
+        navigate("/profile/edit");
+    };
+
     return (
-    <div>
-      <div>
-        <img
-          src={profile.icon}
-          alt="プロフィール画像"
-        />
-
-        <div>{profile.name}</div>
-      </div>
-
-      <div>
-        <div>{profile.bio}</div>
-
         <div>
-          <h3>技術タグ</h3>
+            <div>
+                <img
+                    src={profile.icon}
+                    alt="プロフィール画像"
+                />
 
-          {profile.techTags.map((tag) => (
-            <div key={tag}>{tag}</div>
-          ))}
+                <div>{profile.name}</div>
+            </div>
+
+            <div>
+                <div>{profile.bio}</div>
+
+                <div>
+                    <h3>技術タグ</h3>
+
+                    {profile.techTags.map((tag) => (
+                        <div key={tag}>{tag}</div>
+                    ))}
+                </div>
+
+                <div>
+                    <h3>趣味タグ</h3>
+
+                    {profile.hobbyTags.map((tag) => (
+                        <div key={tag}>{tag}</div>
+                    ))}
+                </div>
+
+                <button onClick={handleEditClick}>プロフィールを編集</button>
+            </div>
         </div>
-
-        <div>
-          <h3>趣味タグ</h3>
-
-          {profile.hobbyTags.map((tag) => (
-            <div key={tag}>{tag}</div>
-          ))}
-        </div>
-
-        <button>プロフィールを編集</button>
-      </div>
-    </div>
-  );
+    );
 }
 
 export default ProfilePage;
