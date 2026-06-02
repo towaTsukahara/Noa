@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 
 function ProfilePage() {
     const navigate = useNavigate();
+    const [activeTab, setActiveTab] = useState("posts");
 
     const [profile] = useState({
         name: "20260027",
@@ -10,10 +11,28 @@ function ProfilePage() {
         bio: "フロントエンドエンジニアです。",
         techTags: ["React", "JavaScript", "HTML", "CSS"],
         hobbyTags: ["ゲーム", "読書", "旅行"],
+        postCount: 3,
+        likeCount: 5,
+        posts: [
+            { id: 1, content: "Reactを勉強中です。", },
+            { id: 2, content: "JavaScriptの復習をしています。", },
+            { id: 3, content: "プロフィール画面を作成しました。", },
+        ],
+        likedPosts: [
+            { id: 101, content: "React Hooks便利ですね。", },
+            { id: 102, content: "Tailwind CSSを試してみた。", },
+        ],
     });
 
     const handleEditClick = () => {
         navigate("/profile/edit");
+    };
+    const handlePostsClick = () => {
+        setActiveTab("posts");
+    };
+
+    const handleLikesClick = () => {
+        setActiveTab("likes");
     };
 
     return (
@@ -25,6 +44,11 @@ function ProfilePage() {
                 />
 
                 <div>{profile.name}</div>
+
+                <div>
+                    <div>投稿数 {profile.postCount}</div>
+                    <div>いいね数 {profile.likeCount}</div>
+                </div>
             </div>
 
             <div>
@@ -47,6 +71,24 @@ function ProfilePage() {
                 </div>
 
                 <button onClick={handleEditClick}>プロフィールを編集</button>
+            </div>
+            <div>
+                <button onClick={handlePostsClick}>投稿</button>
+                <button onClick={handleLikesClick}>いいね</button>
+            </div>
+
+            <div>
+                {activeTab === "posts" && profile.posts.map((post) => (
+                    <div key={post.id}>
+                        {post.content}
+                    </div>
+                ))}
+
+                {activeTab === "likes" && profile.likedPosts.map((post) => (
+                    <div key={post.id}>
+                        {post.content}
+                    </div>
+                ))}
             </div>
         </div>
     );
