@@ -1,11 +1,22 @@
-
-import React, { useState } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
+import { useState, useEffect } from "react";
 function RegisterPage() {
     const [icon, setIcon] = useState(null);
     const [header, setHeader] = useState(null);
     const [bio, setBio] = useState("");
+
+    const navigate = useNavigate();
+    const location = useLocation();
+
     const [hobbies, setHobbies] = useState([]);
     const [skills, setSkills] = useState([]);
+
+    useEffect(() => {
+        if (location.state) {
+            setHobbies(location.state.hobbies || []);
+            setSkills(location.state.skills || []);
+        }
+    }, [location.state]);
 
     const handleSubmit = () => {
         const data = {
@@ -54,14 +65,14 @@ function RegisterPage() {
                 <h2>タグ設定</h2>
                 <div>
                     <p>趣味</p>
-                    <button onClick={() => setHobbies([...hobbies, "サンプル"])}>
-                        タグ設定
+                    <button onClick={() => navigate("/tags/hobby", { state: { hobbies, skills } })}>
+                        タグ追加
                     </button>
                     <div>{hobbies.join(", ")}</div>
                 </div>
                 <div>
                     <p>技術スタック</p>
-                    <button onClick={() => setSkills([...skills, "React"])}>
+                    <button onClick={() => navigate("/tags/skill", { state: { hobbies, skills } })}>
                         タグ追加
                     </button>
                     <div>{skills.join(", ")}</div>
