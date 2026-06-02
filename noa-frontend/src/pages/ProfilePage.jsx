@@ -1,15 +1,16 @@
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 function ProfilePage() {
     const navigate = useNavigate();
 
-    const profile = {
+    const [profile] = useState({
         name: "20260027",
         icon: "https://via.placeholder.com/150",
         bio: "フロントエンドエンジニアです。",
         techTags: ["React", "JavaScript", "HTML", "CSS"],
         hobbyTags: ["ゲーム", "読書", "旅行"],
-    };
+    });
 
     const handleEditClick = () => {
         navigate("/profile/edit");
