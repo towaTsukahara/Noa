@@ -18,6 +18,7 @@ function App() {
         <Route path="/profile/edit" element={<ProfileEditPage />} />
       </Routes>
     </BrowserRouter>
+
   );
 }
 

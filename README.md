@@ -38,7 +38,7 @@ Project Noa/
 
 ```bash
 git clone <このリポジトリのURL>
-cd "Project Noa"
+cd "Project_Noa"
 ```
 
 ### 2. データベースを用意（初回のみ）
