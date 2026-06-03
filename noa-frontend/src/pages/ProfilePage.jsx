@@ -9,8 +9,9 @@ function ProfilePage() {
         name: "20260027",
         icon: "https://via.placeholder.com/150",
         bio: "フロントエンドエンジニアです。",
-        techTags: ["React", "JavaScript", "HTML", "CSS"],
+        skillTags: ["React", "JavaScript", "HTML", "CSS"],
         hobbyTags: ["ゲーム", "読書", "旅行"],
+        certTags: ["基本情報技術者", "応用情報技術者"],
         postCount: 3,
         likeCount: 5,
         posts: [
@@ -57,7 +58,7 @@ function ProfilePage() {
                 <div>
                     <h3>技術タグ</h3>
 
-                    {profile.techTags.map((tag) => (
+                    {profile.skillTags.map((tag) => (
                         <div key={tag}>{tag}</div>
                     ))}
                 </div>
@@ -66,6 +67,14 @@ function ProfilePage() {
                     <h3>趣味タグ</h3>
 
                     {profile.hobbyTags.map((tag) => (
+                        <div key={tag}>{tag}</div>
+                    ))}
+                </div>
+
+                <div>
+                    <h3>資格タグ</h3>
+
+                    {profile.certTags.map((tag) => (
                         <div key={tag}>{tag}</div>
                     ))}
                 </div>

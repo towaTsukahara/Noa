@@ -1,0 +1,105 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+.layout {
+  display: flex;
+  min-height: 100vh;
+}
+
+.sidebar {
+  width: 220px;
+  border-right: 1px solid #ddd;
+  padding: 20px;
+}
+
+.sidebar h1 {
+  margin-bottom: 30px;
+}
+
+.sidebar ul {
+  list-style: none;
+}
+
+.sidebar li {
+  margin-bottom: 16px;
+  cursor: pointer;
+}
+
+.main {
+  flex: 1;
+}
+
+.header {
+  height: 60px;
+  border-bottom: 1px solid #ddd;
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 10px;
+  padding: 0 20px;
+}
+
+.header input {
+  width: 250px;
+  padding: 8px;
+}
+
+.timeline {
+  max-width: 800px;
+  margin: 20px auto;
+}
+
+.post-card {
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 16px;
+  margin-bottom: 16px;
+}
+
+.post-header {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: #ccc;
+}
+
+.nickname {
+  font-weight: bold;
+}
+
+.date {
+  font-size: 12px;
+  color: #666;
+}
+
+.content {
+  margin-bottom: 12px;
+}
+
+.tags {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.tags span {
+  font-size: 12px;
+  border: 1px solid #ddd;
+  padding: 4px 8px;
+  border-radius: 999px;
+}
+
+.actions {
+  display: flex;
+  gap: 20px;
+  font-size: 14px;
+}

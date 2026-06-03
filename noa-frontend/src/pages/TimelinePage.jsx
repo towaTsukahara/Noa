@@ -1,26 +1,100 @@
-import { useEffect, useState } from 'react';
-import { api } from '../api/client';
+import "./TimelinePage.css";
+
+const posts = [
+  {
+    id: 1,
+    userId: 101,
+    nickname: "カフェラテ",
+    createdAt: "10分前",
+    content: "今日はクライアントとの打ち合わせがうまくいって一安心。",
+    tags: ["ありがとう"],
+    likes: 23,
+    replies: 4,
+  },
+  {
+    id: 2,
+    userId: 102,
+    nickname: "ひつじ",
+    createdAt: "25分前",
+    content: "この業務フロー、もっとシンプルにできないかな？",
+    tags: ["アイデア"],
+    likes: 15,
+    replies: 6,
+  },
+];
 
 function TimelinePage() {
-  const [posts, setPosts] = useState([]);
-  const [error, setError] = useState(null);
-
-  useEffect(() => {
-    api('/timeline')
-      .then((data) => setPosts(data.items))
-      .catch((e) => setError(e.message));
-  }, []);
-
   return (
-    <div style={{ padding: 16 }}>
-      <h1>タイムライン</h1>
-      {error && <p style={{ color: 'red' }}>エラー: {error}</p>}
-      {posts.map((post) => (
-        <div key={post.id} style={{ border: '1px solid #ddd', borderRadius: 8, padding: 12, marginBottom: 8 }}>
-          <p>{post.body}</p>
-          <small>♡ {post.likeCount}</small>
-        </div>
-      ))}
+    <div className="layout">
+      {/* サイドバー */}
+      <aside className="sidebar">
+        <h1>Noa</h1>
+
+        <nav>
+          <ul>
+            <li>タイムライン</li>
+            <li>検索</li>
+            <li>いいね一覧</li>
+            <li>通知</li>
+            <li>プロフィール</li>
+          </ul>
+        </nav>
+      </aside>
+
+      {/* メイン */}
+      <div className="main">
+        {/* ヘッダー */}
+        <header className="header">
+          <input
+            type="text"
+            placeholder="検索..."
+          />
+
+          <button>🔔</button>
+          <button>👤</button>
+        </header>
+
+        {/* 投稿一覧 */}
+        <section className="timeline">
+          {posts.map((post) => (
+            <article
+              key={post.id}
+              className="post-card"
+            >
+              <div className="post-header">
+                <div className="avatar"></div>
+
+                <div>
+                  <div className="nickname">
+                    {post.nickname}
+                  </div>
+
+                  <div className="date">
+                    {post.createdAt}
+                  </div>
+                </div>
+              </div>
+
+              <p className="content">
+                {post.content}
+              </p>
+
+              <div className="tags">
+                {post.tags.map((tag) => (
+                  <span key={tag}>
+                    #{tag}
+                  </span>
+                ))}
+              </div>
+
+              <div className="actions">
+                <span>♡ {post.likes}</span>
+                <span>💬 {post.replies}</span>
+              </div>
+            </article>
+          ))}
+        </section>
+      </div>
     </div>
   );
 }
