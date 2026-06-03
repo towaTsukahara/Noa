@@ -69,7 +69,7 @@ function RegisterPage() {
                     <button onClick={() => navigate("/tags/hobby", { state: { hobbies, skills } })}>
                         タグ追加
                     </button>
-                    <div>{skills.join(", ")}</div>
+                    <div>{hobbies.join(", ")}</div>
 
                 </div>
                 <div>

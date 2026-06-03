@@ -10,36 +10,91 @@ const TAGS = {
 const TagPage = ({ type }) => {
     const navigate = useNavigate();
     const location = useLocation();
-
+    const [tags, setTags] = useState([]);
     const [hobbies, setHobbies] = useState([]);
     const [skills, setSkills] = useState([]);
+    const [selectedTags, setSelectedTags] = useState([])
 
     useEffect(() => {
         if (location.state) {
-            setHobbies(location.state.hobbies || []);
-            setSkills(location.state.skills || []);
+            setHobbies([...(location.state.hobbies || [])]);
+            setSkills([...(location.state.skills || [])]);
         }
     }, [location.state]);
+
+    /*
+    useEffect(() => {
+        fetch("http://localhost:5173/api/v1/tags")
+            .then(res => {
+                if (!res.ok) {
+                    throw new Error("APIエラー: " + res.status);
+                }
+                return res.json();
+            })
+            .then(data => {
+                console.log("成功:", data);
+                setTags(data);
+            })
+            .catch(err => {
+                console.error("失敗:", err);
+            });
+    }, []);
+    
+    useEffect(() => {
+        setTags(
+            TAGS[type].map((name, index) => ({
+                id: index,
+                name: name
+            }))
+        );
+    }, [type]);
+    */
+
+    useEffect(() => {
+        fetch("/api/v1/tags")
+            .then(res => {
+                if (!res.ok) {
+                    throw new Error("APIエラー: " + res.status);
+                }
+                return res.json();
+            })
+            /*.then(data => {
+                // typeでフィルタ
+                const filtered = data.filter(tag => tag.type === type);
+                setTags(filtered);
+            })*/
+            .then(data => {
+                console.log("APIデータ:", data);
+
+                const filtered = data.filter(tag => tag.type === type);
+                console.log("filtered:", filtered);
+
+                setTags(filtered);
+            })
+            .catch(err => {
+                console.error(err);
+            });
+    }, [type]);
 
     const selected = type === "hobby" ? hobbies : skills;
     const setSelected = type === "hobby" ? setHobbies : setSkills;
 
     const toggleTag = (tag) => {
-        if (selected.includes(tag)) {
-            setSelected(selected.filter(t => t !== tag));
+        if (selected.includes(tag.name)) {
+            setSelected(selected.filter(t => t !== tag.name));
         } else {
-            setSelected([...selected, tag]);
+            setSelected([...selected, tag.name]);
         }
     };
 
     const handleNext = () => {
         if (type === "hobby") {
             navigate("/tags/skill", {
-                state: { hobbies: selected, skills },
+                state: { hobbies: [...selected], skills: [...skills] },
             });
         } else {
             navigate("/register", {
-                state: { hobbies, skills: selected },
+                state: { hobbies: [...hobbies], skills: [...selected] },
             });
         }
     };
@@ -53,16 +108,17 @@ const TagPage = ({ type }) => {
                 </button>
             </div>
             <div>
-                {TAGS[type].map((tag) => (
-                    <span
-                        key={tag}
+                {tags.map((tag) => (
+                    <button
+                        key={`${type}-${tag.name}`}
                         onClick={() => toggleTag(tag)}
                         style={{
-                            margin: "5px",
+                            backgroundColor: selected.includes(tag.name) ? "blue" : "gray",
+                            color: "white"
                         }}
                     >
-                        {tag}
-                    </span>
+                        {tag.name}
+                    </button>
                 ))}
             </div>
             <button onClick={handleNext}>
