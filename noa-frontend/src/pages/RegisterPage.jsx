@@ -1,5 +1,6 @@
 import { useNavigate, useLocation } from "react-router-dom";
 import { useState, useEffect } from "react";
+
 function RegisterPage() {
     const [icon, setIcon] = useState(null);
     const [header, setHeader] = useState(null);
@@ -68,7 +69,8 @@ function RegisterPage() {
                     <button onClick={() => navigate("/tags/hobby", { state: { hobbies, skills } })}>
                         タグ追加
                     </button>
-                    <div>{hobbies.join(", ")}</div>
+                    <div>{skills.join(", ")}</div>
+
                 </div>
                 <div>
                     <p>技術スタック</p>

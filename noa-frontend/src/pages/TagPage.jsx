@@ -1,11 +1,15 @@
 import { useNavigate, useLocation } from "react-router-dom";
 import { useState, useEffect } from "react";
 
+// ダミーデータ。バックエンド実装したら消す。
+const TAGS = {
+    hobby: ["コーヒー", "登山", "ゲーム", "読書", "カフェ巡り", "ランニング"],
+    skill: ["Java", "Spring Boot", "React", "AWS", "Python", "SQL"],
+};
+
 const TagPage = ({ type }) => {
     const navigate = useNavigate();
     const location = useLocation();
-
-    const [tags, setTags] = useState({ hobby: [], skill: [] });
 
     const [hobbies, setHobbies] = useState([]);
     const [skills, setSkills] = useState([]);
@@ -16,17 +20,6 @@ const TagPage = ({ type }) => {
             setSkills(location.state.skills || []);
         }
     }, [location.state]);
-
-    useEffect(() => {
-        fetch("http://localhost:8080/api/tags")
-            .then((res) => res.json())
-            .then((data) => {
-                setTags(data);
-            })
-            .catch((err) => {
-                console.error("タグ取得失敗", err);
-            });
-    }, []);
 
     const selected = type === "hobby" ? hobbies : skills;
     const setSelected = type === "hobby" ? setHobbies : setSkills;
@@ -60,10 +53,13 @@ const TagPage = ({ type }) => {
                 </button>
             </div>
             <div>
-                {tags[type].map((tag) => (
+                {TAGS[type].map((tag) => (
                     <span
                         key={tag}
                         onClick={() => toggleTag(tag)}
+                        style={{
+                            margin: "5px",
+                        }}
                     >
                         {tag}
                     </span>
