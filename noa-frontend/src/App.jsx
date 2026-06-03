@@ -8,7 +8,7 @@ import ProfileEditPage from './pages/ProfileEditPage';
 import PostCard from './components/post/PostCard';
 import ProfileDitailPage from './pages/ProfileDitailPage';
 import NavBar from './components/layout/NavBar';
-
+import PostDetailPage from "./pages/PostDetailPage";
 
 function App() {
   return (
@@ -24,6 +24,7 @@ function App() {
         <Route path="/profile/edit" element={<ProfileEditPage />} />
         <Route path="/postcard" element={<PostCard />} />
         <Route path="/profileditail" element={<ProfileDitailPage />} />
+        <Route path="/post/:id" element={<PostDetailPage />} />
       </Routes>
     </BrowserRouter>
 

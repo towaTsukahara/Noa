@@ -82,7 +82,23 @@
 }
 
 .content {
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  margin-bottom: 8px;
+}
+
+.detail-link {
+  display: inline-block;
   margin-bottom: 12px;
+  color: #4f46e5;
+  font-size: 14px;
+  text-decoration: none;
+}
+
+.detail-link:hover {
+  text-decoration: underline;
 }
 
 .tags {
@@ -100,6 +116,27 @@
 
 .actions {
   display: flex;
+  align-items: center;
   gap: 20px;
   font-size: 14px;
+}
+
+.like-button {
+  border: none;
+  background: none;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.like-button:hover {
+  opacity: 0.8;
+}
+
+.comment-link {
+  text-decoration: none;
+  color: inherit;
+}
+
+.comment-link:hover {
+  opacity: 0.8;
 }
