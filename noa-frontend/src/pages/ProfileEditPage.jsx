@@ -4,12 +4,18 @@ function ProfileEditPage() {
     const navigate = useNavigate();
 
     const bio = "フロントエンジニアです。";
-    const techTags = ["React", "JavaScript", "HTML", "CSS",];
+    const skillTags = ["React", "JavaScript", "HTML", "CSS",];
     const hobbyTags = ["ゲーム", "読書", "旅行",];
     const certTags = ["基本情報技術者", "応用情報技術者"];
 
-    const handleTagEditClick = () => {
-        navigate("/tags");
+    const handleTagSkillEditClick = () => {
+        navigate("/tags/skilledit");
+    };
+    const handleTagHobbyEditClick = () => {
+        navigate("/tags/hobbyedit");
+    };
+    const handleTagCertEditClick = () => {
+        navigate("/tags/certedit");
     };
 
     const handleCancelClick = () => {
@@ -31,10 +37,10 @@ function ProfileEditPage() {
 
             <div>
                 <h3>技術タグ</h3>
-                {techTags.map((tag) => (
+                {skillTags.map((tag) => (
                     <div key={tag}>{tag}</div>
                 ))}
-                <button onClick={handleTagEditClick}>さらに表示</button>
+                <button onClick={handleTagSkillEditClick}>さらに表示</button>
             </div>
 
             <div>
@@ -43,7 +49,7 @@ function ProfileEditPage() {
                     <div key={tag}>{tag}</div>
                 ))}
 
-                <button onClick={handleTagEditClick}>さらに表示</button>
+                <button onClick={handleTagHobbyEditClick}>さらに表示</button>
             </div>
 
             <div>
@@ -52,7 +58,7 @@ function ProfileEditPage() {
                     <div key={tag}>{tag}</div>
                 ))}
 
-                <button onClick={handleTagEditClick}>さらに表示</button>
+                <button onClick={handleTagCertEditClick}>さらに表示</button>
             </div>
 
             <div>
