@@ -1,13 +1,34 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import "./TimelinePage.css";
-import PostComposeModal from "../components/post/PostComposeModal";
-
-const posts = [
-  // ... 既存のモックデータはそのまま ...
-];
+import { api } from "../api/client";
+import PostComposePage from "../components/post/PostComposeModal";
+import UserHandle from "../components/user/UserHandle";
 
 function TimelinePage() {
+  const [posts, setPosts] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const [showCompose, setShowCompose] = useState(false);
+
+  // タイムライン取得（1ページ目）
+  const loadTimeline = async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const data = await api("/timeline");
+      setPosts(data.items);
+      // TODO(ページング): data.nextCursor を使った「もっと見る」は後で実装。
+    } catch (e) {
+      setError("タイムラインの取得に失敗しました。");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // 画面表示時に読み込む
+  useEffect(() => {
+    loadTimeline();
+  }, []);
 
   return (
     <div className="layout">
@@ -23,8 +44,6 @@ function TimelinePage() {
             <li>プロフィール</li>
           </ul>
         </nav>
-
-        {/* 投稿ボタン */}
         <button className="compose-button" onClick={() => setShowCompose(true)}>
           投稿する
         </button>
@@ -39,39 +58,45 @@ function TimelinePage() {
         </header>
 
         <section className="timeline">
+          {loading && <p>読み込み中...</p>}
+          {error && <p style={{ color: "red" }}>{error}</p>}
+          {!loading && !error && posts.length === 0 && <p>まだ投稿がありません。</p>}
+
           {posts.map((post) => (
             <article key={post.id} className="post-card">
-              {/* ... 既存の投稿カードの中身はそのまま ... */}
               <div className="post-header">
                 <div className="avatar"></div>
                 <div>
-                  <div className="nickname">{post.nickname}</div>
+                  <div className="nickname">
+                    <UserHandle user={post.author} />
+                  </div>
                   <div className="date">{post.createdAt}</div>
                 </div>
               </div>
-              <p className="content">{post.content}</p>
+
+              <p className="content">{post.body}</p>
+
               <div className="tags">
                 {post.tags.map((tag) => (
                   <span key={tag}>#{tag}</span>
                 ))}
               </div>
+
               <div className="actions">
-                <span>♡ {post.likes}</span>
-                <span>💬 {post.replies}</span>
+                <span>♡ {post.likeCount}</span>
+                <span>💬 {post.replyCount}</span>
               </div>
             </article>
           ))}
         </section>
       </div>
 
-      {/* 投稿モーダル（showCompose が true のときだけ表示） */}
+      {/* 投稿モーダル */}
       {showCompose && (
-        <PostComposeModal
+        <PostComposePage
           onClose={() => setShowCompose(false)}
           onPosted={() => {
-            // TODO(F-107): タイムラインをAPIから取得する実装にしたら、ここで再読込する。
-            //              今はモックデータ表示のため、投稿しても一覧には反映されない。
-            alert("投稿しました");
+            loadTimeline(); // 投稿後にタイムラインを再読込 → 自分の投稿が出る
           }}
         />
       )}
