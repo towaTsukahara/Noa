@@ -11,6 +11,7 @@ function ProfilePage() {
         bio: "フロントエンドエンジニアです。",
         techTags: ["React", "JavaScript", "HTML", "CSS"],
         hobbyTags: ["ゲーム", "読書", "旅行"],
+        certTags: ["基本情報技術者", "応用情報技術者"],
         postCount: 3,
         likeCount: 5,
         posts: [
@@ -66,6 +67,14 @@ function ProfilePage() {
                     <h3>趣味タグ</h3>
 
                     {profile.hobbyTags.map((tag) => (
+                        <div key={tag}>{tag}</div>
+                    ))}
+                </div>
+
+                <div>
+                    <h3>資格タグ</h3>
+
+                    {profile.certTags.map((tag) => (
                         <div key={tag}>{tag}</div>
                     ))}
                 </div>
