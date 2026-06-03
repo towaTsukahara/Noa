@@ -11,16 +11,7 @@ const posts = [
     likes: 23,
     replies: 4,
   },
-  {
-    id: 2,
-    userId: 102,
-    nickname: "ひつじ",
-    createdAt: "25分前",
-    content: "この業務フロー、もっとシンプルにできないかな？",
-    tags: ["アイデア"],
-    likes: 15,
-    replies: 6,
-  },
+  
 ];
 
 function TimelinePage() {
