@@ -2,7 +2,6 @@ import { BrowserRouter, Routes, Route, Link } from 'react-router-dom';
 import TimelinePage from './pages/TimelinePage';
 import RegisterPage from './pages/RegisterPage';
 import LoginPage from './pages/LoginPage';
-import RegisterPage from './pages/RegisterPage';
 import TagPage from './pages/TagPage';
 import ProfilePage from './pages/ProfilePage';
 import ProfileEditPage from './pages/ProfileEditPage';
