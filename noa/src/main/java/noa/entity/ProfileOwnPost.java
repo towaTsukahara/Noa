@@ -26,9 +26,6 @@ public class ProfileOwnPost {
     @Column(name = "created_at", insertable = false, nullable = false)
     private OffsetDateTime createdAt;
 
-    @Column(name = "updated_at", insertable = false, nullable = false)
-    private OffsetDateTime updatedAt;
-
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
     public Long getAuthorId() { return authorId; }
@@ -39,6 +36,5 @@ public class ProfileOwnPost {
     public void setBody(String body) { this.body = body; }
     public boolean isDeleted() { return deleted; }
     public void setDeleted(boolean deleted) { this.deleted = deleted; }
-    public OffsetDateTime getCreateAt() { return createdAt; }
-    public OffsetDateTime getUpdateAt() { return updatedAt; }
+    public OffsetDateTime getCreatedAt() { return createdAt; }
 }
