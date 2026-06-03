@@ -1,7 +1,24 @@
+import { useNavigate } from "react-router-dom";
+
 function ProfileEditPage() {
+    const navigate = useNavigate();
+
     const bio = "フロントエンジニアです。";
     const techTags = ["React", "JavaScript", "HTML", "CSS",];
     const hobbyTags = ["ゲーム", "読書", "旅行",];
+    const certTags = ["基本情報技術者", "応用情報技術者"];
+
+    const handleTagEditClick = () => {
+        navigate("/tags");
+    };
+
+    const handleCancelClick = () => {
+        navigate("/profile");
+    };
+
+    const handleSaveClick = () => {
+        navigate("/profile");
+    };
 
     return (
         <div>
@@ -17,8 +34,7 @@ function ProfileEditPage() {
                 {techTags.map((tag) => (
                     <div key={tag}>{tag}</div>
                 ))}
-
-                <button>さらに表示</button>
+                <button onClick={handleTagEditClick}>さらに表示</button>
             </div>
 
             <div>
@@ -27,12 +43,21 @@ function ProfileEditPage() {
                     <div key={tag}>{tag}</div>
                 ))}
 
-                <button>さらに表示</button>
+                <button onClick={handleTagEditClick}>さらに表示</button>
             </div>
 
             <div>
-                <button>キャンセル</button>
-                <button>保存</button>
+                <h3>資格タグ</h3>
+                {certTags.map((tag) => (
+                    <div key={tag}>{tag}</div>
+                ))}
+
+                <button onClick={handleTagEditClick}>さらに表示</button>
+            </div>
+
+            <div>
+                <button onClick={handleCancelClick}>キャンセル</button>
+                <button onClick={handleSaveClick}>保存</button>
             </div>
         </div>
     );
