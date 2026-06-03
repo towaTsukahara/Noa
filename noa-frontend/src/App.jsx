@@ -2,12 +2,11 @@ import { BrowserRouter, Routes, Route, Link } from 'react-router-dom';
 import TimelinePage from './pages/TimelinePage';
 import RegisterPage from './pages/RegisterPage';
 import LoginPage from './pages/LoginPage';
-import RegisterPage from './pages/RegisterPage';
 import TagPage from './pages/TagPage';
 import ProfilePage from './pages/ProfilePage';
 import ProfileEditPage from './pages/ProfileEditPage';
 import TagEditPage from './pages/TagEditPage';
-import PostCard from './components/post/PostCard';
+import PostComposePage from './components/post/PostComposeModal';
 import ProfileDitailPage from './pages/ProfileDitailPage';
 import NavBar from './components/layout/NavBar';
 
@@ -28,7 +27,7 @@ function App() {
         <Route path="/tags/skilledit" element={<TagEditPage type="skill" />} />
         <Route path="/tags/hobbyedit" element={<TagEditPage type="hobby" />} />
         <Route path="/tags/certedit" element={<TagEditPage type="cert" />} />
-        <Route path="/postcard" element={<PostCard />} />
+        <Route path="/post/new" element={<PostComposePage />} />
         <Route path="/profileditail" element={<ProfileDitailPage />} />
       </Routes>
     </BrowserRouter>
