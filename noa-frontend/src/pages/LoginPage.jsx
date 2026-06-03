@@ -1,22 +1,19 @@
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
-import { api } from "../api/client";
+import { useAuth } from "../context/AuthContext";
 
 function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState(null);
+  const { login } = useAuth();
   const navigate = useNavigate();
 
   const handleLogin = async () => {
     setError(null);
     try {
-      const user = await api("/auth/login", {
-        method: "POST",
-        body: JSON.stringify({ email, password }),
-      });
-      console.log("ログイン成功:", user);
-      navigate("/"); // タイムラインへ
+      await login(email, password);
+      navigate("/");
     } catch (e) {
       setError("メールアドレスまたはパスワードが違います");
     }
