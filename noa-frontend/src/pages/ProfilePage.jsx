@@ -27,6 +27,10 @@ function ProfilePage() {
         ],
     });
 
+    const handleFollowClick = () => {
+        navigate("/follow")
+    };
+
     const handleEditClick = () => {
         navigate("/profile/edit");
     };
@@ -93,6 +97,12 @@ function ProfilePage() {
                 <div>
                     <div>投稿数 {profile.postCount}</div>
                     <div>いいね数 {profile.likeCount}</div>
+                </div>
+
+                <div>
+                    <button onClick={handleFollowClick}>
+                        フォロー中一覧
+                    </button>
                 </div>
             </div>
 
