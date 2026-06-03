@@ -9,6 +9,7 @@ import PostCard from './components/post/PostCard';
 import ProfileDitailPage from './pages/ProfileDitailPage';
 import NavBar from './components/layout/NavBar';
 
+
 function App() {
   return (
     <BrowserRouter>
