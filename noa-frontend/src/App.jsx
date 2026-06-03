@@ -1,5 +1,6 @@
 import { BrowserRouter, Routes, Route, Link } from 'react-router-dom';
 import TimelinePage from './pages/TimelinePage';
+import RegisterPage from './pages/RegisterPage';
 import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
 import TagPage from './pages/TagPage';
@@ -17,6 +18,7 @@ function App() {
       <NavBar />
       <Routes>
         <Route path="/" element={<TimelinePage />} />
+        <Route path="/register" element={<RegisterPage />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/register" element={<RegisterPage />} />
         <Route path="/tags/hobby" element={<TagPage type="hobby" />} />
