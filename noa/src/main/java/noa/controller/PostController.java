@@ -31,7 +31,7 @@ public class PostController {
         }
         // current user を投稿者として渡す
         Post post = postService.create(principal.getUser(), req);
-        return PostResponse.from(post);
+        return PostResponse.from(post, 0, false);  // 新規投稿はいいね0・未いいね
     }
 
     // 投稿削除（論理削除・本人のみ）

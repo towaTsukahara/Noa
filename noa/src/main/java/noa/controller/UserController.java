@@ -54,9 +54,13 @@ public class UserController {
     @GetMapping("/users/{handle}/posts")
     public Map<String, Object> userPosts(@PathVariable String handle,
                                          @RequestParam(required = false) Long cursor,
-                                         @RequestParam(defaultValue = "20") int limit) {
+                                         @RequestParam(defaultValue = "20") int limit,
+                                         @AuthenticationPrincipal CustomUserDetails principal) {
+        if (principal == null) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "ログインが必要です");
+        }
         User target = userRepository.findByHandle(handle)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "ユーザーが見つかりません"));
-        return postService.getUserPosts(target, cursor, limit);
+        return postService.getUserPosts(target, cursor, limit, principal.getUser());
     }
 }
