@@ -3,6 +3,8 @@ import "./TimelinePage.css";
 import { api } from "../api/client";
 import PostComposePage from "../components/post/PostComposeModal";
 import UserHandle from "../components/user/UserHandle";
+import { Link } from "react-router-dom";
+
 
 function TimelinePage() {
   const [posts, setPosts] = useState([]);
@@ -16,6 +18,7 @@ function TimelinePage() {
     setError(null);
     try {
       const data = await api("/timeline");
+      console.log(data.items);
       setPosts(data.items);
       // TODO(ページング): data.nextCursor を使った「もっと見る」は後で実装。
     } catch (e) {
@@ -32,7 +35,6 @@ function TimelinePage() {
 
   return (
     <div className="layout">
-      {/* サイドバー */}
       <aside className="sidebar">
         <h1>Noa</h1>
         <nav>
@@ -49,7 +51,6 @@ function TimelinePage() {
         </button>
       </aside>
 
-      {/* メイン */}
       <div className="main">
         <header className="header">
           <input type="text" placeholder="検索..." />
@@ -75,6 +76,19 @@ function TimelinePage() {
               </div>
 
               <p className="content">{post.body}</p>
+              <Link
+                to={`/post/${post.id}`}
+                className="post-detail-link"
+              >
+                詳細...
+              </Link>
+
+              <Link
+                to={`/post/${post.id}`}
+                className="detail-link"
+              >
+                詳細...
+              </Link>
 
               <div className="tags">
                 {post.tags.map((tag) => (
