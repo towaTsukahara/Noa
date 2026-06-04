@@ -7,7 +7,7 @@ import ProfilePage from './pages/ProfilePage';
 import ProfileEditPage from './pages/ProfileEditPage';
 import TagEditPage from './pages/TagEditPage';
 import PostComposePage from './components/post/PostComposeModal';
-import ProfileDitailPage from './pages/ProfileDitailPage';
+import OtherProfilePage from './pages/OtherProfilePage';
 import NavBar from './components/layout/NavBar';
 
 
@@ -28,7 +28,7 @@ function App() {
         <Route path="/tags/hobbyedit" element={<TagEditPage type="hobby" />} />
         <Route path="/tags/certedit" element={<TagEditPage type="cert" />} />
         <Route path="/post/new" element={<PostComposePage />} />
-        <Route path="/profileditail" element={<ProfileDitailPage />} />
+        <Route path="/other-profile" element={<OtherProfilePage />} />
       </Routes>
     </BrowserRouter>
 

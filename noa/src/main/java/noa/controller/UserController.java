@@ -5,19 +5,25 @@ import noa.dto.UserSummaryResponse;
 import noa.entity.User;
 import noa.repository.UserRepository;
 import noa.security.CustomUserDetails;
+import noa.service.PostService;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
+
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/v1")
 public class UserController {
 
     private final UserRepository userRepository;
+    private final PostService postService;
 
-    public UserController(UserRepository userRepository) {
+    public UserController(UserRepository userRepository, PostService postService) {
         this.userRepository = userRepository;
+        this.postService = postService;
     }
 
     @GetMapping("/me")
@@ -42,5 +48,15 @@ public class UserController {
         String nickname = null;
 
         return UserSummaryResponse.from(target, isFollowing, nickname);
+    }
+
+    // そのユーザーの投稿一覧（通常投稿・新しい順・カーソルページング）
+    @GetMapping("/users/{handle}/posts")
+    public Map<String, Object> userPosts(@PathVariable String handle,
+                                         @RequestParam(required = false) Long cursor,
+                                         @RequestParam(defaultValue = "20") int limit) {
+        User target = userRepository.findByHandle(handle)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "ユーザーが見つかりません"));
+        return postService.getUserPosts(target, cursor, limit);
     }
 }
