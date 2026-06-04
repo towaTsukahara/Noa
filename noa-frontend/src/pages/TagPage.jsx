@@ -1,24 +1,23 @@
 import { useNavigate, useLocation } from "react-router-dom";
 import { useState, useEffect } from "react";
 
-// ダミーデータ。バックエンド実装したら消す。
-const TAGS = {
-    hobby: ["コーヒー", "登山", "ゲーム", "読書", "カフェ巡り", "ランニング"],
-    skill: ["Java", "Spring Boot", "React", "AWS", "Python", "SQL"],
-};
-
 const TagPage = ({ type }) => {
     const navigate = useNavigate();
     const location = useLocation();
+
     const [tags, setTags] = useState([]);
+
     const [hobbies, setHobbies] = useState([]);
     const [skills, setSkills] = useState([]);
+    const [certs, setCerts] = useState([]);
+
     const [selectedTags, setSelectedTags] = useState([])
 
     useEffect(() => {
         if (location.state) {
             setHobbies([...(location.state.hobbies || [])]);
             setSkills([...(location.state.skills || [])]);
+            setCerts([...(location.state.certs || [])]);
         }
     }, [location.state]);
 
@@ -49,7 +48,7 @@ const TagPage = ({ type }) => {
         );
     }, [type]);
     */
-
+    /*
     useEffect(() => {
         fetch("/api/v1/tags")
             .then(res => {
@@ -58,11 +57,11 @@ const TagPage = ({ type }) => {
                 }
                 return res.json();
             })
-            /*.then(data => {
+            .then(data => {
                 // typeでフィルタ
                 const filtered = data.filter(tag => tag.type === type);
                 setTags(filtered);
-            })*/
+            })
             .then(data => {
                 console.log("APIデータ:", data);
 
@@ -75,33 +74,77 @@ const TagPage = ({ type }) => {
                 console.error(err);
             });
     }, [type]);
+    */
 
-    const selected = type === "hobby" ? hobbies : skills;
-    const setSelected = type === "hobby" ? setHobbies : setSkills;
+
+
+    useEffect(() => {
+        fetch("http://localhost:8080/api/v1/tags")
+            .then(res => {
+                if (!res.ok) {
+                    throw new Error("APIエラー: " + res.status);
+                }
+                return res.json();
+            })
+            .then(data => {
+                const typeMap = {
+                    hobby: "HOBBY",
+                    skill: "TECH",
+                    cert: "CERT"
+                };
+
+                const filtered = data.filter(
+                    tag => tag.type === typeMap[type]
+                );
+
+                setTags(filtered);
+            })
+            .catch(err => console.error(err));
+    }, [type]);
+
+    const selectedMap = {
+        hobby: [hobbies, setHobbies],
+        skill: [skills, setSkills],
+        cert: [certs, setCerts]
+    };
+
+    const selectedPair = selectedMap[type] || [[], () => { }];
+    const selected = selectedPair[0];
+    const setSelected = selectedPair[1];
 
     const toggleTag = (tag) => {
-        if (selected.includes(tag.name)) {
-            setSelected(selected.filter(t => t !== tag.name));
+        if (selected.includes(tag.id)) {
+            setSelected(selected.filter(t => t !== tag.id));
         } else {
-            setSelected([...selected, tag.name]);
+            setSelected([...selected, tag.id]);
         }
     };
 
     const handleNext = () => {
-        if (type === "hobby") {
-            navigate("/tags/skill", {
-                state: { hobbies: [...selected], skills: [...skills] },
+        if (type === "skill") {
+            navigate("/tags/hobby", {
+                state: { hobbies, skills, certs },
+            });
+        } else if (type === "hobby") {
+            navigate("/tags/cert", {
+                state: { hobbies, skills, certs },
             });
         } else {
-            navigate("/register", {
-                state: { hobbies: [...hobbies], skills: [...selected] },
+            // 最後
+            navigate("/profile/edit", {
+                state: { hobbies, skills, certs },
             });
         }
     };
 
     return (
         <div>
-            <h2>{type === "hobby" ? "興味タグ" : "技術スタックタグ"}</h2>
+            <h2>{type === "hobby"
+                ? "興味タグ"
+                : type === "skill"
+                    ? "技術タグ"
+                    : "資格タグ"}
+            </h2>
             <div>
                 <button onClick={() => navigate(-1)}>
                     ← 戻る
@@ -110,10 +153,10 @@ const TagPage = ({ type }) => {
             <div>
                 {tags.map((tag) => (
                     <button
-                        key={`${type}-${tag.name}`}
+                        key={tag.id}
                         onClick={() => toggleTag(tag)}
                         style={{
-                            backgroundColor: selected.includes(tag.name) ? "blue" : "gray",
+                            backgroundColor: selected.includes(tag.id) ? "blue" : "gray",
                             color: "white"
                         }}
                     >

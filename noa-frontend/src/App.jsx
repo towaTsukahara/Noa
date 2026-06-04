@@ -21,14 +21,20 @@ function App() {
         <Route path="/register" element={<RegisterPage />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/register" element={<RegisterPage />} />
-        <Route path="/tags/hobby" element={<TagPage type="hobby" />} />
-        <Route path="/tags/skill" element={<TagPage type="skill" />} />
+
+        <Route path="/tags/skill" element={<TagEditPage type="skill" />} />
+        <Route path="/tags/hobby" element={<TagEditPage type="hobby" />} />
+        <Route path="/tags/cert" element={<TagEditPage type="cert" />} />
+
         <Route path="/profile" element={<ProfilePage />} />
         <Route path="/follow" element={<FollowPage />} />
         <Route path="/profile/edit" element={<ProfileEditPage />} />
-        <Route path="/tags/skilledit" element={<TagEditPage type="skill" />} />
-        <Route path="/tags/hobbyedit" element={<TagEditPage type="hobby" />} />
-        <Route path="/tags/certedit" element={<TagEditPage type="cert" />} />
+        {/*}
+        
+        <Route path="/tags/hobby" element={<TagPage type="hobby" />} />
+        <Route path="/tags/skill" element={<TagPage type="skill" />} />
+        <Route path="/tags/cert" element={<TagPage type="cert" />} />
+        */}
         <Route path="/post/new" element={<PostComposePage />} />
         <Route path="/profileditail" element={<ProfileDitailPage />} />
       </Routes>

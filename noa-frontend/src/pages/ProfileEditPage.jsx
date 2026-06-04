@@ -9,13 +9,31 @@ function ProfileEditPage() {
     const certTags = ["基本情報技術者", "応用情報技術者"];
 
     const handleTagSkillEditClick = () => {
-        navigate("/tags/skilledit");
+        navigate("/tags/skill", {
+            state: {
+                hobbies: hobbyTags,
+                skills: skillTags,
+                certs: certTags
+            }
+        });
     };
     const handleTagHobbyEditClick = () => {
-        navigate("/tags/hobbyedit");
+        navigate("/tags/hobby", {
+            state: {
+                hobbies: hobbyTags,
+                skills: skillTags,
+                certs: certTags
+            }
+        });
     };
     const handleTagCertEditClick = () => {
-        navigate("/tags/certedit");
+        navigate("/tags/cert", {
+            state: {
+                hobbies: hobbyTags,
+                skills: skillTags,
+                certs: certTags
+            }
+        });
     };
 
     const handleCancelClick = () => {

@@ -2,30 +2,52 @@ import { useNavigate, useLocation } from "react-router-dom";
 import { useState, useEffect } from "react";
 
 // ダミーデータ。バックエンド実装したら消す。
+/*
 const TAGS = {
     hobby: ["コーヒー", "登山", "ゲーム", "読書", "カフェ巡り", "ランニング"],
     skill: ["Java", "Spring Boot", "React", "AWS", "Python", "SQL"],
     cert: ["基本情報技術者", "応用情報技術者"],
 };
+*/
 
 const TagEditPage = ({ type }) => {
     const navigate = useNavigate();
     const location = useLocation();
 
+    const [tags, setTags] = useState([]); // ← APIから取得
     const [hobbies, setHobbies] = useState([]);
     const [skills, setSkills] = useState([]);
-    const [certs, setCers] = useState([]);
+    const [certs, setCerts] = useState([]);
 
     useEffect(() => {
         if (location.state) {
             setHobbies(location.state.hobbies || []);
             setSkills(location.state.skills || []);
-            setCers(location.state.certs || []);
+            setCerts(location.state.certs || []);
         }
     }, [location.state]);
 
-    const selected = type === "hobby" ? hobbies : ("skill" ? skills : certs);
-    const setSelected = type === "hobby" ? setHobbies : ("skill" ? setSkills : setCers);
+    useEffect(() => {
+        fetch("/api/v1/tags")
+            .then(res => res.json())
+            .then(data => {
+                const typeMap = {
+                    hobby: "HOBBY",
+                    skill: "TECH",
+                    cert: "CERT"
+                };
+                const filtered = data.filter(tag => tag.type === typeMap[type]);
+                setTags(filtered);
+            });
+    }, [type]);
+
+    const selectedMap = {
+        hobby: [hobbies, setHobbies],
+        skill: [skills, setSkills],
+        cert: [certs, setCerts],
+    };
+
+    const [selected, setSelected] = selectedMap[type] || [[], () => { }];
 
     const toggleTag = (tag) => {
         if (selected.includes(tag)) {
@@ -35,6 +57,7 @@ const TagEditPage = ({ type }) => {
         }
     };
 
+    /*
     const handleCancelClick = () => {
         navigate("/profile/edit");
     };
@@ -42,26 +65,66 @@ const TagEditPage = ({ type }) => {
     const handleSaveClick = () => {
         navigate("/profile/edit");
     };
+    */
+
+    const handleSave = async () => {
+        const typeMap = {
+            hobby: "HOBBY",
+            skill: "TECH",
+            cert: "CERT"
+        };
+
+        try {
+            await fetch("/api/v1/tags/save", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    userId: 1,
+                    tagIds: selected, // ← ID配列
+                    category: typeMap[type]
+                })
+            });
+
+            // 🔥 前の画面に戻る（state維持）
+            navigate("/profile/edit", {
+                state: {
+                    hobbies,
+                    skills,
+                    certs
+                }
+            });
+
+        } catch (err) {
+            console.error(err);
+        }
+    };
 
     return (
         <div>
-            <h2>{type === "hobby" ? "興味タグ" : ("skill" ? "技術スタックタグ" : "資格タグ")}</h2>
+            <h2>{type === "skill"
+                ? "技術タグ"
+                : type === "hobby"
+                    ? "興味タグ"
+                    : "資格タグ"}
+            </h2>
             <div>
-                {TAGS[type].map((tag) => (
+                {tags.map((tag) => (
                     <span
-                        key={tag}
+                        key={tag.id}
                         onClick={() => toggleTag(tag)}
                         style={{
                             margin: "5px",
                         }}
                     >
-                        {tag}
+                        {tag.name}
                     </span>
                 ))}
             </div>
             <div>
-                <button onClick={handleCancelClick}>キャンセル</button>
-                <button onClick={handleSaveClick}>保存({selected.length}つ選択中)</button>
+                <button onClick={() => navigate("/profile/edit")}>キャンセル</button>
+                <button onClick={handleSave}>保存({selected.length}つ選択中)</button>
             </div>
         </div>
     );

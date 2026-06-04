@@ -6,23 +6,6 @@ import jakarta.persistence.*;
 @Entity
 @Table(name = "tags")
 public class Tag {
-    /*
-     * @Id
-     * private Long id;
-     * private String name;
-     * 
-     * @Column(name = "created_at")
-     * private LocalDateTime createdAt;
-     * 
-     * public Long getId() {
-     * return id;
-     * }
-     * 
-     * public String getName() {
-     * return name;
-     * }
-     */
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
