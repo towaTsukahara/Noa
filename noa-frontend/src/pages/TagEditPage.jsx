@@ -50,10 +50,10 @@ const TagEditPage = ({ type }) => {
     const [selected, setSelected] = selectedMap[type] || [[], () => { }];
 
     const toggleTag = (tag) => {
-        if (selected.includes(tag)) {
-            setSelected(selected.filter(t => t !== tag));
+        if (selected.includes(tag.id)) {
+            setSelected(selected.filter(t => t !== tag.id));
         } else {
-            setSelected([...selected, tag]);
+            setSelected([...selected, tag.id]);
         }
     };
 
@@ -75,7 +75,7 @@ const TagEditPage = ({ type }) => {
         };
 
         try {
-            await fetch("/api/v1/tags/save", {
+            await fetch("http://localhost:8080/api/v1/tags/save", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json"

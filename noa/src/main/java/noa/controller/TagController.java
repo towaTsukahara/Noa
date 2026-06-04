@@ -26,8 +26,9 @@ public class TagController {
     }
 
     // タグ保存
-    @PostMapping
+    @PostMapping("/save")
     public void saveTags(@RequestBody SaveTagRequest request) {
         tagService.saveTags(request);
     }
+
 }
