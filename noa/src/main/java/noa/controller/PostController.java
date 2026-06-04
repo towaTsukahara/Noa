@@ -33,4 +33,15 @@ public class PostController {
         Post post = postService.create(principal.getUser(), req);
         return PostResponse.from(post);
     }
+
+    // 投稿削除（論理削除・本人のみ）
+    @DeleteMapping("/posts/{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void delete(@PathVariable Long id,
+                       @AuthenticationPrincipal CustomUserDetails principal) {
+        if (principal == null) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "ログインが必要です");
+        }
+        postService.delete(id, principal.getUser());
+    }
 }
