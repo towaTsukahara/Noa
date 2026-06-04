@@ -30,7 +30,7 @@ function ProfilePage() {
         ],
     });
 
-    // 自分の投稿をAPIから取得（F-108: プロフィールから自分の投稿を管理する用）
+    // 自分の投稿をAPIから取得
     const loadPosts = async () => {
         if (!user) return; // ログイン情報の復元前は何もしない
         setPostsLoading(true);
@@ -57,15 +57,33 @@ function ProfilePage() {
 
         try {
             await api(`/posts/${postId}`, { method: "DELETE" });
-            loadPosts(); // 削除後に一覧を再読込（タイムラインと同じ流儀）
+            loadPosts(); // 削除後に一覧を再読込
         } catch (e) {
             alert("削除できませんでした。");
         }
     };
 
+    // ===== 画面遷移・タブ切替 =====
+    // dev側で追加された /follow への導線（F-113 フォロー中一覧の画面を想定）。
+    // ラベルや配置はフォロー画面の担当と調整可。
+    const handleFollowClick = () => {
+        navigate("/follow");
+    };
+
     const handleEditClick = () => {
         navigate("/profile/edit");
     };
+
+    const handlePostsClick = () => {
+        setActiveTab("posts");
+    };
+
+    const handleLikesClick = () => {
+        setActiveTab("likes");
+    };
+
+    // ※投稿の「編集」（handleEdit/handleSave）はフェーズ1の機能一覧・API仕様に
+    //   存在しないため外している。必要なら要件追加をチームで合意してから実装する。
 
     return (
         <div>
@@ -93,12 +111,14 @@ function ProfilePage() {
                         <div key={tag}>{tag}</div>
                     ))}
                 </div>
+
+                <button onClick={handleFollowClick}>フォロー</button>
                 <button onClick={handleEditClick}>プロフィールを編集</button>
             </div>
 
             <div>
-                <button onClick={() => setActiveTab("posts")}>投稿</button>
-                <button onClick={() => setActiveTab("likes")}>いいね</button>
+                <button onClick={handlePostsClick}>投稿</button>
+                <button onClick={handleLikesClick}>いいね</button>
             </div>
 
             <div>
@@ -124,9 +144,6 @@ function ProfilePage() {
                                 <div style={{ color: "#666", fontSize: "13px", marginTop: "6px" }}>
                                     ♡ {post.likeCount}　💬 {post.replyCount}
                                 </div>
-
-                                {/* 投稿の「編集」はフェーズ1の仕様（機能一覧・API）に無いため未実装。
-                                    必要ならチームで要件追加を相談してから対応する。 */}
                                 <button onClick={() => handleDelete(post.id)}>削除</button>
                             </div>
                         ))}
