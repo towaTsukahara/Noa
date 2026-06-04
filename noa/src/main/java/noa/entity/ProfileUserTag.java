@@ -6,7 +6,7 @@ import jakarta.persistence.*;
 @Table(name = "user_tags", uniqueConstraints = {
         @UniqueConstraint(name = "uq_user_tags", columnNames = { "user_id", "tag_id", "category" })
 })
-public class UserTag {
+public class ProfileUserTag {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

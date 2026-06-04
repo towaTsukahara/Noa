@@ -1,218 +1,125 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useParams } from "react-router-dom";
+import LikeButton from "../components/post/LikeButton";
+import CommentList from "../components/post/CommentList";
+import CommentForm from "../components/post/CommentForm";
+
+const dummyPosts = [
+  {
+    id: 1,
+    author: "Noa-001",
+    body: "Spring Bootで@Transactionalの境界、サービス層に付けるかリポジトリ層か、みんなどうしてる？",
+    tags: ["spring boot", "質問"],
+    likeCount: 2,
+    comments: [],
+  },
+  {
+    id: 2,
+    author: "Noa-002",
+    body: "ReactのuseEffectの依存配列、ESLintのexhaustive-depsを入れてから事故が減った。",
+    tags: ["react"],
+    likeCount: 1,
+    comments: [],
+  },
+  {
+    id: 21,
+    author: "Noa-003",
+    body: "EXPLAIN ANALYZE が読めるようになると、遅いクエリの原因がすぐ分かる。",
+    tags: ["postgresql"],
+    likeCount: 4,
+    comments: [
+      {
+        id: 1,
+        author: "Noa-001",
+        body: "実行計画を読むの大事ですよね。",
+        mine: false,
+      },
+      {
+        id: 2,
+        author: "Noa-002",
+        body: "最近勉強し始めました！",
+        mine: false,
+      },
+      {
+        id: 3,
+        author: "自分",
+        body: "勉強になります！",
+        mine: true,
+      },
+    ],
+  },
+];
 
 function PostDetailPage() {
-  const navigate = useNavigate();
+  const { id } = useParams();
 
-  const [liked, setLiked] = useState(false);
+  const post = dummyPosts.find(
+    (p) => p.id === Number(id)
+  );
 
-  const [comments, setComments] = useState([
-    {
-      id: 1,
-      user: "山田",
-      text: "お疲れさまです！",
-    },
-    {
-      id: 2,
-      user: "佐藤",
-      text: "良かったですね！",
-    },
-  ]);
+  if (!post) {
+    return <h2>投稿が見つかりません</h2>;
+  }
 
-  const [newComment, setNewComment] =
-    useState("");
+  const [comments, setComments] = useState(
+    post.comments || []
+  );
 
-  const handleComment = () => {
-    if (!newComment.trim()) return;
-
-    const comment = {
+  const handleAddComment = (text) => {
+    const newComment = {
       id: Date.now(),
-      user: "自分",
-      text: newComment,
+      author: "自分",
+      body: text,
+      mine: true,
     };
 
-    setComments([...comments, comment]);
-    setNewComment("");
+    setComments([...comments, newComment]);
+  };
+
+  const handleDeleteComment = (commentId) => {
+    setComments(
+      comments.filter(
+        (comment) => comment.id !== commentId
+      )
+    );
   };
 
   return (
-    <div
-      style={{
-        maxWidth: "800px",
-        margin: "30px auto",
-        padding: "20px",
-      }}
-    >
-      <button
-        onClick={() => navigate("/")}
-      >
-        ← タイムラインへ戻る
-      </button>
+    <div style={{ padding: "20px" }}>
+      <h2>投稿詳細</h2>
 
-      <div
-        style={{
-          border: "1px solid #ddd",
-          borderRadius: "8px",
-          padding: "20px",
-          marginTop: "20px",
-        }}
-      >
-        {/* 投稿者 */}
-        <div
-          style={{
-            display: "flex",
-            gap: "12px",
-            marginBottom: "16px",
-          }}
-        >
-          <div
-            style={{
-              width: "40px",
-              height: "40px",
-              borderRadius: "50%",
-              background: "#ccc",
-            }}
-          />
+      <p>
+        <strong>{post.author}</strong>
+      </p>
 
-          <div>
-            <div
-              style={{
-                fontWeight: "bold",
-              }}
-            >
-              カフェラテ
-            </div>
+      <p>{post.body}</p>
 
-            <div
-              style={{
-                color: "#666",
-                fontSize: "12px",
-              }}
-            >
-              10分前
-            </div>
-          </div>
-        </div>
-
-        {/* 本文 */}
-        <p
-          style={{
-            lineHeight: "1.8",
-            marginBottom: "20px",
-          }}
-        >
-          今日はクライアントとの打ち合わせがうまくいって一安心。
-          今日はクライアントとの打ち合わせがうまくいって一安心。
-          今日はクライアントとの打ち合わせがうまくいって一安心。
-          今日はクライアントとの打ち合わせがうまくいって一安心。
-        </p>
-
-        {/* タグ */}
-        <div
-          style={{
-            marginBottom: "20px",
-          }}
-        >
+      <div>
+        {post.tags.map((tag) => (
           <span
+            key={tag}
             style={{
-              border: "1px solid #ddd",
+              border: "1px solid #ccc",
               padding: "4px 8px",
-              borderRadius: "999px",
+              marginRight: "8px",
+              borderRadius: "20px",
             }}
           >
-            #ありがとう
+            #{tag}
           </span>
-        </div>
-
-        {/* アクション */}
-        <div
-          style={{
-            display: "flex",
-            gap: "20px",
-            marginBottom: "20px",
-          }}
-        >
-          <button
-            onClick={() =>
-              setLiked(!liked)
-            }
-            style={{
-              border: "none",
-              background: "none",
-              cursor: "pointer",
-            }}
-          >
-            {liked ? "❤️ 24" : "🤍 23"}
-          </button>
-
-          <span>
-            💬 {comments.length}
-          </span>
-        </div>
-
-        <hr />
-
-        {/* コメント一覧 */}
-        <h3
-          style={{
-            marginTop: "20px",
-            marginBottom: "15px",
-          }}
-        >
-          コメント
-        </h3>
-
-        {comments.map((comment) => (
-          <div
-            key={comment.id}
-            style={{
-              padding: "12px 0",
-              borderBottom:
-                "1px solid #eee",
-            }}
-          >
-            <strong>
-              {comment.user}
-            </strong>
-
-            <div>{comment.text}</div>
-          </div>
         ))}
-
-        {/* コメント入力 */}
-        <div
-          style={{
-            marginTop: "20px",
-          }}
-        >
-          <textarea
-            rows="4"
-            value={newComment}
-            onChange={(e) =>
-              setNewComment(
-                e.target.value
-              )
-            }
-            placeholder="返信を書く..."
-            style={{
-              width: "100%",
-              padding: "10px",
-            }}
-          />
-
-          <button
-            onClick={handleComment}
-            style={{
-              marginTop: "10px",
-              padding:
-                "8px 16px",
-              cursor: "pointer",
-            }}
-          >
-            返信する
-          </button>
-        </div>
       </div>
+
+      <div style={{ marginTop: "20px" }}>
+        <LikeButton initialCount={post.likeCount} />
+      </div>
+
+      <CommentList
+        comments={comments}
+        onDeleteComment={handleDeleteComment}
+      />
+
+      <CommentForm onAddComment={handleAddComment} />
     </div>
   );
 }
