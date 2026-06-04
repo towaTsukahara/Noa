@@ -82,6 +82,15 @@
 }
 
 .content {
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  margin-bottom: 8px;
+}
+
+.detail-link {
+  display: inline-block;
   margin-bottom: 12px;
 
   display: -webkit-box;
@@ -105,6 +114,7 @@
 
 .actions {
   display: flex;
+  align-items: center;
   gap: 20px;
   font-size: 14px;
 }

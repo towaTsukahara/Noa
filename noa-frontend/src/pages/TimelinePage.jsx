@@ -35,7 +35,6 @@ function TimelinePage() {
 
   return (
     <div className="layout">
-      {/* サイドバー */}
       <aside className="sidebar">
         <h1>Noa</h1>
         <nav>
@@ -52,7 +51,6 @@ function TimelinePage() {
         </button>
       </aside>
 
-      {/* メイン */}
       <div className="main">
         <header className="header">
           <input type="text" placeholder="検索..." />
@@ -81,6 +79,13 @@ function TimelinePage() {
               <Link
                 to={`/post/${post.id}`}
                 className="post-detail-link"
+              >
+                詳細...
+              </Link>
+
+              <Link
+                to={`/post/${post.id}`}
+                className="detail-link"
               >
                 詳細...
               </Link>
