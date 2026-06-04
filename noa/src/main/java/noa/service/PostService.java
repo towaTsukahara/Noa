@@ -35,25 +35,23 @@ public class PostService {
         return postRepository.save(post);
     }
 
-    // タイムライン取得（カーソルページング）
-    public Map<String, Object> getTimeline(Long cursor, int limit) {
+    // 特定ユーザーの投稿一覧（カーソルページング）
+    public Map<String, Object> getUserPosts(User author, Long cursor, int limit) {
         Pageable pageable = PageRequest.of(0, limit);
-
         List<Post> posts = (cursor == null)
-                ? postRepository.findTimelineFirst(pageable)
-                : postRepository.findTimelineAfter(cursor, pageable);
+                ? postRepository.findUserPostsFirst(author.getId(), pageable)
+                : postRepository.findUserPostsAfter(author.getId(), cursor, pageable);
+        return buildPageResponse(posts, limit);
+    }
 
-        // 取得した投稿を PostResponse に変換
+    // 共通: 投稿リストを items + nextCursor の形に組み立てる
+    private Map<String, Object> buildPageResponse(List<Post> posts, int limit) {
         List<PostResponse> items = posts.stream()
                 .map(PostResponse::from)
                 .toList();
-
-        // 次のカーソル: 取得結果が limit 件ちょうどなら「まだ続きがあるかも」として
-        //              最後の投稿のidを返す。limit 未満なら最後のページなので null。
         Long nextCursor = (posts.size() == limit && !posts.isEmpty())
                 ? posts.get(posts.size() - 1).getId()
                 : null;
-
         Map<String, Object> result = new LinkedHashMap<>();
         result.put("items", items);
         result.put("nextCursor", nextCursor);
@@ -78,5 +76,14 @@ public class PostService {
         post.setDeleted(true);
         post.setDeletedAt(OffsetDateTime.now());
         postRepository.save(post);
+    }
+
+    // タイムライン取得（カーソルページング）
+    public Map<String, Object> getTimeline(Long cursor, int limit) {
+        Pageable pageable = PageRequest.of(0, limit);
+        List<Post> posts = (cursor == null)
+                ? postRepository.findTimelineFirst(pageable)
+                : postRepository.findTimelineAfter(cursor, pageable);
+        return buildPageResponse(posts, limit);
     }
 }

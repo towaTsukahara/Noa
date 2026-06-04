@@ -1,14 +1,22 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { api } from "../api/client";
+import { useAuth } from "../context/AuthContext";
 
 function ProfilePage() {
     const navigate = useNavigate();
+    const { user } = useAuth();
     const [activeTab, setActiveTab] = useState("posts");
 
-    const [editingPostId, setEditingPostId] = useState(null);
-    const [editText, setEditText] = useState("");
+    // ===== 自分の投稿（APIから取得） =====
+    const [posts, setPosts] = useState([]);
+    const [postsLoading, setPostsLoading] = useState(true);
+    const [postsError, setPostsError] = useState(null);
 
-    const [profile, setProfile] = useState({
+    // ===== プロフィール表示部（F-104・別担当のためモックのまま） =====
+    // TODO(F-104): /me から bio・タグを取得して表示に差し替える（担当メンバーの範囲）
+    // TODO(F-104/F-112): 投稿数・いいね数の実数表示も後で対応
+    const [profile] = useState({
         name: "20260027",
         icon: "https://via.placeholder.com/150",
         bio: "フロントエンドエンジニアです。",
@@ -16,80 +24,55 @@ function ProfilePage() {
         hobbyTags: ["ゲーム", "読書", "旅行"],
         postCount: 3,
         likeCount: 5,
-        posts: [
-            { id: 1, content: "Reactを勉強中です。" },
-            { id: 2, content: "JavaScriptの復習をしています。" },
-            { id: 3, content: "プロフィール画面を作成しました。" },
-        ],
         likedPosts: [
             { id: 101, content: "React Hooks便利ですね。" },
             { id: 102, content: "Tailwind CSSを試してみた。" },
         ],
     });
 
+    // 自分の投稿をAPIから取得（F-108: プロフィールから自分の投稿を管理する用）
+    const loadPosts = async () => {
+        if (!user) return; // ログイン情報の復元前は何もしない
+        setPostsLoading(true);
+        setPostsError(null);
+        try {
+            const data = await api(`/users/${user.handle}/posts`);
+            setPosts(data.items);
+            // TODO(表示の仕上げ): data.nextCursor を使った「もっと見る」は後で実装
+        } catch (e) {
+            setPostsError("投稿の取得に失敗しました。");
+        } finally {
+            setPostsLoading(false);
+        }
+    };
+
+    useEffect(() => {
+        loadPosts();
+    }, [user]);
+
+    // 投稿削除（F-108: 論理削除API。本人のみ204 / 他人は403）
+    const handleDelete = async (postId) => {
+        const isConfirmed = window.confirm("この投稿を削除しますか？");
+        if (!isConfirmed) return;
+
+        try {
+            await api(`/posts/${postId}`, { method: "DELETE" });
+            loadPosts(); // 削除後に一覧を再読込（タイムラインと同じ流儀）
+        } catch (e) {
+            alert("削除できませんでした。");
+        }
+    };
+
     const handleEditClick = () => {
         navigate("/profile/edit");
     };
 
-    const handlePostsClick = () => {
-        setActiveTab("posts");
-    };
-
-    const handleLikesClick = () => {
-        setActiveTab("likes");
-    };
-
-    const handleEdit = (post) => {
-        setEditingPostId(post.id);
-        setEditText(post.content);
-    };
-
-    const handleSave = (postId) => {
-        setProfile((prev) => ({
-            ...prev,
-            posts: prev.posts.map((post) =>
-                post.id === postId
-                    ? { ...post, content: editText }
-                    : post
-            ),
-        }));
-
-        setEditingPostId(null);
-        setEditText("");
-    };
-
-    const handleCancel = () => {
-        setEditingPostId(null);
-        setEditText("");
-    };
-
-    const handleDelete = (postId) => {
-        const isConfirmed = window.confirm(
-            "この投稿を削除しますか？"
-        );
-
-        if (!isConfirmed) {
-            return;
-        }
-
-        setProfile((prev) => ({
-            ...prev,
-            posts: prev.posts.filter(
-                (post) => post.id !== postId
-            ),
-        }));
-    };
-
     return (
         <div>
+            {/* ===== プロフィール表示部（F-104・モックのまま） ===== */}
             <div>
-                <img
-                    src={profile.icon}
-                    alt="プロフィール画像"
-                />
-
+                <img src={profile.icon} alt="プロフィール画像" />
                 <div>{profile.name}</div>
-
                 <div>
                     <div>投稿数 {profile.postCount}</div>
                     <div>いいね数 {profile.likeCount}</div>
@@ -98,109 +81,63 @@ function ProfilePage() {
 
             <div>
                 <div>{profile.bio}</div>
-
                 <div>
                     <h3>技術タグ</h3>
-
                     {profile.techTags.map((tag) => (
                         <div key={tag}>{tag}</div>
                     ))}
                 </div>
-
                 <div>
                     <h3>趣味タグ</h3>
-
                     {profile.hobbyTags.map((tag) => (
                         <div key={tag}>{tag}</div>
                     ))}
                 </div>
-
-                <button onClick={handleEditClick}>
-                    プロフィールを編集
-                </button>
+                <button onClick={handleEditClick}>プロフィールを編集</button>
             </div>
 
             <div>
-                <button onClick={handlePostsClick}>
-                    投稿
-                </button>
-
-                <button onClick={handleLikesClick}>
-                    いいね
-                </button>
+                <button onClick={() => setActiveTab("posts")}>投稿</button>
+                <button onClick={() => setActiveTab("likes")}>いいね</button>
             </div>
 
             <div>
-                {activeTab === "posts" &&
-                    profile.posts.map((post) => (
-                        <div
-                            key={post.id}
-                            style={{
-                                border: "1px solid #ccc",
-                                padding: "10px",
-                                marginBottom: "10px",
-                            }}
-                        >
-                            {editingPostId === post.id ? (
-                                <>
-                                    <textarea
-                                        value={editText}
-                                        onChange={(e) =>
-                                            setEditText(
-                                                e.target.value
-                                            )
-                                        }
-                                    />
+                {/* ===== 投稿タブ（API取得・削除あり） ===== */}
+                {activeTab === "posts" && (
+                    <>
+                        {postsLoading && <p>読み込み中...</p>}
+                        {postsError && <p style={{ color: "red" }}>{postsError}</p>}
+                        {!postsLoading && !postsError && posts.length === 0 && (
+                            <p>まだ投稿がありません。</p>
+                        )}
 
-                                    <br />
+                        {posts.map((post) => (
+                            <div
+                                key={post.id}
+                                style={{
+                                    border: "1px solid #ccc",
+                                    padding: "10px",
+                                    marginBottom: "10px",
+                                }}
+                            >
+                                <div>{post.body}</div>
+                                <div style={{ color: "#666", fontSize: "13px", marginTop: "6px" }}>
+                                    ♡ {post.likeCount}　💬 {post.replyCount}
+                                </div>
 
-                                    <button
-                                        onClick={() =>
-                                            handleSave(post.id)
-                                        }
-                                    >
-                                        保存
-                                    </button>
+                                {/* 投稿の「編集」はフェーズ1の仕様（機能一覧・API）に無いため未実装。
+                                    必要ならチームで要件追加を相談してから対応する。 */}
+                                <button onClick={() => handleDelete(post.id)}>削除</button>
+                            </div>
+                        ))}
+                    </>
+                )}
 
-                                    <button
-                                        onClick={handleCancel}
-                                    >
-                                        キャンセル
-                                    </button>
-                                </>
-                            ) : (
-                                <>
-                                    <div>
-                                        {post.content}
-                                    </div>
-
-                                    <button
-                                        onClick={() =>
-                                            handleEdit(post)
-                                        }
-                                    >
-                                        編集
-                                    </button>
-
-                                    <button
-                                        onClick={() =>
-                                            handleDelete(
-                                                post.id
-                                            )
-                                        }
-                                    >
-                                        削除
-                                    </button>
-                                </>
-                            )}
-                        </div>
-                    ))}
-
+                {/* ===== いいねタブ（F-111 未実装のためモックのまま） ===== */}
+                {/* TODO(F-111): GET /me/likes 実装後にAPI取得へ差し替え */}
                 {activeTab === "likes" &&
                     profile.likedPosts.map((post) => (
-                        <div key={post.id}>
-                            {post.content}
-                        </div>
+                        <div key={post.id}>{post.content}</div>
                     ))}
             </div>
         </div>
