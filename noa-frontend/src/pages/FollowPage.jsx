@@ -4,6 +4,8 @@ import { useNavigate } from "react-router-dom";
 export default function FollowPage() {
 
     const navigate = useNavigate();
+
+    const [activeTab, setActiveTab] = useState("user");
     const [searchKeyword, setSearchKeyword] = useState("");
 
     // ダミーデータ
@@ -32,11 +34,11 @@ export default function FollowPage() {
 
     // DBから取得する想定（現在はダミー）
     const counts = {
-        user: 23,
-        tag: 30,
-        technology: 12,
-        hobby: 8,
-        qualification: 10,
+        user: 4,
+        tag: 7,
+        technology: 3,
+        hobby: 2,
+        qualification: 2,
     };
 
     const filteredUsers = useMemo(() => {
@@ -71,8 +73,14 @@ export default function FollowPage() {
         navigate("/profile")
     };
 
-    const handleFollowTagEditClick = () => {
-        navigate("/follow/tag")
+    const handleFollowSkillEditClick = () => {
+        navigate("/follow/skilltags")
+    }
+    const handleFollowHobbyEditClick = () => {
+        navigate("/follow/hobbytags")
+    }
+    const handleFollowCertEditClick = () => {
+        navigate("/follow/certtags")
     }
 
     return (
@@ -96,35 +104,47 @@ export default function FollowPage() {
                 </button>
             </div>
 
-            <h3>フォロー中のユーザー</h3>
-            <div>
-                {filteredUsers.map((user) => (
-                    <div key={user.id}>
-                        {user.name}
-                        <button onClick={() => handleUnfollow(user.id)}>
-                            フォローをやめる
-                        </button>
-                    </div>
-                ))}
-            </div>
+            {activeTab === "user" && (
+                <div>
+                    <h2>フォロー中のユーザー</h2>
+                    {filteredUsers.map((user) => (
+                        <div key={user.id}>
+                            {user.name}
+                            <button onClick={() => handleUnfollow(user.id)}>
+                                フォローをやめる
+                            </button>
+                        </div>
+                    ))}
+                </div>
+            )}
 
-            <h3>フォロー中のタグ</h3>
+            
             {activeTab === "tag" && (
                 <div>
+                    <h2>フォロー中のタグ</h2>
                     <h3>技術（{counts.technology}）</h3>
                     {filteredTags.technology.map((tag) => (
                         <div key={tag.id}>{tag.name}</div>
                     ))}
+                    <button onClick={handleFollowSkillEditClick}>
+                        編集
+                    </button>
 
                     <h3>趣味（{counts.hobby}）</h3>
                     {filteredTags.hobby.map((tag) => (
                         <div key={tag.id}>{tag.name}</div>
                     ))}
+                    <button onClick={handleFollowHobbyEditClick}>
+                        編集
+                    </button>
 
                     <h3>資格（{counts.qualification}）</h3>
                     {filteredTags.qualification.map((tag) => (
                         <div key={tag.id}>{tag.name}</div>
                     ))}
+                    <button onClick={handleFollowCertEditClick}>
+                        編集
+                    </button>
                 </div>
             )}
 
