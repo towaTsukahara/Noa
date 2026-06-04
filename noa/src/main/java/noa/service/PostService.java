@@ -8,6 +8,10 @@ import org.springframework.stereotype.Service;
 import noa.dto.PostResponse;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.server.ResponseStatusException;
+
+import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.LinkedHashMap;
@@ -54,5 +58,25 @@ public class PostService {
         result.put("items", items);
         result.put("nextCursor", nextCursor);
         return result;
+    }
+
+        // 投稿を論理削除する（本人のみ）
+    public void delete(Long postId, User requester) {
+        Post post = postRepository.findById(postId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "投稿が見つかりません"));
+
+        // 削除済みのものは「存在しない」扱い
+        if (post.isDeleted()) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "投稿が見つかりません");
+        }
+
+        // 作者チェック: 自分の投稿だけ削除できる
+        if (!post.getAuthor().getId().equals(requester.getId())) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "自分の投稿のみ削除できます");
+        }
+
+        post.setDeleted(true);
+        post.setDeletedAt(OffsetDateTime.now());
+        postRepository.save(post);
     }
 }
