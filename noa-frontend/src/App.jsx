@@ -9,6 +9,7 @@ import TagEditPage from './pages/TagEditPage';
 import PostCard from './components/post/PostCard';
 import ProfileDitailPage from './pages/ProfileDitailPage';
 import NavBar from './components/layout/NavBar';
+import PostDetailPage from "./pages/PostDetailPage";
 
 
 function App() {
@@ -29,6 +30,8 @@ function App() {
         <Route path="/tags/certedit" element={<TagEditPage type="cert" />} />
         <Route path="/postcard" element={<PostCard />} />
         <Route path="/profileditail" element={<ProfileDitailPage />} />
+        <Route path="/post/:id" element={<PostDetailPage />} />
+
       </Routes>
     </BrowserRouter>
 

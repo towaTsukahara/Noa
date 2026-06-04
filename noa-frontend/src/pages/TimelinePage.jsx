@@ -1,4 +1,6 @@
 import "./TimelinePage.css";
+import { Link } from "react-router-dom";
+import { useState } from "react";
 
 const posts = [
   {
@@ -6,18 +8,40 @@ const posts = [
     userId: 101,
     nickname: "カフェラテ",
     createdAt: "10分前",
-    content: "今日はクライアントとの打ち合わせがうまくいって一安心。",
+    content:
+      "今日はクライアントとの打ち合わせがうまくいって一安心。今日はクライアントとの打ち合わせがうまくいって一安心。今日はクライアントとの打ち合わせがうまくいって一安心。今日はクライアントとの打ち合わせがうまくいって一安心。",
     tags: ["ありがとう"],
     likes: 23,
     replies: 4,
   },
-  
+  {
+    id: 2,
+    userId: 102,
+    nickname: "ひつじ",
+    createdAt: "25分前",
+    content:
+      "この業務フロー、もっとシンプルにできないかな？みんなの意見を聞いて改善案を考えたいです。",
+    tags: ["アイデア"],
+    likes: 15,
+    replies: 6,
+  },
 ];
 
 function TimelinePage() {
+  const [likedPosts, setLikedPosts] = useState([]);
+
+  const handleLike = (postId) => {
+    if (likedPosts.includes(postId)) {
+      setLikedPosts(
+        likedPosts.filter((id) => id !== postId)
+      );
+    } else {
+      setLikedPosts([...likedPosts, postId]);
+    }
+  };
+
   return (
     <div className="layout">
-      {/* サイドバー */}
       <aside className="sidebar">
         <h1>Noa</h1>
 
@@ -32,9 +56,7 @@ function TimelinePage() {
         </nav>
       </aside>
 
-      {/* メイン */}
       <div className="main">
-        {/* ヘッダー */}
         <header className="header">
           <input
             type="text"
@@ -45,7 +67,6 @@ function TimelinePage() {
           <button>👤</button>
         </header>
 
-        {/* 投稿一覧 */}
         <section className="timeline">
           {posts.map((post) => (
             <article
@@ -70,6 +91,13 @@ function TimelinePage() {
                 {post.content}
               </p>
 
+              <Link
+                to={`/post/${post.id}`}
+                className="detail-link"
+              >
+                詳細...
+              </Link>
+
               <div className="tags">
                 {post.tags.map((tag) => (
                   <span key={tag}>
@@ -79,8 +107,29 @@ function TimelinePage() {
               </div>
 
               <div className="actions">
-                <span>♡ {post.likes}</span>
-                <span>💬 {post.replies}</span>
+                <button
+                  className="like-button"
+                  onClick={() =>
+                    handleLike(post.id)
+                  }
+                >
+                  {likedPosts.includes(post.id)
+                    ? "❤️"
+                    : "🤍"}
+
+                  {" "}
+
+                  {likedPosts.includes(post.id)
+                    ? post.likes + 1
+                    : post.likes}
+                </button>
+
+                <Link
+                  to={`/post/${post.id}`}
+                  className="comment-link"
+                >
+                  💬 {post.replies}
+                </Link>
               </div>
             </article>
           ))}
