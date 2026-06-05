@@ -12,4 +12,5 @@ public interface PostTagRepository extends JpaRepository<PostTag, Long> {
 
     // タグに紐づく投稿（タグ検索）
     List<PostTag> findByTagId(Long tagId);
+
 }
