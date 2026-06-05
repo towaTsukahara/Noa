@@ -4,6 +4,7 @@ import { api } from "../api/client";
 import PostComposePage from "../components/post/PostComposeModal";
 import UserHandle from "../components/user/UserHandle";
 import { relativeTime } from "../utils/relativeTime";
+import { Link } from "react-router-dom";
 
 function TimelinePage() {
   const [posts, setPosts] = useState([]);
@@ -74,7 +75,6 @@ function TimelinePage() {
 
   return (
     <div className="layout">
-      {/* サイドバー */}
       <aside className="sidebar">
         <h1>Noa</h1>
         <nav>
@@ -91,7 +91,6 @@ function TimelinePage() {
         </button>
       </aside>
 
-      {/* メイン */}
       <div className="main">
         <header className="header">
           <input type="text" placeholder="検索..." />
@@ -117,6 +116,11 @@ function TimelinePage() {
               </div>
 
               <p className="content">{post.body}</p>
+
+              {/* 投稿詳細への導線（F-109: 詳細画面はdev側で作成中） */}
+              <Link to={`/post/${post.id}`} className="post-detail-link">
+                詳細...
+              </Link>
 
               <div className="tags">
                 {post.tags.map((tag) => (

@@ -82,7 +82,21 @@
 }
 
 .content {
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  margin-bottom: 8px;
+}
+
+.detail-link {
+  display: inline-block;
   margin-bottom: 12px;
+
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
 
 .tags {
@@ -100,6 +114,7 @@
 
 .actions {
   display: flex;
+  align-items: center;
   gap: 20px;
   font-size: 14px;
 }
@@ -242,4 +257,13 @@
   color: #999;
   font-size: 13px;
   margin: 16px 0 24px;
+.post-detail-link {
+  display: inline-block;
+  margin-bottom: 12px;
+  color: #666;
+  text-decoration: none;
+}
+
+.post-detail-link:hover {
+  text-decoration: underline;
 }
