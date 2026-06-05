@@ -1,58 +1,70 @@
 package noa.service;
 
-//import java.util.HashSet;
+import java.util.*;
 
-import org.springframework.stereotype.Service;
-
-import jakarta.transaction.Transactional;
 import noa.dto.ProfileUpdateRequest;
-//import noa.entity.ProfileUserTag;
-import noa.repository.UserRepository;
+import noa.entity.ProfileUserTag;
+import noa.entity.Tag;
 import noa.entity.User;
+import noa.repository.ProfileUserTagRepository;
+import noa.repository.UserRepository;
+import org.springframework.stereotype.Service;
+import jakarta.transaction.Transactional;
 
 @Service
 public class ProfileService {
 
     private final UserRepository userRepository;
-    /*
-     * private final TagRepository tagRepository;
-     * private final ProfileUserTagRepository userTagRepository;
-     */
+    private final ProfileUserTagRepository userTagRepository;
+    private final TagService tagService;
 
-    public ProfileService(UserRepository userRepository) {
+    public ProfileService(
+            UserRepository userRepository,
+            ProfileUserTagRepository userTagRepository,
+            TagService tagService) {
+
         this.userRepository = userRepository;
+        this.userTagRepository = userTagRepository;
+        this.tagService = tagService;
     }
+
+    public Map<String, List<String>> tagsOf(User user) {
+
+        List<ProfileUserTag> rows = userTagRepository.findByUser(user);
+        Map<String, List<String>> tags = new LinkedHashMap<>();
+        tags.put("tech", namesOf(rows, "TECH"));
+        tags.put("hobby", namesOf(rows, "HOBBY"));
+        tags.put("cert", namesOf(rows, "CERT"));
+        return tags;
+    }
+
+    private List<String> namesOf(List<ProfileUserTag> rows, String category) {
+        return rows.stream()
+                .filter(r -> r.getCategory().equals(category))
+                .map(r -> r.getTag().getName())
+                .toList();
+    }
+
     @Transactional
     public void updateProfile(User me, ProfileUpdateRequest req) {
 
         me.setBio(req.bio());
         userRepository.save(me);
 
-        /*
-         * userTagRepository.deleteByUser(me);
-         * 
-         * saveTags(me, req.techTags(), "TECH");
-         * saveTags(me, req.hobbyTags(), "HOBBY");
-         * saveTags(me, req.certTags(), "CERT");
-         */
+        userTagRepository.deleteByUser(me);
+        saveTags(me, req.techTags(), "TECH");
+        saveTags(me, req.hobbyTags(), "HOBBY");
+        saveTags(me, req.certTags(), "CERT");
     }
 
-    /*
-    private void saveTags(User me, List<String> name, String category) {
-        if (name == null)
-            return;
+    private void saveTags(User me, List<String> names, String category) {
+        
+        if (names == null) return;
         Set<String> seen = new HashSet<>();
         for (String raw : names) {
             String name = raw.trim().toLowerCase();
-            if (name.isEmpty() || !seen.add(name))
-                continue;
-
-            Tag tag = tagRepository.findByName(name).orElseGet(() -> {
-                Tag t = new Tag();
-                t.setName(name);
-                return tagRepository.save(t);
-            });
-
+            if (name.isEmpty() || !seen.add(norm)) continue;
+            Tag tag = tagService.findOrCreate(raw);
             ProfileUserTag link = new ProfileUserTag();
             link.setUser(me);
             link.setTag(tag);
@@ -60,5 +72,4 @@ public class ProfileService {
             userTagRepository.save(link);
         }
     }
-    */
 }
