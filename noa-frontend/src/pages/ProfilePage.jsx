@@ -198,7 +198,7 @@ function ProfilePage() {
                                     marginBottom: "10px",
                                 }}
                             >
-                                <div>{post.body}</div>
+                                <div style={{ overflowWrap: "anywhere", whiteSpace: "pre-wrap" }}>{post.body}</div>
                                 <div style={{ color: "#666", fontSize: "13px", marginTop: "6px" }}>
                                     <button
                                         onClick={() => handleLikeToggle(post)}
@@ -238,7 +238,7 @@ function ProfilePage() {
                                     marginBottom: "10px",
                                 }}
                             >
-                                <div>{post.body}</div>
+                                <div style={{ overflowWrap: "anywhere", whiteSpace: "pre-wrap" }}>{post.body}</div>
                                 <div style={{ color: "#666", fontSize: "13px", marginTop: "6px" }}>
                                     <button
                                         onClick={() => handleLikedTabToggle(post)}

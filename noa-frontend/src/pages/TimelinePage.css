@@ -268,4 +268,10 @@
   .post-detail-link:hover {
     text-decoration: underline;
   }
+
+  /* ===== 本文の折り返し（長い連続文字列でも横に溢れない） ===== */
+.content {
+  overflow-wrap: anywhere;
+  white-space: pre-wrap; /* 投稿内の改行もそのまま表示 */
+}
 }
