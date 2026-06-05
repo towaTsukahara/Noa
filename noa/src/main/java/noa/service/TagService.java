@@ -23,16 +23,6 @@ public class TagService {
         this.tagRepository = tagRepository;
         this.profileUserTagRepository = profileUserTagRepository;
     }
-/*
-    public Tag findOrCreate(String rawName) {
-        String name = rawName.trim().toLowerCase();
-        return tagRepository.findByName(name).orElseGet(() -> {
-            Tag t = new Tag();
-            t.setName(name);
-            return tagRepository.save(t);
-        });
-    }
-*/
     public List<TagResponse> search(String q) {
         if (q == null || q.isBlank())
             return tagRepository.findAll()
