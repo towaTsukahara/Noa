@@ -3,25 +3,67 @@ import "./TimelinePage.css";
 import { api } from "../api/client";
 import PostComposePage from "../components/post/PostComposeModal";
 import UserHandle from "../components/user/UserHandle";
+import { relativeTime } from "../utils/relativeTime";
 
 function TimelinePage() {
   const [posts, setPosts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [showCompose, setShowCompose] = useState(false);
+  const [nextCursor, setNextCursor] = useState(null);
+  const [loadingMore, setLoadingMore] = useState(false);
+  const PAGE_SIZE = 10; // 1ページの件数。動作確認しやすいよう10に（後で20に戻してOK）
 
   // タイムライン取得（1ページ目）
   const loadTimeline = async () => {
     setLoading(true);
     setError(null);
     try {
-      const data = await api("/timeline");
+      const data = await api(`/timeline?limit=${PAGE_SIZE}`);
       setPosts(data.items);
-      // TODO(ページング): data.nextCursor を使った「もっと見る」は後で実装。
+      setNextCursor(data.nextCursor);
     } catch (e) {
       setError("タイムラインの取得に失敗しました。");
     } finally {
       setLoading(false);
+    }
+  };
+
+  // 続きを読み込む（カーソルページング）
+  const loadMore = async () => {
+    if (!nextCursor) return;
+    setLoadingMore(true);
+    try {
+      const data = await api(`/timeline?cursor=${nextCursor}&limit=${PAGE_SIZE}`);
+      setPosts((prev) => [...prev, ...data.items]); // 既存の下に継ぎ足す
+      setNextCursor(data.nextCursor);
+    } catch (e) {
+      alert("読み込みに失敗しました。");
+    } finally {
+      setLoadingMore(false);
+    }
+  };
+
+  // いいねのトグル（likedByMe に応じて POST / DELETE を出し分け）
+  const handleLikeToggle = async (post) => {
+    try {
+      await api(`/posts/${post.id}/like`, {
+        method: post.likedByMe ? "DELETE" : "POST",
+      });
+      // 画面側の状態を即時更新（再読込せず、その投稿だけ書き換える）
+      setPosts((prev) =>
+        prev.map((p) =>
+          p.id === post.id
+            ? {
+              ...p,
+              likedByMe: !p.likedByMe,
+              likeCount: p.likedByMe ? p.likeCount - 1 : p.likeCount + 1,
+            }
+            : p
+        )
+      );
+    } catch (e) {
+      alert("いいねできませんでした。");
     }
   };
 
@@ -70,7 +112,7 @@ function TimelinePage() {
                   <div className="nickname">
                     <UserHandle user={post.author} />
                   </div>
-                  <div className="date">{post.createdAt}</div>
+                  <div className="date">{relativeTime(post.createdAt)}</div>
                 </div>
               </div>
 
@@ -83,11 +125,25 @@ function TimelinePage() {
               </div>
 
               <div className="actions">
-                <span>♡ {post.likeCount}</span>
+                <button
+                  className={`like-button ${post.likedByMe ? "liked" : ""}`}
+                  onClick={() => handleLikeToggle(post)}
+                >
+                  {post.likedByMe ? "♥" : "♡"} {post.likeCount}
+                </button>
                 <span>💬 {post.replyCount}</span>
               </div>
+
             </article>
           ))}
+          {nextCursor && !loading && (
+            <button className="load-more" onClick={loadMore} disabled={loadingMore}>
+              {loadingMore ? "読み込み中..." : "もっと見る"}
+            </button>
+          )}
+          {!loading && !error && posts.length > 0 && !nextCursor && (
+            <p className="timeline-end">これ以上の投稿はありません</p>
+          )}
         </section>
       </div>
 
