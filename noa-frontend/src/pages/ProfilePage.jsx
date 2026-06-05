@@ -125,10 +125,6 @@ function ProfilePage() {
         navigate("/follow");
     };
 
-    const handleEditClick = () => {
-        navigate("/profile/edit");
-    };
-
     const handlePostsClick = () => {
         setActiveTab("posts");
     };
@@ -165,11 +161,10 @@ function ProfilePage() {
 
                 <h3>資格タグ</h3>
                 {profile?.tags?.cert.map((t) => <span key={t}>{t} </span>)}
-
             </div>
 
             <button onClick={handleFollowClick}>フォロー</button>
-            <button onClick={handleEditClick}>プロフィールを編集</button>
+            <button onClick={() => navigate("/profile/edit")}>プロフィールを編集</button>
 
             <div>
                 <button onClick={handlePostsClick}>投稿</button>
