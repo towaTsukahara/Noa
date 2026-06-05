@@ -32,8 +32,8 @@ function ProfileEditPage() {
     };
 
     useEffect(()=>{
-        if (location.state?.form) { setFrom(location.state.form); return; }
-        api("/me").then((me) => setFrom({
+        if (location.state?.form) { setForm(location.state.form); return; }
+        api("/me").then((me) => setForm({
             bio: me.bio || "",
             skill: me.tags?.tech || [],
             hobby: me.tags?.hobby || [],
@@ -63,7 +63,7 @@ function ProfileEditPage() {
             <h1>プロフィール編集</h1>
 
                 <h3>自己紹介</h3>
-                <textarea value={form.bio} onChange={(e) => setFrom({ ...form, bio: e.target.value })} />
+                <textarea value={form.bio} onChange={(e) => setForm({ ...form, bio: e.target.value })} />
             <div>
                 <h3>技術タグ</h3>
                 {form.skill.map((tag) => (
