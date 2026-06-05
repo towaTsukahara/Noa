@@ -13,18 +13,42 @@ const TagEditPage = ({ type }) => {
 
     const [selected, setSelected] = useState(form[type] || []); // このカテゴリの選択中タグ
     const [q, setQ] = useState("");                          // 検索キーワード
+    const [allTags, setAllTags] = useState([]);     // DBの全タグ
     const [candidates, setCandidates] = useState([]);          // DBから取得した候補
     const [newTag, setNewTag] = useState("");
-    
-    // q が変わるたび、DBから既存タグを検索
-    useEffect(() => {
-        if (!q.trim()) { setCandidates([]); return; }
-        api(`/tags?q=${encodeURIComponent(q.trim())}`)
-            .then((tags) => setCandidates(tags.map((t) => t.name)))
-            .catch(() => setCandidates([]));
-    }, [q]);
 
-    const toggle = (name) => {
+    const removeSelected = (name) => {
+        setSelected(selected.filter(t => t !== name));
+    };
+
+    //  初回：全タグ取得（検索してなくても表示）
+    useEffect(() => {
+        api("/tags")
+            .then((data) => {
+                setAllTags(data);
+                setCandidates(data); // 最初は全部表示
+            })
+            .catch(() => {
+                setAllTags([]);
+                setCandidates([]);
+            });
+    }, []);
+    
+    useEffect(() => {
+        if (!q.trim()) {
+            setCandidates(allTags);
+            return;
+        }
+
+        const filtered = allTags.filter(tag =>
+            tag.name.toLowerCase().includes(q.toLowerCase())
+        );
+
+        setCandidates(filtered);
+    }, [q, allTags]);
+
+    const toggle = (tag) => {
+        const name = tag.name;
         setSelected(selected.includes(name)
             ? selected.filter(t => t !== name)
             : [...selected, name]);
@@ -37,11 +61,34 @@ const TagEditPage = ({ type }) => {
         setNewTag("");
     };
 
-    // 選択をフォームに反映して編集画面へ戻す
-    const handleSave = () => {
-        navigate("/profile/edit", { state: { form: { ...form, [type]: selected } } });
+    //  DB保存
+    const handleSave = async () => {
+        const typeMap = {
+            hobby: "HOBBY",
+            skill: "TECH",
+            cert: "CERT"
+        };
+
+        try {
+            await api("/tags/save", {
+                method: "POST",
+                body: JSON.stringify({
+                    userId: 1,
+                    tagNames: selected, // ← 名前で送る（findOrCreate用）
+                    category: typeMap[type]
+                })
+            });
+
+            navigate("/profile/edit", {
+                state: { form: { ...form, [type]: selected } }
+            });
+
+        } catch (err) {
+            console.error(err);
+        }
+        
     };
-   
+
     return (
         <div>
             <h2>{LABEL[type]}</h2>
@@ -50,20 +97,20 @@ const TagEditPage = ({ type }) => {
             <div>
                 <h3>選択中 ({selected.length})</h3>
                 {selected.map((name) => (
-                    <span key={name} onClick={() => toggle(name)} style={{ margin: 5, cursor: "pointer" }}>
+                    <span key={name} onClick={() => removeSelected(name)} style={{ margin: 5, cursor: "pointer" }}>
                         {name} ×
                     </span>
                 ))}
             </div>
 
-            {/* 検索してクリックで追加 */}
-            <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="タグを検索" />
-            <div>
-                {candidates.map((name) => (
-                    <span key={name} onClick={() => toggle(name)} style={{ margin: 5, cursor: "pointer" }}>
-                        {selected.includes(name) ? "✓ " : ""}{name}
-                    </span>
-                ))}
+            {/* 検索 */}
+            <div style={{ marginTop: "10px" }}>
+                <input
+                    value={q}
+                    onChange={(e) => setQ(e.target.value)}
+                    placeholder="タグを検索"
+                    style={{ padding: "6px", width: "200px" }}
+                />
             </div>
 
             {/* 新規作成（候補に無い名前を打って追加） */}
@@ -75,6 +122,31 @@ const TagEditPage = ({ type }) => {
             <div>
                 <button onClick={() => navigate("/profile/edit", { state: { form } })}>キャンセル</button>
                 <button onClick={handleSave}>保存（{selected.length}つ選択中）</button>
+            </div>
+
+            {/* タグ候補 */}
+            <div style={{
+                display: "flex",
+                flexWrap: "wrap",
+
+            }}>
+                {candidates.map((tag) => (
+                    <span
+                        key={tag.id}
+                        onClick={() => toggle(tag)}
+                        style={{
+                            margin: 5,
+                            cursor: "pointer",
+                            backgroundColor: selected.includes(tag.name) ? "blue" : "gray",
+                            color: "white",
+                            padding: "8px 12px",
+                            borderRadius: "12px",
+                        }}
+                    >
+                        {selected.includes(tag.name) ? "✓ " : ""}
+                        {tag.name}
+                    </span>
+                ))}
             </div>
         </div>
     );
