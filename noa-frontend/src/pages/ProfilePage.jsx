@@ -13,6 +13,10 @@ function ProfilePage() {
     const [postsLoading, setPostsLoading] = useState(true);
     const [postsError, setPostsError] = useState(null);
 
+    // ===== 自分がいいねした投稿（F-111） =====
+    const [likedPosts, setLikedPosts] = useState([]);
+    const [likesLoading, setLikesLoading] = useState(false);
+
     // ===== プロフィール表示部（F-104・別担当のためモックのまま） =====
     // TODO(F-104): /me から bio・タグを取得して表示に差し替える（担当メンバーの範囲）
     // TODO(F-104/F-112): 投稿数・いいね数の実数表示も後で対応
@@ -24,10 +28,6 @@ function ProfilePage() {
         hobbyTags: ["ゲーム", "読書", "旅行"],
         postCount: 3,
         likeCount: 5,
-        likedPosts: [
-            { id: 101, content: "React Hooks便利ですね。" },
-            { id: 102, content: "Tailwind CSSを試してみた。" },
-        ],
     });
 
     // 自分の投稿をAPIから取得
@@ -50,6 +50,20 @@ function ProfilePage() {
         loadPosts();
     }, [user]);
 
+    // 自分がいいねした投稿を取得（F-111: GET /me/likes）
+    const loadLikes = async () => {
+        setLikesLoading(true);
+        try {
+            const data = await api("/me/likes");
+            setLikedPosts(data.items);
+            // TODO(表示の仕上げ): nextCursor の「もっと見る」は後で
+        } catch (e) {
+            // 失敗時は空のまま
+        } finally {
+            setLikesLoading(false);
+        }
+    };
+
     // 投稿削除（F-108: 論理削除API。本人のみ204 / 他人は403）
     const handleDelete = async (postId) => {
         const isConfirmed = window.confirm("この投稿を削除しますか？");
@@ -63,9 +77,52 @@ function ProfilePage() {
         }
     };
 
+    // いいねのトグル（投稿タブ用。likedByMe で POST/DELETE を出し分け）
+    const handleLikeToggle = async (post) => {
+        try {
+            await api(`/posts/${post.id}/like`, {
+                method: post.likedByMe ? "DELETE" : "POST",
+            });
+            setPosts((prev) =>
+                prev.map((p) =>
+                    p.id === post.id
+                        ? {
+                              ...p,
+                              likedByMe: !p.likedByMe,
+                              likeCount: p.likedByMe ? p.likeCount - 1 : p.likeCount + 1,
+                          }
+                        : p
+                )
+            );
+        } catch (e) {
+            alert("いいねできませんでした。");
+        }
+    };
+
+    // いいねタブの♥トグル（その場では一覧から消さず、押し直しできるようにする）
+    const handleLikedTabToggle = async (post) => {
+        try {
+            await api(`/posts/${post.id}/like`, {
+                method: post.likedByMe ? "DELETE" : "POST",
+            });
+            setLikedPosts((prev) =>
+                prev.map((p) =>
+                    p.id === post.id
+                        ? {
+                              ...p,
+                              likedByMe: !p.likedByMe,
+                              likeCount: p.likedByMe ? p.likeCount - 1 : p.likeCount + 1,
+                          }
+                        : p
+                )
+            );
+        } catch (e) {
+            alert("いいねできませんでした。");
+        }
+    };
+
     // ===== 画面遷移・タブ切替 =====
-    // dev側で追加された /follow への導線（F-113 フォロー中一覧の画面を想定）。
-    // ラベルや配置はフォロー画面の担当と調整可。
+    // dev側で追加された /follow への導線（F-113 フォロー中一覧の画面を想定）
     const handleFollowClick = () => {
         navigate("/follow");
     };
@@ -80,10 +137,11 @@ function ProfilePage() {
 
     const handleLikesClick = () => {
         setActiveTab("likes");
+        loadLikes(); // タブを開いたタイミングで取得
     };
 
-    // ※投稿の「編集」（handleEdit/handleSave）はフェーズ1の機能一覧・API仕様に
-    //   存在しないため外している。必要なら要件追加をチームで合意してから実装する。
+    // ※投稿の「編集」はフェーズ1の機能一覧・API仕様に存在しないため未実装。
+    //   必要なら要件追加をチームで合意してから実装する。
 
     return (
         <div>
@@ -122,7 +180,7 @@ function ProfilePage() {
             </div>
 
             <div>
-                {/* ===== 投稿タブ（API取得・削除あり） ===== */}
+                {/* ===== 投稿タブ（API取得・削除・いいねトグル） ===== */}
                 {activeTab === "posts" && (
                     <>
                         {postsLoading && <p>読み込み中...</p>}
@@ -142,7 +200,21 @@ function ProfilePage() {
                             >
                                 <div>{post.body}</div>
                                 <div style={{ color: "#666", fontSize: "13px", marginTop: "6px" }}>
-                                    ♡ {post.likeCount}　💬 {post.replyCount}
+                                    <button
+                                        onClick={() => handleLikeToggle(post)}
+                                        style={{
+                                            border: "none",
+                                            background: "none",
+                                            cursor: "pointer",
+                                            padding: 0,
+                                            fontSize: "13px",
+                                            color: post.likedByMe ? "#e0245e" : "#666",
+                                            fontWeight: post.likedByMe ? "bold" : "normal",
+                                        }}
+                                    >
+                                        {post.likedByMe ? "♥" : "♡"} {post.likeCount}
+                                    </button>
+                                    　💬 {post.replyCount}
                                 </div>
                                 <button onClick={() => handleDelete(post.id)}>削除</button>
                             </div>
@@ -150,12 +222,44 @@ function ProfilePage() {
                     </>
                 )}
 
-                {/* ===== いいねタブ（F-111 未実装のためモックのまま） ===== */}
-                {/* TODO(F-111): GET /me/likes 実装後にAPI取得へ差し替え */}
-                {activeTab === "likes" &&
-                    profile.likedPosts.map((post) => (
-                        <div key={post.id}>{post.content}</div>
-                    ))}
+                {/* ===== いいねタブ（F-111: /me/likes） ===== */}
+                {activeTab === "likes" && (
+                    <>
+                        {likesLoading && <p>読み込み中...</p>}
+                        {!likesLoading && likedPosts.length === 0 && (
+                            <p>いいねした投稿はありません。</p>
+                        )}
+                        {likedPosts.map((post) => (
+                            <div
+                                key={post.id}
+                                style={{
+                                    border: "1px solid #ccc",
+                                    padding: "10px",
+                                    marginBottom: "10px",
+                                }}
+                            >
+                                <div>{post.body}</div>
+                                <div style={{ color: "#666", fontSize: "13px", marginTop: "6px" }}>
+                                    <button
+                                        onClick={() => handleLikedTabToggle(post)}
+                                        style={{
+                                            border: "none",
+                                            background: "none",
+                                            cursor: "pointer",
+                                            padding: 0,
+                                            fontSize: "13px",
+                                            color: post.likedByMe ? "#e0245e" : "#666",
+                                            fontWeight: post.likedByMe ? "bold" : "normal",
+                                        }}
+                                    >
+                                        {post.likedByMe ? "♥" : "♡"} {post.likeCount}
+                                    </button>
+                                    　💬 {post.replyCount}
+                                </div>
+                            </div>
+                        ))}
+                    </>
+                )}
             </div>
         </div>
     );
