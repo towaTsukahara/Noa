@@ -16,12 +16,6 @@ public class TagService {
         this.tagRepository = tagRepository;
     }
 
-    public List<TagResponse> search(String q) {
-        if (q == null || q.isBlank()) return List.of();
-        return tagRepository.findByNameContainingIgnoreCaseOrderByName(q.trim())
-                .stream().limit(20).map(TagResponse::from).toList();
-    }
-
     public Tag findOrCreate(String rawName) {
         String name = rawName.trim().toLowerCase();
         return tagRepository.findByName(name).orElseGet(() -> {
@@ -29,5 +23,12 @@ public class TagService {
             t.setName(name);
             return tagRepository.save(t);
         });
+    }
+
+    public List<TagResponse> search(String q) {
+        if (q == null || q.isBlank())
+            return List.of();
+        return tagRepository.findByNameContainingIgnoreCaseOrderByName(q.trim())
+                .stream().limit(20).map(TagResponse::from).toList();
     }
 }

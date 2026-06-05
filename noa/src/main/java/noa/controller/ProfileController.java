@@ -7,14 +7,12 @@ import org.springframework.web.server.ResponseStatusException;
 import jakarta.validation.Valid;
 import noa.dto.ProfileUpdateRequest;
 import noa.dto.UserResponse;
-import noa.repository.UserRepository;
 import noa.security.CustomUserDetails;
 import noa.service.ProfileService;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.PathVariable;
 
 
 @RestController

@@ -62,8 +62,8 @@ public class ProfileService {
         if (names == null) return;
         Set<String> seen = new HashSet<>();
         for (String raw : names) {
-            String name = raw.trim().toLowerCase();
-            if (name.isEmpty() || !seen.add(norm)) continue;
+            String norm = raw.trim().toLowerCase();
+            if (norm.isEmpty() || !seen.add(norm)) continue;
             Tag tag = tagService.findOrCreate(raw);
             ProfileUserTag link = new ProfileUserTag();
             link.setUser(me);

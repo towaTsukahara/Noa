@@ -1,6 +1,6 @@
 package noa.controller;
 
-import noa.dto.ProfileUpdateRequest;
+//import noa.dto.ProfileUpdateRequest;
 import noa.dto.UserResponse;
 import noa.dto.UserSummaryResponse;
 import noa.entity.User;
@@ -14,7 +14,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
-import jakarta.validation.Valid;
+//import jakarta.validation.Valid;
 
 import java.util.Map;
 import java.util.List;
@@ -44,15 +44,15 @@ public class UserController {
         return UserResponse.from(principal.getUser(), profileService.tagsOf(principal.getUser()));
     }
 
-    @PutMapping("/me/profile")
-    public UserResponse updateProfile(
-            @Valid @RequestBody ProfileUpdateRequest req,
-            @AuthenticationPrincipal CustomUserDetails principal) {
-        if (principal == null)
-            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "ログインが必要です");
-        profileService.updateProfile(principal.getUser(), req);
-        return UserResponse.from(principal.getUser());
-        }
+    // @PutMapping("/me/profile")
+    // public UserResponse updateProfile(
+    //         @Valid @RequestBody ProfileUpdateRequest req,
+    //         @AuthenticationPrincipal CustomUserDetails principal) {
+    //     if (principal == null)
+    //         throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "ログインが必要です");
+    //     profileService.updateProfile(principal.getUser(), req);
+    //     return UserResponse.from(principal.getUser());
+    //     }
 
     // 他ユーザーの公開プロフィール（完全秘匿ビュー）
     @GetMapping("/users/{handle}")
