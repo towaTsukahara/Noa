@@ -1,21 +1,33 @@
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
+import { useState, useEffect } from "react";
 
 function ProfileEditPage() {
     const navigate = useNavigate();
+    const location = useLocation();
 
-    const bio = "フロントエンジニアです。";
-    const skillTags = ["React", "JavaScript", "HTML", "CSS",];
-    const hobbyTags = ["ゲーム", "読書", "旅行",];
-    const certTags = ["基本情報技術者", "応用情報技術者"];
+    const [form, setForm] = useState(
+        location.state?.form || {
+            bio: "",
+            skill: [],
+            hobby: [],
+            cert: []
+        }
+    );
+    
+    useEffect(() => {
+        if (location.state?.form) {
+            setForm(location.state.form);
+        }
+    }, [location.state]);
 
     const handleTagSkillEditClick = () => {
-        navigate("/tags/skilledit");
+        navigate("/tags/skilledit", { state: { form } });
     };
     const handleTagHobbyEditClick = () => {
-        navigate("/tags/hobbyedit");
+        navigate("/tags/hobbyedit", { state: { form } });
     };
     const handleTagCertEditClick = () => {
-        navigate("/tags/certedit");
+        navigate("/tags/certedit", { state: { form } });
     };
 
     const handleCancelClick = () => {
@@ -32,12 +44,12 @@ function ProfileEditPage() {
 
             <div>
                 <h3>自己紹介</h3>
-                <textarea defaultValue={bio} />
+                <textarea value={form.bio} readOnly />
             </div>
 
             <div>
                 <h3>技術タグ</h3>
-                {skillTags.map((tag) => (
+                {form.skill.map((tag) => (
                     <div key={tag}>{tag}</div>
                 ))}
                 <button onClick={handleTagSkillEditClick}>さらに表示</button>
@@ -45,7 +57,7 @@ function ProfileEditPage() {
 
             <div>
                 <h3>興味タグ</h3>
-                {hobbyTags.map((tag) => (
+                {form.hobby.map((tag) => (
                     <div key={tag}>{tag}</div>
                 ))}
 
@@ -54,7 +66,7 @@ function ProfileEditPage() {
 
             <div>
                 <h3>資格タグ</h3>
-                {certTags.map((tag) => (
+                {form.cert.map((tag) => (
                     <div key={tag}>{tag}</div>
                 ))}
 
