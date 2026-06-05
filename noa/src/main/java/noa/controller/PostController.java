@@ -74,6 +74,6 @@ public class PostController {
         if (principal == null)
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "ログインが必要です");
         Post reply = postService.createReply(id, principal.getUser(), req);
-        return PostResponse.from(reply, 0, false); // 新規返信はいいね0・未いいね
+        return PostResponse.from(reply, 0, false,0); // 新規返信はいいね0・未いいね
     }
 }
