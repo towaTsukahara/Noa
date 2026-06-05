@@ -19,6 +19,7 @@ import java.util.Map;
 import java.util.LinkedHashMap;
 import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.ArrayList;
 
 @Service
 public class PostService {
@@ -47,7 +48,7 @@ public class PostService {
         List<Post> posts = (cursor == null)
                 ? postRepository.findUserPostsFirst(author.getId(), pageable)
                 : postRepository.findUserPostsAfter(author.getId(), cursor, pageable);
-        return buildPageResponse(posts, limit, viewer); 
+        return buildPageResponse(posts, limit, viewer);
     }
 
     // 共通: 投稿リストを items + nextCursor の形に組み立てる
@@ -66,8 +67,7 @@ public class PostService {
                 .map(p -> PostResponse.from(
                         p,
                         likeRepository.countByPostId(p.getId()),
-                        likedIds.contains(p.getId())
-                ))
+                        likedIds.contains(p.getId())))
                 .toList();
 
         Long nextCursor = (posts.size() == limit && !posts.isEmpty())
@@ -107,5 +107,39 @@ public class PostService {
                 ? postRepository.findTimelineFirst(pageable)
                 : postRepository.findTimelineAfter(cursor, pageable);
         return buildPageResponse(posts, limit, viewer);
+    }
+
+    // 自分がいいねした投稿一覧（いいねした順・カーソルページング）
+    public Map<String, Object> getMyLikes(User viewer, Long cursor, int limit) {
+        Pageable pageable = PageRequest.of(0, limit);
+        List<PostLike> likes = (cursor == null)
+                ? likeRepository.findMyLikesFirst(viewer.getId(), pageable)
+                : likeRepository.findMyLikesAfter(viewer.getId(), cursor, pageable);
+
+        // いいね順を保ったまま投稿を取得（削除済みは除外）
+        List<Post> posts = new ArrayList<>();
+        for (PostLike like : likes) {
+            postRepository.findById(like.getPostId())
+                    .filter(p -> !p.isDeleted())
+                    .ifPresent(posts::add);
+        }
+
+        List<PostResponse> items = posts.stream()
+                .map(p -> PostResponse.from(
+                        p,
+                        likeRepository.countByPostId(p.getId()),
+                        true // 自分のいいね一覧なので必ず true
+                ))
+                .toList();
+
+        // カーソルは likes の id（いいね順のしおり）
+        Long nextCursor = (likes.size() == limit && !likes.isEmpty())
+                ? likes.get(likes.size() - 1).getId()
+                : null;
+
+        Map<String, Object> result = new LinkedHashMap<>();
+        result.put("items", items);
+        result.put("nextCursor", nextCursor);
+        return result;
     }
 }
