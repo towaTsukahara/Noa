@@ -1,9 +1,5 @@
 package noa.service;
 
-import java.util.List;
-
-import org.springframework.stereotype.Service;
-
 import noa.entity.ProfileUserTag;
 import noa.entity.Tag;
 import noa.dto.SaveTagRequest;
@@ -12,9 +8,13 @@ import noa.repository.ProfileUserTagRepository;
 import noa.repository.TagRepository;
 import noa.entity.User;
 
+import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 @Service
 public class TagService {
+
     private final TagRepository tagRepository;
     private final ProfileUserTagRepository profileUserTagRepository;
 
@@ -24,7 +24,15 @@ public class TagService {
         this.profileUserTagRepository = profileUserTagRepository;
     }
 
-    // タグ画面の検索・サジェスト（部分一致・上限20件）
+    public Tag findOrCreate(String rawName) {
+        String name = rawName.trim().toLowerCase();
+        return tagRepository.findByName(name).orElseGet(() -> {
+            Tag t = new Tag();
+            t.setName(name);
+            return tagRepository.save(t);
+        });
+    }
+
     public List<TagResponse> search(String q) {
         if (q == null || q.isBlank())
             return tagRepository.findAll()

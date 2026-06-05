@@ -212,13 +212,66 @@
   cursor: not-allowed;
 }
 
-.post-detail-link {
-  display: inline-block;
-  margin-bottom: 12px;
+/* ===== いいねボタン ===== */
+.like-button {
+  border: none;
+  background: none;
+  cursor: pointer;
+  font-size: 14px;
   color: #666;
-  text-decoration: none;
+  padding: 0;
 }
 
-.post-detail-link:hover {
-  text-decoration: underline;
+.like-button.liked {
+  color: #e0245e;
+  font-weight: bold;
+}
+
+.like-button:hover {
+  opacity: 0.7;
+}
+
+/* ===== もっと見る ===== */
+.load-more {
+  display: block;
+  width: 100%;
+  padding: 12px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  background: #fff;
+  cursor: pointer;
+  margin-bottom: 24px;
+}
+
+.load-more:hover {
+  background: #f5f5f5;
+}
+
+.load-more:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+.timeline-end {
+  text-align: center;
+  color: #999;
+  font-size: 13px;
+  margin: 16px 0 24px;
+
+  .post-detail-link {
+    display: inline-block;
+    margin-bottom: 12px;
+    color: #666;
+    text-decoration: none;
+  }
+
+  .post-detail-link:hover {
+    text-decoration: underline;
+  }
+
+  /* ===== 本文の折り返し（長い連続文字列でも横に溢れない） ===== */
+.content {
+  overflow-wrap: anywhere;
+  white-space: pre-wrap; /* 投稿内の改行もそのまま表示 */
+}
 }
