@@ -145,12 +145,12 @@ function ProfilePage() {
         <div>
             {/* ===== プロフィール表示部（F-104・モックのまま） ===== */}
             <div>
-                <img src={profile.icon} alt="プロフィール画像" />
+                {/* <img src={profile.icon} alt="プロフィール画像" />
                 <div>{profile.name}</div>
                 <div>
                     <div>投稿数 {profile.postCount}</div>
                     <div>いいね数 {profile.likeCount}</div>
-                </div>
+                </div> */}
             </div>
 
             <div>
@@ -166,9 +166,10 @@ function ProfilePage() {
                 <h3>資格タグ</h3>
                 {profile?.tags?.cert.map((t) => <span key={t}>{t} </span>)}
 
-                <button onClick={handleFollowClick}>フォロー</button>
-                <button onClick={handleEditClick}>プロフィールを編集</button>
             </div>
+
+            <button onClick={handleFollowClick}>フォロー</button>
+            <button onClick={handleEditClick}>プロフィールを編集</button>
 
             <div>
                 <button onClick={handlePostsClick}>投稿</button>
