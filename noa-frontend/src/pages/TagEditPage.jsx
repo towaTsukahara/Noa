@@ -4,13 +4,6 @@ import { api } from "../api/client";
 
 const LABEL = { skill: "技術スタックタグ", hobby: "興味タグ", cert: "資格タグ" };
 
-// ダミーデータ。バックエンド実装したら消す。
-const TAGS = {
-    hobby: ["コーヒー", "登山", "ゲーム", "読書", "カフェ巡り", "ランニング"],
-    skill: ["Java", "Spring Boot", "React", "AWS", "Python", "SQL"],
-    cert: ["基本情報技術者", "応用情報技術者"],
-};
-
 const TagEditPage = ({ type }) => {
     const navigate = useNavigate();
     const location = useLocation();
@@ -22,22 +15,7 @@ const TagEditPage = ({ type }) => {
     const [q, setQ] = useState("");                          // 検索キーワード
     const [candidates, setCandidates] = useState([]);          // DBから取得した候補
     const [newTag, setNewTag] = useState("");
-    /*
-        const [hobbies, setHobbies] = useState([]);
-        const [skills, setSkills] = useState([]);
-        const [certs, setCers] = useState([]);
     
-        useEffect(() => {
-            if (location.state) {
-                setHobbies(location.state.hobbies || []);
-                setSkills(location.state.skills || []);
-                setCers(location.state.certs || []);
-            }
-        }, [location.state]);
-    
-        const selected = type === "hobby" ? hobbies : ("skill" ? skills : certs);
-        const setSelected = type === "hobby" ? setHobbies : ("skill" ? setSkills : setCers);
-    */
     // q が変わるたび、DBから既存タグを検索
     useEffect(() => {
         if (!q.trim()) { setCandidates([]); return; }
@@ -63,15 +41,7 @@ const TagEditPage = ({ type }) => {
     const handleSave = () => {
         navigate("/profile/edit", { state: { form: { ...form, [type]: selected } } });
     };
-    /*
-        const handleCancelClick = () => {
-            navigate("/profile/edit");
-        };
-    
-        const handleSaveClick = () => {
-            navigate("/profile/edit");
-        };
-    */
+   
     return (
         <div>
             <h2>{LABEL[type]}</h2>
