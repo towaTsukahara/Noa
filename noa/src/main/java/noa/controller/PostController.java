@@ -32,7 +32,7 @@ public class PostController {
         }
         // current user を投稿者として渡す
         Post post = postService.create(principal.getUser(), req);
-        return PostResponse.from(post, 0, false); // 新規投稿はいいね0・未いいね
+        return PostResponse.from(post, 0, false, 0);  // 新規投稿はいいね0・未いいね
     }
 
     // 投稿削除（論理削除・本人のみ）
@@ -74,6 +74,6 @@ public class PostController {
         if (principal == null)
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "ログインが必要です");
         Post reply = postService.createReply(id, principal.getUser(), req);
-        return PostResponse.from(reply, 0, false); // 新規返信はいいね0・未いいね
+        return PostResponse.from(reply, 0, false,0); // 新規返信はいいね0・未いいね
     }
 }

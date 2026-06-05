@@ -67,7 +67,9 @@ public class PostService {
                                 .map(p -> PostResponse.from(
                                                 p,
                                                 likeRepository.countByPostId(p.getId()),
-                                                likedIds.contains(p.getId())))
+                                                likedIds.contains(p.getId()),
+                                                postRepository.countReplies(p.getId()) // 返信数
+                                ))
                                 .toList();
 
                 Long nextCursor = (posts.size() == limit && !posts.isEmpty())
@@ -110,40 +112,39 @@ public class PostService {
         }
 
         // 自分がいいねした投稿一覧（いいねした順・カーソルページング）
-        public Map<String, Object> getMyLikes(User viewer, Long cursor, int limit) {
-                Pageable pageable = PageRequest.of(0, limit);
-                List<PostLike> likes = (cursor == null)
-                                ? likeRepository.findMyLikesFirst(viewer.getId(), pageable)
-                                : likeRepository.findMyLikesAfter(viewer.getId(), cursor, pageable);
+    public Map<String, Object> getMyLikes(User viewer, Long cursor, int limit) {
+        Pageable pageable = PageRequest.of(0, limit);
+        List<PostLike> likes = (cursor == null)
+                ? likeRepository.findMyLikesFirst(viewer.getId(), pageable)
+                : likeRepository.findMyLikesAfter(viewer.getId(), cursor, pageable);
 
-                // いいね順を保ったまま投稿を取得（削除済みは除外）
-                List<Post> posts = new ArrayList<>();
-                for (PostLike like : likes) {
-                        postRepository.findById(like.getPostId())
-                                        .filter(p -> !p.isDeleted())
-                                        .ifPresent(posts::add);
-                }
-
-                List<PostResponse> items = posts.stream()
-                                .map(p -> PostResponse.from(
-                                                p,
-                                                likeRepository.countByPostId(p.getId()),
-                                                true // 自分のいいね一覧なので必ず true
-                                ))
-                                .toList();
-
-                // カーソルは likes の id（いいね順のしおり）
-                Long nextCursor = (likes.size() == limit && !likes.isEmpty())
-                                ? likes.get(likes.size() - 1).getId()
-                                : null;
-
-                Map<String, Object> result = new LinkedHashMap<>();
-                result.put("items", items);
-                result.put("nextCursor", nextCursor);
-                return result;
+        // いいね順を保ったまま投稿を取得（削除済みは除外）
+        List<Post> posts = new ArrayList<>();
+        for (PostLike like : likes) {
+            postRepository.findById(like.getPostId())
+                    .filter(p -> !p.isDeleted())
+                    .ifPresent(posts::add);
         }
 
-        // ここから下、追加した（カワサキ）
+        List<PostResponse> items = posts.stream()
+                .map(p -> PostResponse.from(
+                        p,
+                        likeRepository.countByPostId(p.getId()),
+                        true,
+                        postRepository.countReplies(p.getId())
+                ))
+                .toList();
+
+        // カーソルは likes の id（いいね順のしおり）
+        Long nextCursor = (likes.size() == limit && !likes.isEmpty())
+                ? likes.get(likes.size() - 1).getId()
+                : null;
+
+        Map<String, Object> result = new LinkedHashMap<>();
+        result.put("items", items);
+        result.put("nextCursor", nextCursor);
+        return result;
+    }
 
         // === 投稿詳細を1件取得（いいね数・自分のいいね有無つき）===
         public PostResponse getPost(Long id, User viewer) {
@@ -154,7 +155,7 @@ public class PostService {
 
                 long likeCount = likeRepository.countByPostId(id);
                 boolean likedByMe = likeRepository.existsByUserIdAndPostId(viewer.getId(), id);
-                return PostResponse.from(post, likeCount, likedByMe);
+                return PostResponse.from(post, likeCount, likedByMe, postRepository.countReplies(id));
         }
 
         // === 返信一覧（カーソル）。組み立ては既存の buildPageResponse を再利用 ===
