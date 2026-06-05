@@ -22,21 +22,21 @@ public record PostResponse(
         OffsetDateTime createdAt)
 
 {
-    public static PostResponse from(Post post, long likeCount, boolean likedByMe) {
+public static PostResponse from(Post post, long likeCount, boolean likedByMe, long replyCount) {
         Map<String, Object> author = Map.of(
-                "handle", post.getAuthor().getHandle());
+            "handle", post.getAuthor().getHandle()
+        );
         // TODO(F-115): タグは未実装のため空。
-        // TODO(F-109): replyCount は返信実装後に集計。今は 0。
         return new PostResponse(
-                post.getId(),
-                author,
-                post.getParentId(),
-                post.getBody(),
-                List.of(),
-                (int) likeCount,
-                likedByMe,
-                0,
-                post.isDeleted(),
-                post.getCreatedAt());
-    }
-}
+            post.getId(),
+            author,
+            post.getParentId(),
+            post.getBody(),
+            List.of(),        // tags
+            (int) likeCount,
+            likedByMe,
+            (int) replyCount,
+            post.isDeleted(),
+            post.getCreatedAt()
+        );
+    }}
