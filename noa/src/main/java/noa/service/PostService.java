@@ -145,4 +145,43 @@ public class PostService {
         result.put("nextCursor", nextCursor);
         return result;
     }
+        }
+
+        // === 投稿詳細を1件取得（いいね数・自分のいいね有無つき）===
+        public PostResponse getPost(Long id, User viewer) {
+                Post post = postRepository.findById(id)
+                                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "投稿が見つかりません"));
+
+                // TODO(F-120): 閲覧ログ(view_logs)に1件記録する（誰がいつ見たか）
+
+                long likeCount = likeRepository.countByPostId(id);
+                boolean likedByMe = likeRepository.existsByUserIdAndPostId(viewer.getId(), id);
+                return PostResponse.from(post, likeCount, likedByMe);
+        }
+
+        // === 返信一覧（カーソル）。組み立ては既存の buildPageResponse を再利用 ===
+        public Map<String, Object> getReplies(Long parentId, Long cursor, int limit, User viewer) {
+                if (!postRepository.existsById(parentId))
+                        throw new ResponseStatusException(HttpStatus.NOT_FOUND, "投稿が見つかりません");
+                Pageable pageable = PageRequest.of(0, limit);
+                List<Post> replies = (cursor == null)
+                                ? postRepository.findRepliesFirst(parentId, pageable)
+                                : postRepository.findRepliesAfter(parentId, cursor, pageable);
+                return buildPageResponse(replies, limit, viewer);
+        }
+
+        // === 返信作成（親IDつきの投稿として保存）===
+        public Post createReply(Long parentId, User author, PostCreateRequest req) {
+                Post parent = postRepository.findById(parentId)
+                                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "投稿が見つかりません"));
+                if (parent.isDeleted())
+                        throw new ResponseStatusException(HttpStatus.NOT_FOUND, "投稿が見つかりません");
+
+                Post reply = new Post();
+                reply.setAuthor(author);
+                reply.setBody(req.body());
+                reply.setParentId(parentId); // ← これが「返信」の印
+                // TODO(F-117): 親投稿の作者へ返信通知を生成する
+                return postRepository.save(reply);
+        }
 }
