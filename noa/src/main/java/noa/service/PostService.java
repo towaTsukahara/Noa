@@ -145,7 +145,6 @@ public class PostService {
         result.put("nextCursor", nextCursor);
         return result;
     }
-        }
 
         // === 投稿詳細を1件取得（いいね数・自分のいいね有無つき）===
         public PostResponse getPost(Long id, User viewer) {
@@ -156,7 +155,7 @@ public class PostService {
 
                 long likeCount = likeRepository.countByPostId(id);
                 boolean likedByMe = likeRepository.existsByUserIdAndPostId(viewer.getId(), id);
-                return PostResponse.from(post, likeCount, likedByMe);
+                return PostResponse.from(post, likeCount, likedByMe, postRepository.countReplies(id));
         }
 
         // === 返信一覧（カーソル）。組み立ては既存の buildPageResponse を再利用 ===
