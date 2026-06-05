@@ -7,11 +7,11 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.Map;
 
-@RestController
+//@RestController
 @RequestMapping("/api/v1")
 @Tag(name = "タグ")
 public class TagController {
-
+    /*
     @Operation(summary = "タグ検索・サジェスト（モック）")
     @GetMapping("/tags")
     public List<Map<String, Object>> search(@RequestParam(required = false) String q) {
@@ -20,6 +20,7 @@ public class TagController {
                 MockData.tag(9, "spring security")
         );
     }
+        */
 
     @Operation(summary = "特定タグの投稿一覧（モック）")
     @GetMapping("/tags/{tagId}/posts")

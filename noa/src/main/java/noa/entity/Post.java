@@ -2,6 +2,7 @@ package noa.entity;
 
 import jakarta.persistence.*;
 import java.time.OffsetDateTime;
+import java.util.*;
 
 @Entity
 @Table(name = "posts")
@@ -34,6 +35,14 @@ public class Post {
 
     @Column(name = "updated_at", nullable = false, insertable = false, updatable = false)
     private OffsetDateTime updatedAt;
+
+    @ManyToMany
+    @JoinTable(
+        name = "post_tags",
+        joinColumns = @JoinColumn(name = "post_id"),
+        inverseJoinColumns = @JoinColumn(name = "tag_id")
+    )
+    private List<Tag> tags;
 
     // --- getter / setter ---
     public Long getId() { return id; }
