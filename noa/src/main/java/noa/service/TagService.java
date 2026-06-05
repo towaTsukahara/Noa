@@ -23,7 +23,7 @@ public class TagService {
         this.tagRepository = tagRepository;
         this.profileUserTagRepository = profileUserTagRepository;
     }
-
+/*
     public Tag findOrCreate(String rawName) {
         String name = rawName.trim().toLowerCase();
         return tagRepository.findByName(name).orElseGet(() -> {
@@ -32,7 +32,7 @@ public class TagService {
             return tagRepository.save(t);
         });
     }
-
+*/
     public List<TagResponse> search(String q) {
         if (q == null || q.isBlank())
             return tagRepository.findAll()
@@ -77,7 +77,8 @@ public class TagService {
             if (profileUserTagRepository.existsByUserIdAndTagIdAndCategory(
                     request.getUserId(),
                     tag.getId(),
-                    request.getCategory())) {
+                    request.getCategory()
+                )) {
                 continue;
             }
 
