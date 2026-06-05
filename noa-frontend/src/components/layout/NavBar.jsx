@@ -1,6 +1,7 @@
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 
+// 上部バー（検索枠・通知・ログインユーザー表示・ログアウト）
 function NavBar() {
   const { user, logout, loading } = useAuth();
   const navigate = useNavigate();
@@ -11,16 +12,19 @@ function NavBar() {
   };
 
   return (
-    <nav style={{ padding: "12px", borderBottom: "1px solid #ddd", display: "flex", gap: 12, alignItems: "center" }}>
-      <Link to="/">タイムライン</Link>
+    <nav className="header" style={{ gap: 12 }}>
+      {/* TODO(F-116): 検索は未実装。入力欄は仮置き */}
+      <input type="text" placeholder="検索..." />
+      {/* TODO(F-117): 通知ベルは未実装 */}
+      <button>🔔</button>
+
       {loading ? null : user ? (
         <>
-          <Link to="/profile">プロフィール</Link>
-          <span style={{ marginLeft: "auto" }}>{user.handle}</span>
+          <span>{user.handle}</span>
           <button onClick={handleLogout}>ログアウト</button>
         </>
       ) : (
-        <Link to="/login" style={{ marginLeft: "auto" }}>ログイン</Link>
+        <Link to="/login">ログイン</Link>
       )}
     </nav>
   );
