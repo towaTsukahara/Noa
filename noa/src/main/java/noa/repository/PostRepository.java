@@ -23,4 +23,8 @@ public interface PostRepository extends JpaRepository<Post, Long> {
     // 同・カーソルの続き（cursorより小さいid）
     @Query("select p from Post p where p.author.id = :authorId and p.parentId is null and p.isDeleted = false and p.id < :cursor order by p.id desc")
     List<Post> findUserPostsAfter(Long authorId, Long cursor, Pageable pageable);
+
+    // 投稿への返信数（未削除のみ）
+    @Query("select count(p) from Post p where p.parentId = :parentId and p.isDeleted = false")
+    long countReplies(Long parentId);
 }
