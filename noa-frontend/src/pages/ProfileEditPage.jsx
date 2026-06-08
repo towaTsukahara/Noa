@@ -81,7 +81,6 @@ function ProfileEditPage() {
                 </button>
             </div>
         </div>
-        </div>
     );
 }
 
