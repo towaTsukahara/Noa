@@ -11,6 +11,8 @@ import TagEditPage from './pages/TagEditPage';
 import OtherProfilePage from './pages/OtherProfilePage';
 import PostDetailPage from './pages/PostDetailPage';
 import AppLayout from './components/layout/AppLayout';
+import SearchPage from './pages/SearchPage';
+import TagDetailPage from './pages/TagDetailPage';
 
 function App() {
   return (
@@ -36,6 +38,8 @@ function App() {
           <Route path="/tags/certedit" element={<TagEditPage type="cert" />} />
           <Route path="/post/:id" element={<PostDetailPage />} />
           <Route path="/other-profile" element={<OtherProfilePage />} />
+          <Route path="/search" element={<SearchPage />} />
+          <Route path="/tag/:tagId" element={<TagDetailPage />} />
         </Route>
       </Routes>
     </BrowserRouter>

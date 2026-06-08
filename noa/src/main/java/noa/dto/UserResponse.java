@@ -13,19 +13,22 @@ public record UserResponse(
     String status,
     boolean emailVerified,
     String bio,
-    Map<String, List<String>> tags
+    Map<String, List<String>> tags,
+    long postCount,
+    long likeCount
 ) {
 
     public static UserResponse from(User u) {
-        return from(u, Map.of("tech", List.of(), "hobby", List.of(), "cert", List.of()));
+        return from(u, Map.of("tech", List.of(), "hobby", List.of(), "cert", List.of()), 0, 0);
     }
     
     // User エンティティから詰め替える
-    public static UserResponse from(User u, Map<String, List<String>> tags) {
+    public static UserResponse from(User u, Map<String, List<String>> tags, long postCount, long likeCount) {
         return new UserResponse(
             u.getHandle(), u.getEmployeeNo(), u.getEmail(),
             u.getRole(), u.getStatus(),
-            u.isEmailVerified(), u.getBio(), tags
+            u.isEmailVerified(), u.getBio(), tags,
+            postCount, likeCount
         );
     }
 }

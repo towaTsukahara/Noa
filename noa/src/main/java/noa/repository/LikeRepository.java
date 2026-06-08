@@ -2,6 +2,7 @@ package noa.repository;
 
 import noa.entity.PostLike;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 import java.util.List;
 import java.util.Optional;
 
@@ -25,4 +26,9 @@ public interface LikeRepository extends JpaRepository<PostLike, Long> {
     @org.springframework.data.jpa.repository.Query(
         "select l from PostLike l where l.userId = :userId and l.id < :cursor order by l.id desc")
     List<PostLike> findMyLikesAfter(Long userId, Long cursor, org.springframework.data.domain.Pageable pageable);
+
+    @Query("""
+        select count(l) from PostLike l, Post p where l.postId = p.id and p.author.id = :userId and p.isDeleted = false
+    """)
+    long countRecievedLikes(Long userId);
 }
