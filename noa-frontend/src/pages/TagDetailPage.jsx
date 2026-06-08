@@ -2,17 +2,19 @@
 import { useState } from "react";
 import { useParams } from "react-router-dom";
 import { POSTS, TAGS } from "../date/mockData";
+import { getFollowedTags, followTag, unfollowTag } from "../date/followedTag";
 
 export default function TagDetailPage() {
+
     const { tagId } = useParams();
 
     const tag = TAGS.find(
         (tag) => tag.id === Number(tagId)
     );
 
-    const [isFollowed, setIsFollowed] = useState(false);
+    const [isFollowed, setIsFollowed] = useState(tag ? getFollowedTags().includes(tag.name) : false);
 
-    const relatedPosts = POSTS.filter((post) => 
+    const relatedPosts = POSTS.filter((post) =>
         tag && post.tags.includes(tag.name)
     );
 
@@ -20,10 +22,24 @@ export default function TagDetailPage() {
         return <div>not found 404</div>
     }
 
+    const toggleFollow = () => {
+        if (isFollowed) {
+            unfollowTag(tag.name);
+        } else {
+            followTag(tag.name);
+        }
+
+        setIsFollowed(
+            getFollowedTags().includes(
+                tag.name
+            )
+        );
+    };
+
     return (
         <div>
             <h1>{tag.name}</h1>
-            <button onClick={() => setIsFollowed(!isFollowed)}>
+            <button onClick={toggleFollow}>
                 {isFollowed ? "unfollow" : "follow"}
             </button>
 

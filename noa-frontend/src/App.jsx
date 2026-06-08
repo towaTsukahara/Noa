@@ -40,7 +40,7 @@ function App() {
           <Route path="/post/:id" element={<PostDetailPage />} />
           <Route path="/other-profile" element={<OtherProfilePage />} />
           <Route path="/search" element={<SearchPage />} />
-          <Route path="/tag/:tagId" element={<TagDetailPage />} />
+          <Route path="/search/tag/:tagId" element={<TagDetailPage />} />
           <Route path="/notifications" element={<NotificationPage />} />
         </Route>
       </Routes>
