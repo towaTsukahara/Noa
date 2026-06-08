@@ -70,10 +70,25 @@ function ProfilePage() {
         try {
             await api(`/posts/${postId}`, { method: "DELETE" });
             loadPosts(); // 削除後に一覧を再読込
+            loadProfile(); //削除後にプロフィール情報再取得
         } catch (e) {
             alert("削除できませんでした。");
         }
     };
+
+    //投稿・削除時、プロフィール情報再取得
+    const loadProfile = async () => {
+        try {
+            const me = await api("/me");
+            setProfile(me);
+        } catch {
+            setProfile(null);
+        }
+    };
+
+    useEffect(() => {
+        loadProfile();
+    }, []);
 
     // いいねのトグル（投稿タブ用。likedByMe で POST/DELETE を出し分け）
     const handleLikeToggle = async (post) => {
@@ -141,17 +156,20 @@ function ProfilePage() {
         <div>
             {/* ===== プロフィール表示部（F-104・モックのまま） ===== */}
             <div>
-                {/* <img src={profile.icon} alt="プロフィール画像" />
-                <div>{profile.name}</div>
                 <div>
-                    <div>投稿数 {profile.postCount}</div>
-                    <div>いいね数 {profile.likeCount}</div>
-                </div> */}
+                    {/* <img src={profile.icon} alt="プロフィール画像" /> */}
+                    <div>{profile?.handle}</div>
+                    <div>社員番号: {profile?.employeeNo}</div>
+                    <div>メールアドレス: {profile?.email}</div>
+                </div>
+                <div>
+                    <div>投稿数 {profile?.postCount ?? 0}</div>
+                    <div>いいね数 {profile?.likeCount ?? 0}</div>
+                </div>
             </div>
 
             <div>
-                <div>{profile?.handle}</div>
-                <div>{profile?.bio}</div>
+                <div>自己紹介エリア: {profile?.bio}</div>
 
                 <h3>技術タグ</h3>
                 {profile?.tags?.tech.map((t) => <span key={t}>{t} </span>)}

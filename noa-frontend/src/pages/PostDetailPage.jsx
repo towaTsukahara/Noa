@@ -57,7 +57,6 @@ function PostDetailPage() {
 
     const [post, setPost] = useState(null);
     const [loading, setLoading] = useState(true);
-
     const [comments, setComments] = useState([]);
 
     useEffect(() => {
@@ -66,17 +65,16 @@ function PostDetailPage() {
                 const data = await api(`/posts/${id}`);
                 setPost(data);
 
-                const repliesData = await api(`/posts/${id}/replies`);
+                const commentsData = await api(`/comments?postId=${id}`);
 
                 setComments(
-                    repliesData.items.map(reply => ({
-                        id: reply.id,
-                        author: reply.author.handle,
-                        body: reply.body,
-                        mine: false
+                    commentsData.map((comment) => ({
+                        id: comment.id,
+                        author: comment.authorName,
+                        body: comment.body,
+                        mine: false,
                     }))
                 );
-
             } catch (error) {
                 console.error("投稿取得失敗", error);
             } finally {
@@ -87,22 +85,34 @@ function PostDetailPage() {
         fetchPost();
     }, [id]);
 
-    const handleAddComment = (text) => {
-        const newComment = {
-            id: Date.now(),
-            author: "自分",
-            body: text,
-            mine: true,
-        };
+    const handleAddComment = async (text) => {
+        try {
+            await api(`/comments`, {
+                method: "POST",
+                body: JSON.stringify({
+                    postId: Number(id),
+                    body: text,
+                }),
+            });
 
-        setComments([...comments, newComment]);
+            const commentsData = await api(`/comments?postId=${id}`);
+
+            setComments(
+                commentsData.map((comment) => ({
+                    id: comment.id,
+                    author: comment.authorName,
+                    body: comment.body,
+                    mine: false,
+                }))
+            );
+        } catch (error) {
+            console.error("コメント投稿失敗", error);
+        }
     };
 
     const handleDeleteComment = (commentId) => {
         setComments(
-            comments.filter(
-                (comment) => comment.id !== commentId
-            )
+            comments.filter((comment) => comment.id !== commentId)
         );
     };
 

@@ -44,7 +44,11 @@ public class UserController {
         if (principal == null) {
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "ログインが必要です");
         }
-        return UserResponse.from(principal.getUser(), profileService.tagsOf(principal.getUser()));
+        return UserResponse.from(
+            principal.getUser(),
+            profileService.tagsOf(principal.getUser()),
+            profileService.getPostCounts(principal.getUser()),
+            profileService.getLikeCount(principal.getUser()));
     }
 
     // @PutMapping("/me/profile")

@@ -6,6 +6,8 @@ import noa.dto.ProfileUpdateRequest;
 import noa.entity.ProfileUserTag;
 import noa.entity.Tag;
 import noa.entity.User;
+import noa.repository.LikeRepository;
+import noa.repository.PostRepository;
 import noa.repository.ProfileUserTagRepository;
 import noa.repository.UserRepository;
 import org.springframework.stereotype.Service;
@@ -14,18 +16,32 @@ import jakarta.transaction.Transactional;
 @Service
 public class ProfileService {
 
+    private final LikeRepository likeRepository;
     private final UserRepository userRepository;
     private final ProfileUserTagRepository userTagRepository;
     private final TagService tagService;
+    private final PostRepository postRepository;
 
     public ProfileService(
             UserRepository userRepository,
             ProfileUserTagRepository userTagRepository,
-            TagService tagService) {
+            TagService tagService,
+            PostRepository postRepository,
+            PostService postService, LikeRepository likeRepository) {
 
         this.userRepository = userRepository;
         this.userTagRepository = userTagRepository;
         this.tagService = tagService;
+        this.postRepository = postRepository;
+        this.likeRepository = likeRepository;
+    }
+
+    public long getPostCounts(User user) {
+        return postRepository.countByAuthorIdAndParentIdIsNullAndIsDeletedFalse(user.getId());
+    }
+
+    public long getLikeCount(User user) {
+        return likeRepository.countRecievedLikes(user.getId());
     }
 
     public Map<String, List<String>> tagsOf(User user) {

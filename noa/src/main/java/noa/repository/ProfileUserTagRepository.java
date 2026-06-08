@@ -9,7 +9,7 @@ import java.util.List;
 
 public interface ProfileUserTagRepository extends JpaRepository<ProfileUserTag, Long>{
 
-     boolean existsByUserIdAndTagIdAndCategory(Long userId, Long tagId, String category);
+    boolean existsByUserIdAndTagIdAndCategory(Long userId, Long tagId, String category);
      
     List<ProfileUserTag> findByUser(User user);
 

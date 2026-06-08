@@ -35,6 +35,7 @@ function ProfileEditPage() {
                 certTags: form.cert,
             }),
         });
+
         navigate("/profile");
     };
 
@@ -72,9 +73,14 @@ function ProfileEditPage() {
             </div>
 
             <div>
-                <button onClick={() => navigate("/profile")}>キャンセル</button>
-                <button onClick={handleSave}>保存</button>
+                <button onClick={() => navigate("/profile")}>
+                    キャンセル
+                </button>
+                <button onClick={handleSave}>
+                    保存
+                </button>
             </div>
+        </div>
         </div>
     );
 }
