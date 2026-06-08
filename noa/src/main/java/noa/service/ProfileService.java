@@ -44,6 +44,10 @@ public class ProfileService {
         return likeRepository.countRecievedLikes(user.getId());
     }
 
+    public long getLikedPostCount(User user) {
+        return likeRepository.countByuserId(user.getId());
+    }
+
     public Map<String, List<String>> tagsOf(User user) {
 
         List<ProfileUserTag> rows = userTagRepository.findByUser(user);
