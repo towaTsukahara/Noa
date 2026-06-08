@@ -30,15 +30,13 @@ function App() {
           <Route path="/tags/skill" element={<TagPage type="skill" />} />
           <Route path="/profile" element={<ProfilePage />} />
           <Route path="/follow" element={<FollowPage />} />
-          <Route path="/follow/skilltags" element={<FollowTagEditPage type="skill" />} />
-          <Route path="/follow/hobbytags" element={<FollowTagEditPage type="hobby" />} />
-          <Route path="/follow/certtags" element={<FollowTagEditPage type="cert" />} />
           <Route path="/profile/edit" element={<ProfileEditPage />} />
           <Route path="/tags/skilledit" element={<TagEditPage type="skill" />} />
           <Route path="/tags/hobbyedit" element={<TagEditPage type="hobby" />} />
           <Route path="/tags/certedit" element={<TagEditPage type="cert" />} />
           <Route path="/post/:id" element={<PostDetailPage />} />
-          <Route path="/other-profile" element={<OtherProfilePage />} />
+          <Route path="/users/:handle" element={<OtherProfilePage />} />
+          <Route path="/follow/tags" element={<FollowTagEditPage />} />
           <Route path="/search" element={<SearchPage />} />
           <Route path="/search/tag/:tagId" element={<TagDetailPage />} />
           <Route path="/notifications" element={<NotificationPage />} />

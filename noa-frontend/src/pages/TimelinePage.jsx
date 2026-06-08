@@ -56,10 +56,10 @@ function TimelinePage() {
         prev.map((p) =>
           p.id === post.id
             ? {
-                ...p,
-                likedByMe: !p.likedByMe,
-                likeCount: p.likedByMe ? p.likeCount - 1 : p.likeCount + 1,
-              }
+              ...p,
+              likedByMe: !p.likedByMe,
+              likeCount: p.likedByMe ? p.likeCount - 1 : p.likeCount + 1,
+            }
             : p
         )
       );
@@ -85,7 +85,9 @@ function TimelinePage() {
             <div className="avatar"></div>
             <div>
               <div className="nickname">
-                <UserHandle user={post.author} />
+                <Link to={`/users/${post.author.handle}`} className="author-link">
+                  <UserHandle user={post.author} />
+                </Link>
               </div>
               <div className="date">{relativeTime(post.createdAt)}</div>
             </div>

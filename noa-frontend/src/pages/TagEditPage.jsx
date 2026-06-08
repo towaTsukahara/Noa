@@ -2,7 +2,7 @@ import { useNavigate, useLocation } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { api } from "../api/client";
 
-const LABEL = { skill: "技術スタックタグ", hobby: "興味タグ", cert: "資格タグ" };
+const LABEL = { skill: "技術スタックタグ", hobby: "興味タグ", cert: "趣味タグ" };
 
 const TagEditPage = ({ type }) => {
     const navigate = useNavigate();

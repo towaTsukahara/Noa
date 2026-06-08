@@ -22,21 +22,23 @@ public record PostResponse(
         OffsetDateTime createdAt)
 
 {
-public static PostResponse from(Post post, long likeCount, boolean likedByMe, long replyCount) {
+    public static PostResponse from(Post post, long likeCount, boolean likedByMe, long replyCount) {
         Map<String, Object> author = Map.of(
-            "handle", post.getAuthor().getHandle()
-        );
-        // TODO(F-115): タグは未実装のため空。
+                "handle", post.getAuthor().getHandle());
+        // タグ名のリスト（post_tags 経由）。null なら空に
+        List<String> tagNames = (post.getTags() == null)
+                ? List.of()
+                : post.getTags().stream().map(noa.entity.Tag::getName).toList();
         return new PostResponse(
-            post.getId(),
-            author,
-            post.getParentId(),
-            post.getBody(),
-            List.of(),        // tags
-            (int) likeCount,
-            likedByMe,
-            (int) replyCount,
-            post.isDeleted(),
-            post.getCreatedAt()
-        );
-    }}
+                post.getId(),
+                author,
+                post.getParentId(),
+                post.getBody(),
+                tagNames,
+                (int) likeCount,
+                likedByMe,
+                (int) replyCount,
+                post.isDeleted(),
+                post.getCreatedAt());
+    }
+}
