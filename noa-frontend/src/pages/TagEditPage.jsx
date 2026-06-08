@@ -69,24 +69,9 @@ const TagEditPage = ({ type }) => {
             cert: "CERT"
         };
 
-        try {
-            await api("/tags/save", {
-                method: "POST",
-                body: JSON.stringify({
-                    userId: 1,
-                    tagNames: selected, // ← 名前で送る（findOrCreate用）
-                    category: typeMap[type]
-                })
-            });
-
-            navigate("/profile/edit", {
-                state: { form: { ...form, [type]: selected } }
-            });
-
-        } catch (err) {
-            console.error(err);
-        }
-        
+        navigate("/profile/edit", {
+            state: { form: { ...form, [type]: selected } }
+        });
     };
 
     return (

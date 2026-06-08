@@ -51,7 +51,7 @@ function ProfileEditPage() {
             body: JSON.stringify({
                 bio: form.bio,
                 techTags: form.skill,
-                hobbyTags: form.fobby,
+                hobbyTags: form.hobby,
                 certTags: form.cert,
             }),
         });
@@ -76,7 +76,6 @@ function ProfileEditPage() {
                 {form.hobby.map((tag) => (
                     <div key={tag}>{tag}</div>
                 ))}
-
                 <button onClick={handleTagHobbyEditClick}>さらに表示</button>
             </div>
             <div>
@@ -84,7 +83,6 @@ function ProfileEditPage() {
                 {form.cert.map((tag) => (
                     <div key={tag}>{tag}</div>
                 ))}
-
                 <button onClick={handleTagCertEditClick}>さらに表示</button>
             </div>
 
