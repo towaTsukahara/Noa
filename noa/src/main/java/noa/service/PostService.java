@@ -3,6 +3,7 @@ package noa.service;
 import noa.dto.PostCreateRequest;
 import noa.entity.Post;
 import noa.entity.User;
+import noa.entity.Tag;
 import noa.entity.PostLike;
 import noa.repository.LikeRepository;
 import noa.repository.PostRepository;
@@ -26,19 +27,35 @@ public class PostService {
 
         private final PostRepository postRepository;
         private final LikeRepository likeRepository;
+        private final TagService tagService;
 
-        public PostService(PostRepository postRepository, LikeRepository likeRepository) {
+        public PostService(PostRepository postRepository, LikeRepository likeRepository,
+                        TagService tagService) {
                 this.postRepository = postRepository;
                 this.likeRepository = likeRepository;
+                this.tagService = tagService;
         }
 
-        // 通常投稿を作成する（投稿者は呼び出し側が渡す current user）
+        // 通常投稿を作成する（タグも一緒に保存）
+        @org.springframework.transaction.annotation.Transactional
         public Post create(User author, PostCreateRequest req) {
                 Post post = new Post();
                 post.setAuthor(author);
                 post.setBody(req.body());
-                post.setParentId(null); // 通常投稿は親なし（返信は F-109）
-                // is_deleted は false がデフォルト、created_at/updated_at は DB 任せ
+                post.setParentId(null);
+
+                // タグ名を findOrCreate で Tag に変換して紐付ける（重複は除く）
+                if (req.tags() != null && !req.tags().isEmpty()) {
+                        List<Tag> tags = new ArrayList<>();
+                        for (String name : req.tags()) {
+                                if (name == null || name.isBlank())
+                                        continue;
+                                Tag tag = tagService.findOrCreate(name);
+                                if (!tags.contains(tag))
+                                        tags.add(tag);
+                        }
+                        post.setTags(tags);
+                }
                 return postRepository.save(post);
         }
 
@@ -112,39 +129,38 @@ public class PostService {
         }
 
         // 自分がいいねした投稿一覧（いいねした順・カーソルページング）
-    public Map<String, Object> getMyLikes(User viewer, Long cursor, int limit) {
-        Pageable pageable = PageRequest.of(0, limit);
-        List<PostLike> likes = (cursor == null)
-                ? likeRepository.findMyLikesFirst(viewer.getId(), pageable)
-                : likeRepository.findMyLikesAfter(viewer.getId(), cursor, pageable);
+        public Map<String, Object> getMyLikes(User viewer, Long cursor, int limit) {
+                Pageable pageable = PageRequest.of(0, limit);
+                List<PostLike> likes = (cursor == null)
+                                ? likeRepository.findMyLikesFirst(viewer.getId(), pageable)
+                                : likeRepository.findMyLikesAfter(viewer.getId(), cursor, pageable);
 
-        // いいね順を保ったまま投稿を取得（削除済みは除外）
-        List<Post> posts = new ArrayList<>();
-        for (PostLike like : likes) {
-            postRepository.findById(like.getPostId())
-                    .filter(p -> !p.isDeleted())
-                    .ifPresent(posts::add);
+                // いいね順を保ったまま投稿を取得（削除済みは除外）
+                List<Post> posts = new ArrayList<>();
+                for (PostLike like : likes) {
+                        postRepository.findById(like.getPostId())
+                                        .filter(p -> !p.isDeleted())
+                                        .ifPresent(posts::add);
+                }
+
+                List<PostResponse> items = posts.stream()
+                                .map(p -> PostResponse.from(
+                                                p,
+                                                likeRepository.countByPostId(p.getId()),
+                                                true,
+                                                postRepository.countReplies(p.getId())))
+                                .toList();
+
+                // カーソルは likes の id（いいね順のしおり）
+                Long nextCursor = (likes.size() == limit && !likes.isEmpty())
+                                ? likes.get(likes.size() - 1).getId()
+                                : null;
+
+                Map<String, Object> result = new LinkedHashMap<>();
+                result.put("items", items);
+                result.put("nextCursor", nextCursor);
+                return result;
         }
-
-        List<PostResponse> items = posts.stream()
-                .map(p -> PostResponse.from(
-                        p,
-                        likeRepository.countByPostId(p.getId()),
-                        true,
-                        postRepository.countReplies(p.getId())
-                ))
-                .toList();
-
-        // カーソルは likes の id（いいね順のしおり）
-        Long nextCursor = (likes.size() == limit && !likes.isEmpty())
-                ? likes.get(likes.size() - 1).getId()
-                : null;
-
-        Map<String, Object> result = new LinkedHashMap<>();
-        result.put("items", items);
-        result.put("nextCursor", nextCursor);
-        return result;
-    }
 
         // === 投稿詳細を1件取得（いいね数・自分のいいね有無つき）===
         public PostResponse getPost(Long id, User viewer) {
