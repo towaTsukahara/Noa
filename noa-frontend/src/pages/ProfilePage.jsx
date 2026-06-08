@@ -186,7 +186,7 @@ function ProfilePage() {
 
             <div>
                 <button onClick={handlePostsClick}>投稿</button>
-                <button onClick={handleLikesClick}>いいね</button>
+                <button onClick={handleLikesClick}>いいね ({profile?.likedPostCount ?? 0})</button>
             </div>
 
             <div>

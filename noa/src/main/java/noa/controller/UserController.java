@@ -45,18 +45,9 @@ public class UserController {
             principal.getUser(),
             profileService.tagsOf(principal.getUser()),
             profileService.getPostCounts(principal.getUser()),
-            profileService.getLikeCount(principal.getUser()));
+            profileService.getLikeCount(principal.getUser()),
+            profileService.getLikedPostCount(principal.getUser()));
     }
-
-    // @PutMapping("/me/profile")
-    // public UserResponse updateProfile(
-    //         @Valid @RequestBody ProfileUpdateRequest req,
-    //         @AuthenticationPrincipal CustomUserDetails principal) {
-    //     if (principal == null)
-    //         throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "ログインが必要です");
-    //     profileService.updateProfile(principal.getUser(), req);
-    //     return UserResponse.from(principal.getUser());
-    //     }
 
     // 他ユーザーの公開プロフィール（完全秘匿ビュー）
     @GetMapping("/users/{handle}")

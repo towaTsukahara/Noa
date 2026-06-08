@@ -27,8 +27,12 @@ public interface LikeRepository extends JpaRepository<PostLike, Long> {
         "select l from PostLike l where l.userId = :userId and l.id < :cursor order by l.id desc")
     List<PostLike> findMyLikesAfter(Long userId, Long cursor, org.springframework.data.domain.Pageable pageable);
 
+    //いいね数カウント
     @Query("""
         select count(l) from PostLike l, Post p where l.postId = p.id and p.author.id = :userId and p.isDeleted = false
     """)
+    //いいねされた数
     long countRecievedLikes(Long userId);
+    //いいねした数
+    long countByuserId(Long uesrId);
 }
