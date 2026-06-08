@@ -70,10 +70,25 @@ function ProfilePage() {
         try {
             await api(`/posts/${postId}`, { method: "DELETE" });
             loadPosts(); // 削除後に一覧を再読込
+            loadProfile(); //削除後にプロフィール情報再取得
         } catch (e) {
             alert("削除できませんでした。");
         }
     };
+
+    //投稿・削除時、プロフィール情報再取得
+    const loadProfile = async () => {
+        try {
+            const me = await api("/me");
+            setProfile(me);
+        } catch {
+            setProfile(null);
+        }
+    };
+
+    useEffect(() => {
+        loadProfile();
+    }, []);
 
     // いいねのトグル（投稿タブ用。likedByMe で POST/DELETE を出し分け）
     const handleLikeToggle = async (post) => {

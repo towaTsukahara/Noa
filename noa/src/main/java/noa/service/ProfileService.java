@@ -6,7 +6,6 @@ import noa.dto.ProfileUpdateRequest;
 import noa.entity.ProfileUserTag;
 import noa.entity.Tag;
 import noa.entity.User;
-import noa.entity.Post;
 import noa.repository.PostRepository;
 import noa.repository.ProfileUserTagRepository;
 import noa.repository.UserRepository;
