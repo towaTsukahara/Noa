@@ -1,8 +1,6 @@
 //名前変更予定
 import { useState } from "react";
 import { useParams } from "react-router-dom";
-import { POSTS, TAGS } from "../date/mockData";
-import { getFollowedTags, followTag, unfollowTag } from "../date/followedTag";
 
 export default function TagDetailPage() {
 
