@@ -8,7 +8,10 @@ import java.util.List;
 public interface TagRepository extends JpaRepository<Tag, Long> {
 
     Optional<Tag> findByName(String name);
+
     // 名前検索（オートコンプリートとか）
     List<Tag> findByNameContainingIgnoreCaseOrderByName(String q);
 
+    // 検索機能用
+    List<Tag> findByNameContainingIgnoreCase(String keyword);
 }

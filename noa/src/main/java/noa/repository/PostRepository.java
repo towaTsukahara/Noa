@@ -39,4 +39,7 @@ public interface PostRepository extends JpaRepository<Post, Long> {
 
     //投稿数カウント用
     long countByAuthorIdAndParentIdIsNullAndIsDeletedFalse(Long authorId);
+
+    //検索機能用
+    List<Post> findByBodyContainingIgnoreCase(String keyword);
 }
