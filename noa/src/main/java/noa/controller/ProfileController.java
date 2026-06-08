@@ -37,6 +37,7 @@ public class ProfileController {
             return UserResponse.from(
                 principal.getUser(),
                 profileService.tagsOf(principal.getUser()),
-                profileService.getPostCounts(principal.getUser()));
+                profileService.getPostCounts(principal.getUser()),
+                profileService.getLikeCount(principal.getUser()));
         }
 }

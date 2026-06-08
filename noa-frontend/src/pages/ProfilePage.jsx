@@ -156,17 +156,20 @@ function ProfilePage() {
         <div>
             {/* ===== プロフィール表示部（F-104・モックのまま） ===== */}
             <div>
-                {/* <img src={profile.icon} alt="プロフィール画像" /> */}
-                {/* <div>{profile.name}</div> */}
+                <div>
+                    {/* <img src={profile.icon} alt="プロフィール画像" /> */}
+                    <div>{profile?.handle}</div>
+                    <div>社員番号: {profile?.employeeNo}</div>
+                    <div>メールアドレス: {profile?.email}</div>
+                </div>
                 <div>
                     <div>投稿数 {profile?.postCount ?? 0}</div>
-                    {/* <div>いいね数 {profile.likeCount}</div> */}
+                    <div>いいね数 {profile?.likeCount ?? 0}</div>
                 </div>
             </div>
 
             <div>
-                <div>{profile?.handle}</div>
-                <div>{profile?.bio}</div>
+                <div>自己紹介エリア: {profile?.bio}</div>
 
                 <h3>技術タグ</h3>
                 {profile?.tags?.tech.map((t) => <span key={t}>{t} </span>)}
