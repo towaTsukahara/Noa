@@ -174,10 +174,10 @@ function ProfilePage() {
                 <h3>技術タグ</h3>
                 {profile?.tags?.tech.map((t) => <span key={t}>{t} </span>)}
 
-                <h3>趣味タグ</h3>
+                <h3>興味タグ</h3>
                 {profile?.tags?.hobby.map((t) => <span key={t}>{t} </span>)}
 
-                <h3>資格タグ</h3>
+                <h3>趣味タグ</h3>
                 {profile?.tags?.cert.map((t) => <span key={t}>{t} </span>)}
             </div>
 
