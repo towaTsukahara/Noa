@@ -141,12 +141,12 @@ function ProfilePage() {
         <div>
             {/* ===== プロフィール表示部（F-104・モックのまま） ===== */}
             <div>
-                {/* <img src={profile.icon} alt="プロフィール画像" />
-                <div>{profile.name}</div>
+                {/* <img src={profile.icon} alt="プロフィール画像" /> */}
+                {/* <div>{profile.name}</div> */}
                 <div>
-                    <div>投稿数 {profile.postCount}</div>
-                    <div>いいね数 {profile.likeCount}</div>
-                </div> */}
+                    <div>投稿数 {profile?.postCount ?? 0}</div>
+                    {/* <div>いいね数 {profile.likeCount}</div> */}
+                </div>
             </div>
 
             <div>

@@ -6,6 +6,8 @@ import noa.dto.ProfileUpdateRequest;
 import noa.entity.ProfileUserTag;
 import noa.entity.Tag;
 import noa.entity.User;
+import noa.entity.Post;
+import noa.repository.PostRepository;
 import noa.repository.ProfileUserTagRepository;
 import noa.repository.UserRepository;
 import org.springframework.stereotype.Service;
@@ -17,15 +19,23 @@ public class ProfileService {
     private final UserRepository userRepository;
     private final ProfileUserTagRepository userTagRepository;
     private final TagService tagService;
+    private final PostRepository postRepository;
 
     public ProfileService(
             UserRepository userRepository,
             ProfileUserTagRepository userTagRepository,
-            TagService tagService) {
+            TagService tagService,
+            PostRepository postRepository,
+            PostService postService) {
 
         this.userRepository = userRepository;
         this.userTagRepository = userTagRepository;
         this.tagService = tagService;
+        this.postRepository = postRepository;
+    }
+
+    public long getPostCounts(User user) {
+        return postRepository.countByAuthorIdAndParentIdIsNullAndIsDeletedFalse(user.getId());
     }
 
     public Map<String, List<String>> tagsOf(User user) {
