@@ -6,12 +6,34 @@ function ProfileEditPage() {
     const navigate = useNavigate();
     const location = useLocation();
 
-    const [form, setFrom] = useState(null);
-
+    const [form, setForm] = useState(
+        location.state?.form || {
+            bio: "",
+            skill: [],
+            hobby: [],
+            cert: []
+        }
+    );
+    
     useEffect(() => {
+        if (location.state?.form) {
+            setForm(location.state.form);
+        }
+    }, [location.state]);
 
-        if (location.state?.form) { setFrom(location.state.form); return; }
-        api("/me").then((me) => setFrom({
+    const handleTagSkillEditClick = () => {
+        navigate("/tags/skilledit", { state: { form } });
+    };
+    const handleTagHobbyEditClick = () => {
+        navigate("/tags/hobbyedit", { state: { form } });
+    };
+    const handleTagCertEditClick = () => {
+        navigate("/tags/certedit", { state: { form } });
+    };
+
+    useEffect(()=>{
+        if (location.state?.form) { setForm(location.state.form); return; }
+        api("/me").then((me) => setForm({
             bio: me.bio || "",
             skill: me.tags?.tech || [],
             hobby: me.tags?.hobby || [],
@@ -29,7 +51,7 @@ function ProfileEditPage() {
             body: JSON.stringify({
                 bio: form.bio,
                 techTags: form.skill,
-                hobbyTags: form.fobby,
+                hobbyTags: form.hobby,
                 certTags: form.cert,
             }),
         });
@@ -41,19 +63,28 @@ function ProfileEditPage() {
             <h1>プロフィール編集</h1>
 
                 <h3>自己紹介</h3>
-                <textarea value={form.bio} onChange={(e) => setFrom({ ...form, bio: e.target.value })} />
-
+                <textarea value={form.bio} onChange={(e) => setForm({ ...form, bio: e.target.value })} />
+            <div>
                 <h3>技術タグ</h3>
-                {form.skill.map((t) => <span key={t}>{t} </span>)}
-                <button onClick={() => editTags("skill")}>編集</button>
-
+                {form.skill.map((tag) => (
+                    <div key={tag}>{tag}</div>
+                ))}
+                <button onClick={handleTagSkillEditClick}>さらに表示</button>
+            </div>
+            <div>
                 <h3>興味タグ</h3>
-                {form.hobby.map((t) => <span key={t}>{t} </span>)}
-                <button onClick={() => editTags("hobby")}>編集</button>
-
+                {form.hobby.map((tag) => (
+                    <div key={tag}>{tag}</div>
+                ))}
+                <button onClick={handleTagHobbyEditClick}>さらに表示</button>
+            </div>
+            <div>
                 <h3>資格タグ</h3>
-                {form.cert.map((t) => <span key={t}>{t} </span>)}
-                <button onClick={() => editTags("cert")}>編集</button>
+                {form.cert.map((tag) => (
+                    <div key={tag}>{tag}</div>
+                ))}
+                <button onClick={handleTagCertEditClick}>さらに表示</button>
+            </div>
 
             <div>
                 <button onClick={() => navigate("/profile")}>キャンセル</button>

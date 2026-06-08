@@ -13,6 +13,7 @@ import PostDetailPage from './pages/PostDetailPage';
 import AppLayout from './components/layout/AppLayout';
 import SearchPage from './pages/SearchPage';
 import TagDetailPage from './pages/TagDetailPage';
+import NotificationPage from './pages/NotificationPage';
 
 function App() {
   return (
@@ -40,6 +41,7 @@ function App() {
           <Route path="/other-profile" element={<OtherProfilePage />} />
           <Route path="/search" element={<SearchPage />} />
           <Route path="/tag/:tagId" element={<TagDetailPage />} />
+          <Route path="/notifications" element={<NotificationPage />} />
         </Route>
       </Routes>
     </BrowserRouter>
