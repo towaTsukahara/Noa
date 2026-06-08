@@ -65,13 +65,13 @@ function PostDetailPage() {
                 const data = await api(`/posts/${id}`);
                 setPost(data);
 
-                const repliesData = await api(`/posts/${id}/replies`);
+                const commentsData = await api(`/comments?postId=${id}`);
 
                 setComments(
-                    repliesData.items.map((reply) => ({
-                        id: reply.id,
-                        author: reply.author.handle,
-                        body: reply.body,
+                    commentsData.map((comment) => ({
+                        id: comment.id,
+                        author: comment.authorName,
+                        body: comment.body,
                         mine: false,
                     }))
                 );

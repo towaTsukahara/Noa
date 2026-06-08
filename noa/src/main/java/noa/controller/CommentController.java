@@ -31,9 +31,13 @@ public class CommentController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public Comment create(
+    public CommentResponse create(
             @RequestBody CommentCreateRequest request,
             @AuthenticationPrincipal CustomUserDetails principal) {
+
+        System.out.println("principal = " + principal);
+        System.out.println("postId = " + request.getPostId());
+        System.out.println("body = " + request.getBody());
 
         if (principal == null) {
             throw new ResponseStatusException(
@@ -41,8 +45,18 @@ public class CommentController {
                     "ログインが必要です");
         }
 
-        return commentService.create(
+        Comment comment = commentService.create(
                 principal.getUser(),
                 request);
+
+        CommentResponse response = new CommentResponse();
+
+        response.setId(comment.getId());
+        response.setAuthorId(comment.getAuthor().getId());
+        response.setAuthorName(comment.getAuthor().getHandle());
+        response.setBody(comment.getBody());
+        response.setCreatedAt(comment.getCreatedAt());
+
+        return response;
     }
 }
