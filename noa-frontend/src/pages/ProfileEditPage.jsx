@@ -1,28 +1,59 @@
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { api } from "../api/client";
 
 function ProfileEditPage() {
     const navigate = useNavigate();
+    const location = useLocation();
 
-    const bio = "フロントエンジニアです。";
-    const skillTags = ["React", "JavaScript", "HTML", "CSS",];
-    const hobbyTags = ["ゲーム", "読書", "旅行",];
-    const certTags = ["基本情報技術者", "応用情報技術者"];
+    const [form, setForm] = useState({
+        bio: "",
+        skill: [],
+        hobby: [],
+        cert: [],
+    });
+
+    useEffect(() => {
+        if (location.state?.form) {
+            setForm(location.state.form);
+            return;
+        }
+
+        api("/me").then((me) =>
+            setForm({
+                bio: me.bio || "",
+                skill: me.tags?.tech || [],
+                hobby: me.tags?.hobby || [],
+                cert: me.tags?.cert || [],
+            })
+        );
+    }, [location.state]);
+
+    if (!form) return <p>読み込み中...</p>;
 
     const handleTagSkillEditClick = () => {
-        navigate("/tags/skilledit");
+        navigate("/tags/skilledit", { state: { form } });
     };
+
     const handleTagHobbyEditClick = () => {
-        navigate("/tags/hobbyedit");
+        navigate("/tags/hobbyedit", { state: { form } });
     };
+
     const handleTagCertEditClick = () => {
-        navigate("/tags/certedit");
+        navigate("/tags/certedit", { state: { form } });
     };
 
-    const handleCancelClick = () => {
-        navigate("/profile");
-    };
+    const handleSave = async () => {
+        await api("/me/profile", {
+            method: "PUT",
+            body: JSON.stringify({
+                bio: form.bio,
+                techTags: form.skill,
+                hobbyTags: form.hobby,
+                certTags: form.cert,
+            }),
+        });
 
-    const handleSaveClick = () => {
         navigate("/profile");
     };
 
@@ -32,38 +63,51 @@ function ProfileEditPage() {
 
             <div>
                 <h3>自己紹介</h3>
-                <textarea defaultValue={bio} />
+                <textarea
+                    value={form.bio}
+                    onChange={(e) =>
+                        setForm({ ...form, bio: e.target.value })
+                    }
+                />
             </div>
 
             <div>
                 <h3>技術タグ</h3>
-                {skillTags.map((tag) => (
+                {form.skill.map((tag) => (
                     <div key={tag}>{tag}</div>
                 ))}
-                <button onClick={handleTagSkillEditClick}>さらに表示</button>
+                <button onClick={handleTagSkillEditClick}>
+                    さらに表示
+                </button>
             </div>
 
             <div>
                 <h3>興味タグ</h3>
-                {hobbyTags.map((tag) => (
+                {form.hobby.map((tag) => (
                     <div key={tag}>{tag}</div>
                 ))}
-
-                <button onClick={handleTagHobbyEditClick}>さらに表示</button>
+                <button onClick={handleTagHobbyEditClick}>
+                    さらに表示
+                </button>
             </div>
 
             <div>
                 <h3>資格タグ</h3>
-                {certTags.map((tag) => (
+                {form.cert.map((tag) => (
                     <div key={tag}>{tag}</div>
                 ))}
-
-                <button onClick={handleTagCertEditClick}>さらに表示</button>
+                <button onClick={handleTagCertEditClick}>
+                    さらに表示
+                </button>
             </div>
 
             <div>
-                <button onClick={handleCancelClick}>キャンセル</button>
-                <button onClick={handleSaveClick}>保存</button>
+                <button onClick={() => navigate("/profile")}>
+                    キャンセル
+                </button>
+                <button onClick={handleSave}>
+                    保存
+                </button>
             </div>
         </div>
     );
