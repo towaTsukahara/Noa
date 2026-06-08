@@ -1,116 +1,108 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { api } from "../api/client";
+import UserHandle from "../components/user/UserHandle";
 
 export default function FollowPage() {
-
     const navigate = useNavigate();
 
     const [activeTab, setActiveTab] = useState("user");
     const [searchKeyword, setSearchKeyword] = useState("");
 
-    // ダミーデータ
-    const followedUsers = [
-        { id: 1, name: "田中太郎" },
-        { id: 2, name: "佐藤花子" },
-        { id: 3, name: "鈴木一郎" },
-        { id: 4, name: "山田次郎" },
-    ];
+    const [users, setUsers] = useState([]);   // フォロー中ユーザー（UserSummary）
+    const [tags, setTags] = useState([]);      // フォロー中タグ（{id, name}）
+    const [loading, setLoading] = useState(true);
 
-    const followedTags = {
-        technology: [
-            { id: 1, name: "Java" },
-            { id: 2, name: "Spring Boot" },
-            { id: 3, name: "React" },
-        ],
-        hobby: [
-            { id: 4, name: "映画鑑賞" },
-            { id: 5, name: "旅行" },
-        ],
-        qualification: [
-            { id: 6, name: "基本情報技術者" },
-            { id: 7, name: "応用情報技術者" },
-        ],
-    };
-
-    // DBから取得する想定（現在はダミー）
-    const counts = {
-        user: 4,
-        tag: 7,
-        technology: 3,
-        hobby: 2,
-        qualification: 2,
-    };
-
-    const filteredUsers = useMemo(() => {
-        return followedUsers.filter((user) =>
-            user.name.toLowerCase().includes(searchKeyword.toLowerCase())
-        );
-    }, [searchKeyword]);
-
-    const filteredTags = useMemo(() => {
-        return {
-            technology: followedTags.technology.filter((tag) =>
-                tag.name.toLowerCase().includes(searchKeyword.toLowerCase())
-            ),
-            hobby: followedTags.hobby.filter((tag) =>
-                tag.name.toLowerCase().includes(searchKeyword.toLowerCase())
-            ),
-            qualification: followedTags.qualification.filter((tag) =>
-                tag.name.toLowerCase().includes(searchKeyword.toLowerCase())
-            ),
-        };
-    }, [searchKeyword]);
-
-    const handleUnfollow = (userId) => {
-        const result = window.confirm("フォローを解除しますか？");
-
-        if (result) {
-            console.log(`${userId} のフォローを解除`);
+    // フォロー中のユーザーとタグを取得
+    const load = async () => {
+        setLoading(true);
+        try {
+            const u = await api("/me/following");        // { items, nextCursor }
+            setUsers(u.items);
+            const t = await api("/me/following/tags");   // [{ id, name }]
+            setTags(t);
+        } catch (e) {
+            // 失敗時は空のまま（必要ならエラー表示を足す）
+        } finally {
+            setLoading(false);
         }
     };
 
-    const handleBackClick = () => {
-        navigate("/profile")
+    useEffect(() => {
+        load();
+    }, []);
+
+    // 検索（取得済みデータをフロントで絞り込む）
+    const filteredUsers = useMemo(() => {
+        const kw = searchKeyword.toLowerCase();
+        return users.filter((u) =>
+            (u.nickname || u.handle).toLowerCase().includes(kw)
+        );
+    }, [searchKeyword, users]);
+
+    const filteredTags = useMemo(() => {
+        const kw = searchKeyword.toLowerCase();
+        return tags.filter((t) => t.name.toLowerCase().includes(kw));
+    }, [searchKeyword, tags]);
+
+    // ユーザーのフォロー解除
+    const handleUnfollowUser = async (handle) => {
+        if (!window.confirm("フォローを解除しますか？")) return;
+        try {
+            await api(`/users/${handle}/follow`, { method: "DELETE" });
+            setUsers((prev) => prev.filter((u) => u.handle !== handle));
+        } catch (e) {
+            alert("解除に失敗しました。");
+        }
     };
 
-    const handleFollowSkillEditClick = () => {
-        navigate("/follow/skilltags")
-    }
-    const handleFollowHobbyEditClick = () => {
-        navigate("/follow/hobbytags")
-    }
-    const handleFollowCertEditClick = () => {
-        navigate("/follow/certtags")
-    }
+    // タグのフォロー解除
+    const handleUnfollowTag = async (name) => {
+        if (!window.confirm(`#${name} のフォローを解除しますか？`)) return;
+        try {
+            await api(`/tags/${encodeURIComponent(name)}/follow`, { method: "DELETE" });
+            setTags((prev) => prev.filter((t) => t.name !== name));
+        } catch (e) {
+            alert("解除に失敗しました。");
+        }
+    };
+
+    if (loading) return <p style={{ padding: 20 }}>読み込み中...</p>;
 
     return (
-        <div>
-            {/* 検索バー */}
+        <div style={{ maxWidth: 800, margin: "0 auto", padding: 20 }}>
             <input
                 type="text"
                 placeholder="検索"
                 value={searchKeyword}
                 onChange={(e) => setSearchKeyword(e.target.value)}
+                style={{ width: "100%", padding: 8, marginBottom: 16 }}
             />
 
-            {/* タブ切替 */}
-            <div>
+            {/* タブ切替（件数は取得した配列の長さ） */}
+            <div style={{ display: "flex", gap: 8, marginBottom: 16 }}>
                 <button onClick={() => setActiveTab("user")}>
-                    ユーザー（{counts.user}）
+                    ユーザー（{users.length}）
                 </button>
-
                 <button onClick={() => setActiveTab("tag")}>
-                    タグ（{counts.tag}）
+                    タグ（{tags.length}）
                 </button>
             </div>
 
             {activeTab === "user" && (
                 <div>
                     <h2>フォロー中のユーザー</h2>
-                    {filteredUsers.map((user) => (
-                        <div key={user.id}>
-                            {user.name}
-                            <button onClick={() => handleUnfollow(user.id)}>
+                    {filteredUsers.length === 0 && <p>フォロー中のユーザーはいません。</p>}
+                    {filteredUsers.map((u) => (
+                        <div key={u.handle} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "8px 0", borderBottom: "1px solid #eee" }}>
+                            {/* 名前クリックで相手プロフィールへ */}
+                            <span
+                                style={{ cursor: "pointer" }}
+                                onClick={() => navigate(`/users/${u.handle}`)}
+                            >
+                                <UserHandle user={u} />
+                            </span>
+                            <button onClick={() => handleUnfollowUser(u.handle)}>
                                 フォローをやめる
                             </button>
                         </div>
@@ -118,40 +110,26 @@ export default function FollowPage() {
                 </div>
             )}
 
-            
             {activeTab === "tag" && (
                 <div>
                     <h2>フォロー中のタグ</h2>
-                    <h3>技術（{counts.technology}）</h3>
-                    {filteredTags.technology.map((tag) => (
-                        <div key={tag.id}>{tag.name}</div>
+                    {filteredTags.length === 0 && <p>フォロー中のタグはありません。</p>}
+                    {filteredTags.map((t) => (
+                        <div key={t.id} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "8px 0", borderBottom: "1px solid #eee" }}>
+                            <span>#{t.name}</span>
+                            <button onClick={() => handleUnfollowTag(t.name)}>
+                                フォローをやめる
+                            </button>
+                        </div>
                     ))}
-                    <button onClick={handleFollowSkillEditClick}>
-                        編集
-                    </button>
-
-                    <h3>趣味（{counts.hobby}）</h3>
-                    {filteredTags.hobby.map((tag) => (
-                        <div key={tag.id}>{tag.name}</div>
-                    ))}
-                    <button onClick={handleFollowHobbyEditClick}>
-                        編集
-                    </button>
-
-                    <h3>資格（{counts.qualification}）</h3>
-                    {filteredTags.qualification.map((tag) => (
-                        <div key={tag.id}>{tag.name}</div>
-                    ))}
-                    <button onClick={handleFollowCertEditClick}>
-                        編集
+                    <button onClick={() => navigate("/follow/tags")} style={{ marginTop: 12 }}>
+                        ＋ タグを追加・編集
                     </button>
                 </div>
             )}
 
-            <div>
-                <button onClick={handleBackClick}>
-                    戻る
-                </button>
+            <div style={{ marginTop: 24 }}>
+                <button onClick={() => navigate("/profile")}>戻る</button>
             </div>
         </div>
     );

@@ -59,4 +59,6 @@ public class Post {
     public void setDeletedAt(OffsetDateTime deletedAt) { this.deletedAt = deletedAt; }
     public OffsetDateTime getCreatedAt() { return createdAt; }
     public OffsetDateTime getUpdatedAt() { return updatedAt; }
+    public List<Tag> getTags() { return tags; }
+    public void setTags(List<Tag> tags) { this.tags = tags; }
 }

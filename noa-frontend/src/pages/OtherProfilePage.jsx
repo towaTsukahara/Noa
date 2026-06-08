@@ -1,186 +1,89 @@
 import { useState, useEffect } from "react";
+import { useParams, useNavigate } from "react-router-dom";
+import { api } from "../api/client";
+import { useAuth } from "../context/AuthContext";
+import FollowButton from "../components/user/FollowButton";
+import { relativeTime } from "../utils/relativeTime";
 
 export default function OtherProfilePage() {
-  // 本来はURLやAPIから取得
-  const targetUserId = "user001";
+  const { handle } = useParams(); // URLの /users/:handle から取得
+  const { user } = useAuth();
+  const navigate = useNavigate();
 
-  const [nickname, setNickname] = useState("");
+  const [profile, setProfile] = useState(null);
+  const [posts, setPosts] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
+  // 自分自身のhandleなら自分のプロフィールへ
   useEffect(() => {
-    const savedName = localStorage.getItem(
-      `nickname_${targetUserId}`
-    );
-
-    if (savedName) {
-      setNickname(savedName);
+    if (user && user.handle === handle) {
+      navigate("/profile", { replace: true });
     }
-  }, []);
+  }, [user, handle]);
 
-  const handleSave = () => {
-    localStorage.setItem(
-      `nickname_${targetUserId}`,
-      nickname
-    );
-
-    alert("保存しました");
+  const load = async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const p = await api(`/users/${handle}`); // 秘匿ビュー（isFollowing/nickname実値）
+      setProfile(p);
+      const data = await api(`/users/${handle}/posts`);
+      setPosts(data.items);
+    } catch (e) {
+      setError("ユーザー情報の取得に失敗しました。");
+    } finally {
+      setLoading(false);
+    }
   };
 
+  useEffect(() => {
+    load();
+  }, [handle]);
+
+  if (loading) return <p style={{ padding: 20 }}>読み込み中...</p>;
+  if (error) return <p style={{ padding: 20, color: "red" }}>{error}</p>;
+  if (!profile) return null;
+
   return (
-    <div
-      style={{
-        maxWidth: "800px",
-        margin: "0 auto",
-        padding: "20px",
-      }}
-    >
-      {/* ヘッダー画像 */}
-      <div
-        style={{
-          height: "180px",
-          background: "#ddd",
-          borderRadius: "8px",
-        }}
-      />
+    <div style={{ maxWidth: 800, margin: "0 auto", padding: 20 }}>
+      {/* TODO(フェーズ2): アイコン画像はメディア機能実装後。今はプレースホルダ */}
+      <div style={{ width: 100, height: 100, background: "#bbb", borderRadius: "50%", margin: "0 auto 12px" }} />
 
-      {/* アイコン */}
-      <div
-        style={{
-          width: "100px",
-          height: "100px",
-          background: "#bbb",
-          borderRadius: "50%",
-          margin: "-50px auto 20px",
-          border: "4px solid white",
-        }}
-      />
+      {/* 表示名：nickname優先・なければhandle（F-105の秘匿ルール） */}
+      <h2 style={{ textAlign: "center", margin: "0 0 4px" }}>
+        {profile.nickname || profile.handle}
+      </h2>
+      {profile.nickname && (
+        <p style={{ textAlign: "center", color: "#888", fontSize: 13, margin: 0 }}>{profile.handle}</p>
+      )}
+      {/* TODO(F-114): ニックネームの設定・変更UIは nickname API 本実装後にここへ */}
 
-      {/* ニックネーム編集 */}
-      <div
-        style={{
-          display: "flex",
-          justifyContent: "center",
-          gap: "10px",
-          marginBottom: "20px",
-        }}
-      >
-        <input
-          type="text"
-          value={nickname}
-          placeholder="この人の呼び名"
-          onChange={(e) =>
-            setNickname(e.target.value)
-          }
-          style={{
-            padding: "8px",
-            border: "1px solid #ccc",
-          }}
-        />
-
-        <button
-          onClick={handleSave}
-          style={{
-            padding: "8px 16px",
-            cursor: "pointer",
-          }}
-        >
-          保存
-        </button>
+      <div style={{ textAlign: "center", margin: "16px 0" }}>
+        <FollowButton handle={profile.handle} initialFollowing={profile.isFollowing} />
       </div>
 
-      {/* 統計 */}
-      <div
-        style={{
-          display: "flex",
-          justifyContent: "center",
-          gap: "40px",
-          marginBottom: "30px",
-        }}
-      >
-        <div>
-          <div>投稿</div>
-          <strong>12</strong>
-        </div>
-
-        <div>
-          <div>いいね</div>
-          <strong>20</strong>
-        </div>
-      </div>
-
-      {/* 自己紹介 */}
-      <section style={{ marginBottom: "20px" }}>
+      <section style={{ marginBottom: 20 }}>
         <h3>自己紹介</h3>
-
-        <div
-          style={{
-            border: "1px solid #ccc",
-            padding: "16px",
-            minHeight: "80px",
-          }}
-        >
-          自己紹介文
-        </div>
+        <p style={{ overflowWrap: "anywhere", whiteSpace: "pre-wrap" }}>{profile.bio || "（未設定）"}</p>
       </section>
 
-      {/* 興味タグ */}
-      <section style={{ marginBottom: "20px" }}>
+      <section style={{ marginBottom: 20 }}>
         <h3>興味タグ</h3>
-
-        <div
-          style={{
-            border: "1px solid #ccc",
-            padding: "16px",
-          }}
-        >
-          #映画 #カフェ #旅行
-        </div>
+        <p>技術: {profile.tags.tech.join("、") || "—"}</p>
+        <p>趣味: {profile.tags.hobby.join("、") || "—"}</p>
+        <p>資格: {profile.tags.cert.join("、") || "—"}</p>
       </section>
 
-      {/* 技術タグ */}
-      <section style={{ marginBottom: "20px" }}>
-        <h3>技術スタック</h3>
-
-        <div
-          style={{
-            border: "1px solid #ccc",
-            padding: "16px",
-          }}
-        >
-          #React #JavaScript
-        </div>
-      </section>
-
-      {/* 投稿一覧 */}
       <h3>投稿</h3>
-
-      {[1, 2].map((post) => (
-        <div
-          key={post}
-          style={{
-            border: "1px solid #ccc",
-            padding: "16px",
-            marginBottom: "12px",
-          }}
-        >
-          <div
-            style={{
-              fontWeight: "bold",
-              marginBottom: "8px",
-            }}
-          >
-            {nickname || "未設定"}
+      {posts.length === 0 && <p>まだ投稿がありません。</p>}
+      {posts.map((post) => (
+        <div key={post.id} style={{ border: "1px solid #ccc", borderRadius: 8, padding: 12, marginBottom: 10 }}>
+          <div style={{ overflowWrap: "anywhere", whiteSpace: "pre-wrap" }}>{post.body}</div>
+          <div style={{ color: "#666", fontSize: 13, marginTop: 6 }}>
+            ♡ {post.likeCount}　💬 {post.replyCount}　{relativeTime(post.createdAt)}
           </div>
-
-          <div>投稿内容</div>
-
-          <div
-            style={{
-              marginTop: "10px",
-              color: "#666",
-            }}
-          >
-            ♡ 12
-          </div>
+          {/* いいねトグルが必要ならタイムラインと同じ handleLikeToggle パターンを追加 */}
         </div>
       ))}
     </div>
