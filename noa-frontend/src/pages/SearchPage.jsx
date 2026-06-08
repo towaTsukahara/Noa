@@ -1,11 +1,12 @@
 import { useState } from "react";
 import { POSTS, TAGS } from "../date/mockData";
 import { useNavigate } from "react-router-dom";
+import { getFollowedTags, followTag, unfollowTag } from "../date/followedTag";
 
 export default function SearchPage() {
     const [keyword, setKeyword] = useState("");
     const [selectedTab, setSelectedTab] = useState("posts");
-    const [followedTags, setFollowedTags] = useState(["React", "AWS",]);
+    const [myFollowedTags, setMyFollowedTags] = useState(getFollowedTags());
     const navigate = useNavigate();
 
     const filteredPosts = POSTS
@@ -38,12 +39,14 @@ export default function SearchPage() {
     });
 
     const toggleFollow = (tagName) => {
-        setFollowedTags((prev) =>
-            prev.includes(tagName)
-                ? prev.filter(
-                    (name) => name !== tagName
-                )
-                : [...prev, tagName]
+        if (
+            myFollowedTags.includes(tagName)
+        ) {
+            unfollowTag(tagName);
+        } else {
+            followTag(tagName);
+        }
+        setMyFollowedTags([...getFollowedTags()]
         );
     };
 
@@ -57,10 +60,6 @@ export default function SearchPage() {
                 value={keyword}
                 onChange={(e) => setKeyword(e.target.value)}
             />
-
-            <button onClick={() => handleSearch()}>
-                検索
-            </button>
 
             <div>
                 <button onClick={() => setSelectedTab("posts")}>投稿</button>
@@ -84,12 +83,12 @@ export default function SearchPage() {
             ) : (
                 <div>
                     {filteredTags.map((tag) => {
-                        const isFollowed = followedTags.includes(tag.name);
+                        const isFollowed = myFollowedTags.includes(tag.name);
 
                         return (
                             <div key={tag.id}>
                                 <span
-                                    onClick={() => navigate(`tag/${tag.id}`)}
+                                    onClick={() => navigate(`/tag/${tag.id}`)}
                                     style={{ cursor: "pointer" }}>
                                     {tag.name}
                                 </span>
