@@ -114,7 +114,9 @@ function TimelinePage() {
             >
               {post.likedByMe ? "♥" : "♡"} {post.likeCount}
             </button>
-            <span>💬 {post.replyCount}</span>
+            <Link to={`/post/${post.id}?reply=1`} className="reply-button">
+              💬 {post.replyCount}
+            </Link>
           </div>
         </article>
       ))}

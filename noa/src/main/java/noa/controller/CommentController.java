@@ -68,4 +68,14 @@ public class CommentController {
         }
         return commentService.getMyComments(principal.getUser());
     }
+
+    @DeleteMapping("/{commentId}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void delete(@PathVariable Long commentId,
+                       @AuthenticationPrincipal CustomUserDetails principal) {
+        if (principal == null) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "ログインが必要です");
+        }
+        commentService.delete(commentId, principal.getUser());
+    }
 }
