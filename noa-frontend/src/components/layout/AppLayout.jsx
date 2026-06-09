@@ -4,7 +4,7 @@ import SideBar from "./SideBar";
 import NavBar from "./NavBar";
 import PostComposeModal from "../post/PostComposeModal";
 import { useAuth } from "../../context/AuthContext";
-import "../../pages/TimelinePage.css";
+import "./AppLayout.css";
 
 function AppLayout() {
   const { user, loading } = useAuth();

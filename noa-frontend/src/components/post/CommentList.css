@@ -1,0 +1,97 @@
+/* Comments — CommentList / CommentForm / CommentDeleteButton
+   構造:
+     .comments > h3 + .comment(> strong.comment-author + p.comment-body + button.comment-delete)
+     .comment-form > textarea.field + button.btn */
+
+.comments {
+  padding: 0;
+}
+.comments h3 {
+  padding: 14px 22px 6px;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--soft);
+  letter-spacing: 0.02em;
+}
+
+.comment {
+  padding: 13px 22px;
+  border-bottom: 1px solid var(--line2);
+}
+.comment-author {
+  display: block;
+  font-family: var(--mono-font);
+  font-size: 11.5px;
+  font-weight: 500;
+  color: var(--mono);
+  margin-bottom: 4px;
+}
+.comment-body {
+  font-size: 14px;
+  line-height: 1.7;
+  color: #2b3038;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+/* 削除ボタン（自分のコメントのみ表示） */
+.comment-delete {
+  margin-top: 8px;
+  border: 1px solid #e7d4d1;
+  background: #fff;
+  color: var(--danger);
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 500;
+  padding: 5px 12px;
+  border-radius: var(--r-sm);
+  cursor: pointer;
+  transition: background 0.12s, border-color 0.12s;
+}
+.comment-delete:hover {
+  background: #f7ece9;
+  border-color: var(--danger);
+}
+
+/* 返信フォーム */
+.comment-form {
+  padding: 16px 22px 24px;
+}
+.comment-form textarea {
+  width: 100%;
+  min-height: 84px;
+  font-family: inherit;
+  font-size: 14px;
+  line-height: 1.7;
+  color: var(--ink);
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: var(--r-md);
+  padding: 11px 14px;
+  outline: none;
+  resize: vertical;
+  transition: border-color 0.13s, box-shadow 0.13s;
+}
+.comment-form textarea::placeholder {
+  color: var(--faint);
+}
+.comment-form textarea:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-bg);
+}
+.comment-form button {
+  margin-top: 10px;
+  font-family: inherit;
+  font-weight: 600;
+  font-size: 13.5px;
+  padding: 9px 20px;
+  border-radius: var(--r-md);
+  border: 1px solid var(--accent);
+  background: var(--accent);
+  color: #fff;
+  cursor: pointer;
+  transition: background 0.14s;
+}
+.comment-form button:hover {
+  background: var(--accent-d);
+}

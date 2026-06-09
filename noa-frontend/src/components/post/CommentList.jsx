@@ -1,27 +1,20 @@
 import CommentDeleteButton from "./CommentDeleteButton";
+import "./CommentList.css";
 
 function CommentList({ comments, onDeleteComment }) {
   return (
-    <div>
+    <div className="comments">
       <h3>コメント</h3>
 
       {comments.map((comment) => (
-        <div
-          key={comment.id}
-          style={{
-            borderBottom: "1px solid #ddd",
-            padding: "8px 0",
-          }}
-        >
-          <strong>{comment.author}</strong>
+        <div key={comment.id} className="comment">
+          <strong className="comment-author">{comment.author}</strong>
 
-          <p>{comment.body}</p>
+          <p className="comment-body">{comment.body}</p>
 
           {comment.mine && (
             <CommentDeleteButton
-              onDelete={() =>
-                onDeleteComment(comment.id)
-              }
+              onDelete={() => onDeleteComment(comment.id)}
             />
           )}
         </div>

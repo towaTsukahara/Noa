@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { api } from "../../api/client";
 import { useAuth } from "../../context/AuthContext";
+import "./FollowButton.css";
 
 /**
  * フォロー/解除のトグルボタン（F-113）。
@@ -35,17 +36,9 @@ function FollowButton({ handle, initialFollowing, onChanged }) {
 
   return (
     <button
+      className={`follow-button ${following ? "is-following" : ""}`}
       onClick={toggle}
       disabled={busy}
-      style={{
-        padding: "8px 20px",
-        borderRadius: 999,
-        cursor: "pointer",
-        border: following ? "1px solid #ccc" : "none",
-        background: following ? "#fff" : "#1a1a1a",
-        color: following ? "#333" : "#fff",
-        fontWeight: "bold",
-      }}
     >
       {following ? "フォロー中" : "フォローする"}
     </button>

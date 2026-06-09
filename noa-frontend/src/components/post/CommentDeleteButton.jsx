@@ -1,3 +1,5 @@
+import "./CommentList.css";
+
 function CommentDeleteButton({ onDelete }) {
   const handleDelete = () => {
     const result = window.confirm(
@@ -10,7 +12,7 @@ function CommentDeleteButton({ onDelete }) {
   };
 
   return (
-    <button onClick={handleDelete}>
+    <button className="comment-delete" onClick={handleDelete}>
       削除
     </button>
   );

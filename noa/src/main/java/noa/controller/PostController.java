@@ -12,6 +12,8 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/api/v1")
 public class PostController {
@@ -52,28 +54,5 @@ public class PostController {
         if (principal == null)
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "ログインが必要です");
         return postService.getPost(id, principal.getUser());
-    }
-
-    // 返信一覧
-    @GetMapping("/posts/{id}/replies")
-    public Map<String, Object> replies(@PathVariable Long id,
-            @RequestParam(required = false) Long cursor,
-            @RequestParam(defaultValue = "20") int limit,
-            @AuthenticationPrincipal CustomUserDetails principal) {
-        if (principal == null)
-            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "ログインが必要です");
-        return postService.getReplies(id, cursor, limit, principal.getUser());
-    }
-
-    // 返信作成（入力は投稿作成と同じ PostCreateRequest を再利用）
-    @PostMapping("/posts/{id}/replies")
-    @ResponseStatus(HttpStatus.CREATED)
-    public PostResponse reply(@PathVariable Long id,
-            @Valid @RequestBody PostCreateRequest req,
-            @AuthenticationPrincipal CustomUserDetails principal) {
-        if (principal == null)
-            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "ログインが必要です");
-        Post reply = postService.createReply(id, principal.getUser(), req);
-        return PostResponse.from(reply, 0, false,0); // 新規返信はいいね0・未いいね
     }
 }

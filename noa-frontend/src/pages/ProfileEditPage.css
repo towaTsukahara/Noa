@@ -1,0 +1,53 @@
+/* ProfileEditPage — プロフィール編集
+   構造（リファクタ後）:
+     .profile-edit.page
+       > h1.page-title
+       > .edit-block (h3 + textarea.field / .edit-taglist + button)
+       > .edit-actions (キャンセル / 保存) */
+
+.profile-edit .edit-block {
+  padding: 18px 22px;
+  border-bottom: 1px solid var(--line2);
+}
+.profile-edit .edit-block h3 {
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--soft);
+  letter-spacing: 0.02em;
+  margin-bottom: 10px;
+}
+.profile-edit textarea.field {
+  min-height: 96px;
+}
+
+/* 選択済みタグの一覧（編集画面のプレビュー） */
+.edit-taglist {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+  margin-bottom: 12px;
+}
+.edit-taglist .tag {
+  cursor: default;
+}
+.edit-taglist:empty::before {
+  content: "未設定";
+  font-size: 13px;
+  color: var(--faint);
+}
+
+.profile-edit .edit-block > button {
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--accent);
+  background: var(--accent-bg);
+  border: none;
+  border-radius: var(--r-sm);
+  padding: 8px 14px;
+  cursor: pointer;
+  transition: background 0.13s;
+}
+.profile-edit .edit-block > button:hover {
+  background: #dcece6;
+}

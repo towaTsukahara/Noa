@@ -1,0 +1,25 @@
+/* TagDetailPage — タグ詳細（そのタグの投稿一覧）
+   構造（リファクタ後）:
+     .tag-detail.page
+       > .tag-hero (> .tag-hero-name + button.btn[.btn-ghost])
+       > .section-title「投稿」
+       > .mini-post(> .search-title + .search-snippet) */
+
+.tag-hero {
+  padding: 24px 22px 20px;
+  border-bottom: 1px solid var(--line2);
+}
+.tag-hero-name {
+  font-family: var(--mono-font);
+  font-size: 26px;
+  font-weight: 600;
+  color: var(--ink);
+}
+.tag-hero-desc {
+  font-size: 13px;
+  color: var(--soft);
+  margin: 7px 0 16px;
+}
+.tag-hero .btn {
+  margin-top: 4px;
+}
