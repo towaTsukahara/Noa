@@ -10,8 +10,8 @@ public interface CommentRepository extends JpaRepository<Comment, Long> {
 
     @Query("select c from Comment c where c.post.id = :postId order by c.id asc")
 
-    
     List<Comment> findByPostId(Long postId);
+
     long countByPostId(Long postId);
 
     // 自分が書いたコメントを新しい順に取得

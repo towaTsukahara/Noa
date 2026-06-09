@@ -149,4 +149,11 @@
 /* hover全体 */
 .mini-delete:hover {
   background: rgba(255, 0, 0, 0.08);
+/* コメントタブのカード（クリックで元投稿へ） */
+.profile-comment {
+  cursor: pointer;
+  transition: background 0.12s;
+}
+.profile-comment:hover {
+  background: var(--accent-bg);
 }

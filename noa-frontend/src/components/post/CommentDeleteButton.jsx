@@ -1,18 +1,15 @@
-import "./CommentList.css";
+import "./CommentList.css"; // 削除ボタンのスタイルも一覧CSSにまとめる
 
+// コメント削除ボタン。確認ダイアログを挟んで onDelete を呼ぶだけ。
 function CommentDeleteButton({ onDelete }) {
   const handleDelete = () => {
-    const result = window.confirm(
-      "本当に削除しますか？"
-    );
-
-    if (result) {
+    if (window.confirm("このコメントを削除しますか？")) {
       onDelete();
     }
   };
 
   return (
-    <button className="comment-delete" onClick={handleDelete}>
+    <button className="btn-danger comment-del" onClick={handleDelete}>
       削除
     </button>
   );

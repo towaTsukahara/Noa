@@ -18,7 +18,7 @@ function SideBar({ onCompose }) {
             <NavLink to="/search">検索</NavLink>
           </li>
           <li>
-            <NavLink to="/likes">いいね一覧</NavLink>
+            <NavLink to="/likes">フォロータグ</NavLink>
           </li>
           <li>
             <NavLink to="/notifications">通知</NavLink>
