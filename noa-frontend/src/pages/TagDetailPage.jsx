@@ -1,54 +1,82 @@
 //名前変更予定
-import { useState } from "react";
-import { useParams } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { useParams, useNavigate } from "react-router-dom";
 
 export default function TagDetailPage() {
 
+    const [tag, setTag] = useState(null);
+    const [loading, setLoading] = useState(true);
+
     const { tagId } = useParams();
+    const navigate = useNavigate();
 
-    const tag = TAGS.find(
-        (tag) => tag.id === Number(tagId)
-    );
+    const fetchTag = async () => {
+        try {
+            const response = await fetch(`/api/v1/tags/${tagId}`, { credentials: "include", });
 
-    const [isFollowed, setIsFollowed] = useState(tag ? getFollowedTags().includes(tag.name) : false);
+            if (!response.ok) {
+                throw new Error("取得失敗");
+            }
 
-    const relatedPosts = POSTS.filter((post) =>
-        tag && post.tags.includes(tag.name)
-    );
+            const data = await response.json();
 
-    if (!tag) {
-        return <div>not found 404</div>
+            setTag(data);
+
+        } catch (error) {
+            console.error(error);
+
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    useEffect(() => {
+        fetchTag();
+    }, [tagId]);
+
+    if (loading) {
+        return <div>読み込み中...</div>;
     }
 
-    const toggleFollow = () => {
-        if (isFollowed) {
-            unfollowTag(tag.name);
-        } else {
-            followTag(tag.name);
-        }
+    if (!tag) {
+        return <div>タグが見つかりません</div>
+    }
 
-        setIsFollowed(
-            getFollowedTags().includes(
-                tag.name
-            )
-        );
+    const toggleFollow = async () => {
+        try {
+            const response = await fetch(
+                `/api/v1/tags/${encodeURIComponent(tag.name)}/follow`,
+                { method: tag.followed ? "DELETE" : "POST" , credentials: "include", }
+            );
+
+            if (!response.ok) {
+                throw new Error();
+            }
+
+            fetchTag();
+
+        } catch (error) {
+            console.error(error);
+        }
     };
 
     return (
         <div>
             <h1>{tag.name}</h1>
             <button onClick={toggleFollow}>
-                {isFollowed ? "unfollow" : "follow"}
+                {tag.followed ? "フォローをやめる" : "フォローする"}
             </button>
 
             <hr />
 
-            <h2>posts</h2>
-            {relatedPosts.map((post) => (
-                <div key={post.id}>
-                    <h3>{post.title}</h3>
-                    <div>{post.content}</div>
-
+            <h2>タグが付いた投稿</h2>
+            {tag.posts.map((post) => (
+                <div 
+                    key={post.id}
+                    onClick={() => navigate(`/posts/${post.id}`)}
+                    style={{ cursor: "pointer" }}
+                >
+                    <div>{post.body}</div>
                     <hr />
                 </div>
             ))}
