@@ -7,7 +7,33 @@ export default function SearchPage() {
     const [posts, setPosts] = useState([]);
     const [tags, setTags] = useState([]);
     const [followingTags, setFollowingTags] = useState([]);
+    const [suggestions, setSuggestions] = useState([]);
     const navigate = useNavigate();
+
+    const fetchSuggestions = async (value) => {
+
+        if (!value.trim()) {
+            setSuggestions([]);
+            return;
+        }
+
+        try {
+            const response = await fetch(`/api/v1/tags?q=${encodeURIComponent(value)}`,
+                { credentials: "include", });
+
+            if (!response.ok) {
+                return;
+            }
+
+            const data = await response.json();
+
+            setSuggestions(data.slice(0, 5));
+
+        } catch (error) {
+            console.error(error);
+        }
+
+    };
 
     const handleSearch = async () => {
         try {
@@ -86,8 +112,28 @@ export default function SearchPage() {
                 type="text"
                 placeholder="キーワードを入力"
                 value={keyword}
-                onChange={(e) => setKeyword(e.target.value)}
+                onChange={(e) => {
+                    const value = e.target.value;
+                    setKeyword(value);
+                    fetchSuggestions(value);
+                }}
             />
+            {suggestions.length > 0 && (
+                <div>
+                    {suggestions.map((tag) => (
+                        <div
+                            key={tag.id}
+                            onClick={() => {
+                                setKeyword(tag.name);
+                                setSuggestions([]);
+                            }}
+                            style={{ cursor: "pointer" }}
+                        >
+                            {tag.name}
+                        </div>
+                    ))}
+                </div>
+            )}
             <button onClick={handleSearch}>検索</button>
 
             <div>
