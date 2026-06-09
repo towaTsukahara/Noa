@@ -1,0 +1,115 @@
+/* ProfilePage — 自分のプロフィール
+   構造（リファクタ後）:
+     .profile.page
+       > .profile-hero
+           > .profile-hero-top (.avatar.is-lg + .profile-id + .profile-actions)
+           > .profile-stats
+           > p.profile-bio
+           > .profile-tagset > .tag-group(.tag-group-label + .tag-row>span.tag)
+       > .tabs > button.tab
+       > .mini-post ... */
+
+.profile-hero {
+  padding: 24px 22px 18px;
+  border-bottom: 1px solid var(--line2);
+}
+.profile-hero-top {
+  display: flex;
+  gap: 18px;
+  align-items: flex-start;
+}
+.profile-id {
+  flex: 1;
+  min-width: 0;
+}
+.profile-id .user-handle {
+  font-size: 14px;
+}
+.profile-name {
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--ink);
+  margin: 2px 0;
+}
+.profile-sub {
+  font-size: 12px;
+  color: var(--faint);
+  font-family: var(--mono-font);
+}
+.profile-actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.profile-stats {
+  display: flex;
+  gap: 22px;
+  margin-top: 16px;
+}
+.profile-stats span {
+  font-size: 13px;
+  color: var(--soft);
+}
+.profile-stats b {
+  color: var(--ink);
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.profile-bio {
+  font-size: 14px;
+  line-height: 1.8;
+  color: #3a4047;
+  margin-top: 16px;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.profile-tagset {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px 18px;
+  margin-top: 18px;
+}
+
+/* 投稿リスト内の削除ボタン */
+.mini-post .mini-delete {
+  margin-top: 10px;
+  border: 1px solid #e7d4d1;
+  background: #fff;
+  color: var(--danger);
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 500;
+  padding: 5px 12px;
+  border-radius: var(--r-sm);
+  cursor: pointer;
+  transition: background 0.12s, border-color 0.12s;
+}
+.mini-post .mini-delete:hover {
+  background: #f7ece9;
+  border-color: var(--danger);
+}
+
+/* 投稿タブのいいねボタン（インライン） */
+.mini-post .mini-like {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  border: none;
+  background: none;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 12.5px;
+  color: var(--soft);
+  padding: 0;
+  font-variant-numeric: tabular-nums;
+}
+.mini-post .mini-like:hover {
+  color: var(--like);
+}
+.mini-post .mini-like.liked {
+  color: var(--like);
+  font-weight: 600;
+}

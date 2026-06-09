@@ -1,0 +1,22 @@
+/* AppLayout — アプリ全体のシェル（左レール + メイン列）
+   構造: .layout > (.sidebar | .main > (.header + <Outlet/>)) */
+
+.layout {
+  height: 100vh;
+  display: grid;
+  grid-template-columns: 242px 1fr;
+  background: var(--bg);
+}
+
+.main {
+  height: 100vh;
+  overflow-y: auto;
+  background: var(--panel);
+  position: relative;
+}
+
+@media (max-width: 1000px) {
+  .layout {
+    grid-template-columns: 74px 1fr;
+  }
+}

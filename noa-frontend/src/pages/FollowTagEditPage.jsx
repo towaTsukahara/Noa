@@ -1,9 +1,9 @@
 import { useNavigate } from "react-router-dom";
 import { useEffect, useMemo, useState } from "react";
 import { api } from "../api/client";
+import "./FollowTagEditPage.css";
 
 // タグをフォロー/解除する画面（カテゴリなし・フラット）
-// type prop は使わなくなった（カテゴリ廃止）。App.jsx 側のルートも後で1本に整理する。
 const FollowTagEditPage = () => {
     const navigate = useNavigate();
 
@@ -34,20 +34,17 @@ const FollowTagEditPage = () => {
     // タグをクリックしたら、その場でフォロー/解除を実行（楽観的更新）
     const toggleTag = async (name) => {
         const isFollowing = followingNames.has(name);
-        // 先に画面を更新
         setFollowingNames((prev) => {
             const next = new Set(prev);
             if (isFollowing) next.delete(name);
             else next.add(name);
             return next;
         });
-        // APIを叩く
         try {
             await api(`/tags/${encodeURIComponent(name)}/follow`, {
                 method: isFollowing ? "DELETE" : "POST",
             });
         } catch (e) {
-            // 失敗したら元に戻す
             setFollowingNames((prev) => {
                 const next = new Set(prev);
                 if (isFollowing) next.add(name);
@@ -63,37 +60,31 @@ const FollowTagEditPage = () => {
         return allTags.filter((t) => t.name.toLowerCase().includes(kw));
     }, [allTags, searchKeyword]);
 
-    if (loading) return <p style={{ padding: 20 }}>読み込み中...</p>;
+    if (loading) return <div className="follow-tag-edit page"><p className="empty-note">読み込み中...</p></div>;
 
     return (
-        <div style={{ maxWidth: 800, margin: "0 auto", padding: 20 }}>
-            <h2>タグをフォロー</h2>
+        <div className="follow-tag-edit page">
+            <h2 className="page-title">タグをフォロー</h2>
 
-            <input
-                type="text"
-                placeholder="タグを検索"
-                value={searchKeyword}
-                onChange={(e) => setSearchKeyword(e.target.value)}
-                style={{ width: "100%", padding: 8, marginBottom: 16 }}
-            />
+            <div className="page-pad" style={{ paddingBottom: 6 }}>
+                <input
+                    className="field"
+                    type="text"
+                    placeholder="タグを検索"
+                    value={searchKeyword}
+                    onChange={(e) => setSearchKeyword(e.target.value)}
+                />
+            </div>
 
-            <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
+            <div className="tag-cloud">
                 {filteredTags.length === 0 && <p>タグが見つかりません。</p>}
                 {filteredTags.map((tag) => {
                     const on = followingNames.has(tag.name);
                     return (
                         <span
                             key={tag.id}
+                            className={`tag-toggle ${on ? "is-on" : ""}`}
                             onClick={() => toggleTag(tag.name)}
-                            style={{
-                                padding: "6px 14px",
-                                borderRadius: 999,
-                                cursor: "pointer",
-                                border: on ? "none" : "1px solid #ccc",
-                                background: on ? "#1a1a1a" : "#fff",
-                                color: on ? "#fff" : "#333",
-                                userSelect: "none",
-                            }}
                         >
                             #{tag.name} {on ? "✓" : "+"}
                         </span>
@@ -101,8 +92,8 @@ const FollowTagEditPage = () => {
                 })}
             </div>
 
-            <div style={{ marginTop: 24 }}>
-                <button onClick={() => navigate("/follow")}>戻る</button>
+            <div className="edit-actions" style={{ justifyContent: "flex-start" }}>
+                <button className="btn btn-quiet" onClick={() => navigate("/follow")}>戻る</button>
             </div>
         </div>
     );

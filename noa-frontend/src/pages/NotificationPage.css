@@ -1,0 +1,79 @@
+/* NotificationPage — 通知（いいね / 返信のみ）
+   構造（リファクタ後）:
+     .notifications.page
+       > h2.page-title「通知」
+       > .notif(.unread)?
+           > .notif-icon(.is-like / .is-reply) (♡ / @)
+           > .notif-main (> .notif-text(> b.notif-actor) + .notif-snippet + .notif-time)
+           > .notif-dot?  (未読マーク) */
+
+.notif {
+  display: flex;
+  align-items: flex-start;
+  gap: 13px;
+  padding: 15px 22px;
+  border-bottom: 1px solid var(--line2);
+  position: relative;
+}
+.notif.unread {
+  background: #f3f6f4;
+}
+
+.notif-icon {
+  flex: none;
+  width: 34px;
+  height: 34px;
+  border-radius: var(--r-md);
+  display: grid;
+  place-items: center;
+  font-size: 16px;
+  font-weight: 700;
+}
+.notif-icon.is-like {
+  background: #f7ece9;
+  color: var(--like);
+}
+.notif-icon.is-reply {
+  background: var(--accent-bg);
+  color: var(--accent);
+}
+
+.notif-main {
+  min-width: 0;
+  flex: 1;
+}
+.notif-text {
+  font-size: 13.5px;
+  color: #2b3038;
+  line-height: 1.55;
+}
+.notif-actor {
+  font-family: var(--mono-font);
+  font-weight: 500;
+  color: var(--ink);
+}
+.notif-snippet {
+  font-size: 12.5px;
+  color: var(--soft);
+  margin-top: 3px;
+  display: -webkit-box;
+  -webkit-line-clamp: 1;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.notif-time {
+  font-size: 11px;
+  color: var(--faint);
+  margin-top: 4px;
+  font-family: var(--mono-font);
+}
+
+.notif-dot {
+  position: absolute;
+  right: 18px;
+  top: 18px;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--accent);
+}

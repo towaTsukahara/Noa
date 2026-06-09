@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import "./TimelinePage.css";
+import "../components/post/LikeButton.css"; // インラインの .like-button 用
 import { api } from "../api/client";
 import UserHandle from "../components/user/UserHandle";
 import { relativeTime } from "../utils/relativeTime";
@@ -76,7 +77,7 @@ function TimelinePage() {
   return (
     <section className="timeline">
       {loading && <p>読み込み中...</p>}
-      {error && <p style={{ color: "red" }}>{error}</p>}
+      {error && <p>{error}</p>}
       {!loading && !error && posts.length === 0 && <p>まだ投稿がありません。</p>}
 
       {posts.map((post) => (
