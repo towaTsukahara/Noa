@@ -1,6 +1,7 @@
 import { useNavigate, useLocation } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { api } from "../api/client";
+import "./TagEditPage.css";
 
 const LABEL = { skill: "技術スタックタグ", hobby: "興味タグ", cert: "趣味タグ" };
 
@@ -33,7 +34,7 @@ const TagEditPage = ({ type }) => {
                 setCandidates([]);
             });
     }, []);
-    
+
     useEffect(() => {
         if (!q.trim()) {
             setCandidates(allTags);
@@ -74,7 +75,7 @@ const TagEditPage = ({ type }) => {
                 method: "POST",
                 body: JSON.stringify({
                     userId: 1,
-                    tagNames: selected, // ← 名前で送る（findOrCreate用）
+                    tagNames: selected,
                     category: typeMap[type]
                 })
             });
@@ -86,62 +87,69 @@ const TagEditPage = ({ type }) => {
         } catch (err) {
             console.error(err);
         }
-        
     };
 
     return (
-        <div>
-            <h2>{LABEL[type]}</h2>
+        <div className="tag-edit page">
+            <h2 className="page-title">{LABEL[type]}</h2>
 
             {/* 選択中（クリックで外す） */}
-            <div>
+            <div className="edit-block">
                 <h3>選択中 ({selected.length})</h3>
-                {selected.map((name) => (
-                    <span key={name} onClick={() => removeSelected(name)} style={{ margin: 5, cursor: "pointer" }}>
-                        {name} ×
-                    </span>
-                ))}
+                <div className="tag-cloud" style={{ padding: 0 }}>
+                    {selected.map((name) => (
+                        <span
+                            key={name}
+                            className="tag-toggle is-on"
+                            onClick={() => removeSelected(name)}
+                        >
+                            {name} ×
+                        </span>
+                    ))}
+                </div>
             </div>
 
             {/* 検索 */}
-            <div style={{ marginTop: "10px" }}>
+            <div className="edit-block">
+                <h3>検索</h3>
                 <input
+                    className="field"
                     value={q}
                     onChange={(e) => setQ(e.target.value)}
                     placeholder="タグを検索"
-                    style={{ padding: "6px", width: "200px" }}
                 />
             </div>
 
             {/* 新規作成（候補に無い名前を打って追加） */}
-            <div>
-                <input value={newTag} onChange={(e) => setNewTag(e.target.value)} placeholder="新しいタグ名" />
-                <button onClick={addNew}>新規追加</button>
+            <div className="edit-block">
+                <h3>新規作成</h3>
+                <div className="new-tag-row">
+                    <input
+                        className="field"
+                        value={newTag}
+                        onChange={(e) => setNewTag(e.target.value)}
+                        placeholder="新しいタグ名"
+                    />
+                    <button className="btn btn-ghost" onClick={addNew}>新規追加</button>
+                </div>
             </div>
 
-            <div>
-                <button onClick={() => navigate("/profile/edit", { state: { form } })}>キャンセル</button>
-                <button onClick={handleSave}>保存（{selected.length}つ選択中）</button>
+            <div className="edit-actions">
+                <button className="btn btn-quiet" onClick={() => navigate("/profile/edit", { state: { form } })}>
+                    キャンセル
+                </button>
+                <button className="btn" onClick={handleSave}>
+                    保存（{selected.length}つ選択中）
+                </button>
             </div>
 
             {/* タグ候補 */}
-            <div style={{
-                display: "flex",
-                flexWrap: "wrap",
-
-            }}>
+            <div className="tag-cloud">
                 {candidates.map((tag) => (
                     <span
                         key={tag.id}
+                        className={`tag-toggle ${selected.includes(tag.name) ? "is-on" : ""}`}
                         onClick={() => toggle(tag)}
-                        style={{
-                            margin: 5,
-                            cursor: "pointer",
-                            backgroundColor: selected.includes(tag.name) ? "blue" : "gray",
-                            color: "white",
-                            padding: "8px 12px",
-                            borderRadius: "12px",
-                        }}
                     >
                         {selected.includes(tag.name) ? "✓ " : ""}
                         {tag.name}

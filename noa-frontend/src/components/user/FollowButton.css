@@ -1,0 +1,34 @@
+/* FollowButton — フォロー/解除トグル
+   構造: button.follow-button(.is-following)
+   自分自身には表示しない（コンポーネント側で null を返す）。 */
+
+.follow-button {
+  font-family: inherit;
+  font-weight: 600;
+  font-size: 13.5px;
+  padding: 10px 24px;
+  border-radius: var(--r-md);
+  border: 1px solid var(--accent);
+  background: var(--accent);
+  color: #fff;
+  cursor: pointer;
+  transition: background 0.14s, color 0.14s, border-color 0.14s, opacity 0.14s;
+}
+.follow-button:hover {
+  background: var(--accent-d);
+  border-color: var(--accent-d);
+}
+.follow-button:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+/* フォロー中はゴースト表示 */
+.follow-button.is-following {
+  background: #fff;
+  color: var(--accent);
+}
+.follow-button.is-following:hover {
+  background: var(--accent-bg);
+  border-color: var(--accent);
+}

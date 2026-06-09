@@ -1,5 +1,6 @@
 import { useNavigate, useLocation } from "react-router-dom";
 import { useState, useEffect } from "react";
+import "./TagPage.css";
 
 // ダミーデータ。バックエンド実装したら消す。
 const TAGS = {
@@ -45,29 +46,32 @@ const TagPage = ({ type }) => {
     };
 
     return (
-        <div>
-            <h2>{type === "hobby" ? "興味タグ" : "技術スタックタグ"}</h2>
-            <div>
-                <button onClick={() => navigate(-1)}>
+        <div className="tag-select page">
+            <h2 className="page-title">{type === "hobby" ? "興味タグ" : "技術スタックタグ"}</h2>
+
+            <div className="back-row">
+                <button className="btn btn-quiet" onClick={() => navigate(-1)}>
                     ← 戻る
                 </button>
             </div>
-            <div>
+
+            <div className="tag-cloud">
                 {TAGS[type].map((tag) => (
                     <span
                         key={tag}
+                        className={`tag-toggle ${selected.includes(tag) ? "is-on" : ""}`}
                         onClick={() => toggleTag(tag)}
-                        style={{
-                            margin: "5px",
-                        }}
                     >
                         {tag}
                     </span>
                 ))}
             </div>
-            <button onClick={handleNext}>
-                次へ ({selected.length}つ選択中)
-            </button>
+
+            <div className="edit-actions">
+                <button className="btn" onClick={handleNext}>
+                    次へ（{selected.length}つ選択中）
+                </button>
+            </div>
         </div>
     );
 };

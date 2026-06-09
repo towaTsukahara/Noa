@@ -4,6 +4,7 @@ import { api } from "../api/client";
 import { useAuth } from "../context/AuthContext";
 import FollowButton from "../components/user/FollowButton";
 import { relativeTime } from "../utils/relativeTime";
+import "./OtherProfilePage.css";
 
 export default function OtherProfilePage() {
   const { handle } = useParams(); // URLの /users/:handle から取得
@@ -41,49 +42,48 @@ export default function OtherProfilePage() {
     load();
   }, [handle]);
 
-  if (loading) return <p style={{ padding: 20 }}>読み込み中...</p>;
-  if (error) return <p style={{ padding: 20, color: "red" }}>{error}</p>;
+  if (loading) return <div className="other-profile page"><p className="empty-note">読み込み中...</p></div>;
+  if (error) return <div className="other-profile page"><p className="empty-note">{error}</p></div>;
   if (!profile) return null;
 
   return (
-    <div style={{ maxWidth: 800, margin: "0 auto", padding: 20 }}>
-      {/* TODO(フェーズ2): アイコン画像はメディア機能実装後。今はプレースホルダ */}
-      <div style={{ width: 100, height: 100, background: "#bbb", borderRadius: "50%", margin: "0 auto 12px" }} />
+    <div className="other-profile page">
+      <div className="op-hero">
+        {/* TODO(フェーズ2): アイコン画像はメディア機能実装後。今は抽象プレースホルダ */}
+        <div className="avatar is-lg is-round op-avatar" />
 
-      {/* 表示名：nickname優先・なければhandle（F-105の秘匿ルール） */}
-      <h2 style={{ textAlign: "center", margin: "0 0 4px" }}>
-        {profile.nickname || profile.handle}
-      </h2>
-      {profile.nickname && (
-        <p style={{ textAlign: "center", color: "#888", fontSize: 13, margin: 0 }}>{profile.handle}</p>
-      )}
-      {/* TODO(F-114): ニックネームの設定・変更UIは nickname API 本実装後にここへ */}
+        {/* 表示名：nickname優先・なければhandle（F-105の秘匿ルール） */}
+        <div className="op-name">{profile.nickname || profile.handle}</div>
+        {profile.nickname && <div className="op-handle">{profile.handle}</div>}
+        {/* TODO(F-114): ニックネームの設定・変更UIは nickname API 本実装後にここへ */}
 
-      <div style={{ textAlign: "center", margin: "16px 0" }}>
-        <FollowButton handle={profile.handle} initialFollowing={profile.isFollowing} />
+        <div className="op-follow">
+          <FollowButton handle={profile.handle} initialFollowing={profile.isFollowing} />
+        </div>
       </div>
 
-      <section style={{ marginBottom: 20 }}>
+      <section className="op-section">
         <h3>自己紹介</h3>
-        <p style={{ overflowWrap: "anywhere", whiteSpace: "pre-wrap" }}>{profile.bio || "（未設定）"}</p>
+        <p>{profile.bio || "（未設定）"}</p>
       </section>
 
-      <section style={{ marginBottom: 20 }}>
-        <h3>興味タグ</h3>
+      <section className="op-section">
+        <h3>タグ</h3>
         <p>技術: {profile.tags.tech.join("、") || "—"}</p>
         <p>趣味: {profile.tags.hobby.join("、") || "—"}</p>
         <p>資格: {profile.tags.cert.join("、") || "—"}</p>
       </section>
 
-      <h3>投稿</h3>
-      {posts.length === 0 && <p>まだ投稿がありません。</p>}
+      <div className="section-title">投稿</div>
+      {posts.length === 0 && <p className="empty-note">まだ投稿がありません。</p>}
       {posts.map((post) => (
-        <div key={post.id} style={{ border: "1px solid #ccc", borderRadius: 8, padding: 12, marginBottom: 10 }}>
-          <div style={{ overflowWrap: "anywhere", whiteSpace: "pre-wrap" }}>{post.body}</div>
-          <div style={{ color: "#666", fontSize: 13, marginTop: 6 }}>
-            ♡ {post.likeCount}　💬 {post.replyCount}　{relativeTime(post.createdAt)}
+        <div key={post.id} className="mini-post">
+          <div className="mini-body">{post.body}</div>
+          <div className="mini-meta">
+            <span>♡ {post.likeCount}</span>
+            <span>💬 {post.replyCount}</span>
+            <span>{relativeTime(post.createdAt)}</span>
           </div>
-          {/* いいねトグルが必要ならタイムラインと同じ handleLikeToggle パターンを追加 */}
         </div>
       ))}
     </div>

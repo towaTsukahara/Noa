@@ -2,6 +2,7 @@ package noa.controller;
 
 import noa.dto.CommentCreateRequest;
 import noa.dto.CommentResponse;
+import noa.dto.MyCommentResponse;
 import noa.entity.Comment;
 import noa.security.CustomUserDetails;
 import noa.service.CommentService;
@@ -58,5 +59,13 @@ public class CommentController {
         response.setCreatedAt(comment.getCreatedAt());
 
         return response;
+    }
+
+    @GetMapping("/me")
+    public List<MyCommentResponse> myComments(@AuthenticationPrincipal CustomUserDetails principal) {
+        if (principal == null) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "ログインが必要です");
+        }
+        return commentService.getMyComments(principal.getUser());
     }
 }

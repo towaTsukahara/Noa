@@ -1,0 +1,96 @@
+/* RegisterPage — 新規登録（アプリシェル外・全画面センタリング）
+   構造（リファクタ後）:
+     .auth > .auth-card.auth-card-wide
+       > h1.auth-logo + p.auth-sub
+       > label.auth-label(> .auth-label-text + input.field)
+       > p.auth-error?
+       > button.btn.auth-submit
+       > p.auth-foot > a
+   ※ .auth / .auth-card / .auth-logo / .auth-sub / .auth-error / .auth-submit /
+     .auth-foot は LoginPage.css と共通の見た目（このファイルにも同梱して自己完結）。 */
+
+.auth {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 30px;
+  background:
+    radial-gradient(circle at 14% 0%, rgba(47, 107, 94, 0.06), transparent 42%),
+    var(--bg);
+}
+
+.auth-card {
+  width: 100%;
+  max-width: 420px;
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+  padding: 36px 32px 30px;
+  box-shadow: var(--shadow-soft);
+  text-align: center;
+}
+.auth-card-wide {
+  max-width: 460px;
+}
+
+.auth-logo {
+  font-size: 30px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  color: var(--ink);
+}
+.auth-logo span {
+  color: var(--accent);
+}
+
+.auth-sub {
+  font-size: 13.5px;
+  color: var(--soft);
+  margin-top: 4px;
+  margin-bottom: 24px;
+}
+
+/* ラベル付きフィールド（登録フォーム） */
+.auth-label {
+  display: block;
+  text-align: left;
+  margin-bottom: 16px;
+}
+.auth-label-text {
+  display: block;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--soft);
+  margin-bottom: 6px;
+}
+.auth-label .field {
+  height: 44px;
+}
+
+.auth-error {
+  color: var(--danger);
+  font-size: 13px;
+  text-align: left;
+  margin: 4px 0 12px;
+}
+
+.auth-submit {
+  width: 100%;
+  height: 46px;
+  margin-top: 8px;
+  font-size: 14.5px;
+}
+
+.auth-foot {
+  font-size: 13px;
+  color: var(--soft);
+  margin-top: 20px;
+}
+.auth-foot a {
+  color: var(--accent);
+  font-weight: 600;
+}
+.auth-foot a:hover {
+  text-decoration: underline;
+}

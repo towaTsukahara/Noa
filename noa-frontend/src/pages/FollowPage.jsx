@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { api } from "../api/client";
 import UserHandle from "../components/user/UserHandle";
+import "./FollowPage.css";
 
 export default function FollowPage() {
     const navigate = useNavigate();
@@ -22,7 +23,7 @@ export default function FollowPage() {
             const t = await api("/me/following/tags");   // [{ id, name }]
             setTags(t);
         } catch (e) {
-            // 失敗時は空のまま（必要ならエラー表示を足す）
+            // 失敗時は空のまま
         } finally {
             setLoading(false);
         }
@@ -67,42 +68,50 @@ export default function FollowPage() {
         }
     };
 
-    if (loading) return <p style={{ padding: 20 }}>読み込み中...</p>;
+    if (loading) return <div className="follow page"><p className="empty-note">読み込み中...</p></div>;
 
     return (
-        <div style={{ maxWidth: 800, margin: "0 auto", padding: 20 }}>
-            <input
-                type="text"
-                placeholder="検索"
-                value={searchKeyword}
-                onChange={(e) => setSearchKeyword(e.target.value)}
-                style={{ width: "100%", padding: 8, marginBottom: 16 }}
-            />
+        <div className="follow page">
+            <div className="follow-search">
+                <input
+                    className="field"
+                    type="text"
+                    placeholder="検索"
+                    value={searchKeyword}
+                    onChange={(e) => setSearchKeyword(e.target.value)}
+                />
+            </div>
 
             {/* タブ切替（件数は取得した配列の長さ） */}
-            <div style={{ display: "flex", gap: 8, marginBottom: 16 }}>
-                <button onClick={() => setActiveTab("user")}>
+            <div className="tabs">
+                <button
+                    className={`tab ${activeTab === "user" ? "active" : ""}`}
+                    onClick={() => setActiveTab("user")}
+                >
                     ユーザー（{users.length}）
                 </button>
-                <button onClick={() => setActiveTab("tag")}>
+                <button
+                    className={`tab ${activeTab === "tag" ? "active" : ""}`}
+                    onClick={() => setActiveTab("tag")}
+                >
                     タグ（{tags.length}）
                 </button>
             </div>
 
             {activeTab === "user" && (
-                <div>
+                <div className="follow-list">
                     <h2>フォロー中のユーザー</h2>
                     {filteredUsers.length === 0 && <p>フォロー中のユーザーはいません。</p>}
                     {filteredUsers.map((u) => (
-                        <div key={u.handle} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "8px 0", borderBottom: "1px solid #eee" }}>
+                        <div key={u.handle} className="row-between">
                             {/* 名前クリックで相手プロフィールへ */}
                             <span
-                                style={{ cursor: "pointer" }}
+                                className="follow-name"
                                 onClick={() => navigate(`/users/${u.handle}`)}
                             >
                                 <UserHandle user={u} />
                             </span>
-                            <button onClick={() => handleUnfollowUser(u.handle)}>
+                            <button className="btn btn-quiet" onClick={() => handleUnfollowUser(u.handle)}>
                                 フォローをやめる
                             </button>
                         </div>
@@ -111,25 +120,25 @@ export default function FollowPage() {
             )}
 
             {activeTab === "tag" && (
-                <div>
+                <div className="follow-list">
                     <h2>フォロー中のタグ</h2>
                     {filteredTags.length === 0 && <p>フォロー中のタグはありません。</p>}
                     {filteredTags.map((t) => (
-                        <div key={t.id} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "8px 0", borderBottom: "1px solid #eee" }}>
-                            <span>#{t.name}</span>
-                            <button onClick={() => handleUnfollowTag(t.name)}>
+                        <div key={t.id} className="row-between">
+                            <span className="follow-tag">#{t.name}</span>
+                            <button className="btn btn-quiet" onClick={() => handleUnfollowTag(t.name)}>
                                 フォローをやめる
                             </button>
                         </div>
                     ))}
-                    <button onClick={() => navigate("/follow/tags")} style={{ marginTop: 12 }}>
+                    <button className="btn btn-ghost follow-add" onClick={() => navigate("/follow/tags")}>
                         ＋ タグを追加・編集
                     </button>
                 </div>
             )}
 
-            <div style={{ marginTop: 24 }}>
-                <button onClick={() => navigate("/profile")}>戻る</button>
+            <div className="edit-actions" style={{ justifyContent: "flex-start" }}>
+                <button className="btn btn-quiet" onClick={() => navigate("/profile")}>戻る</button>
             </div>
         </div>
     );

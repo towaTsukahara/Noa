@@ -1,55 +1,120 @@
-/* サイドバー全体 */
+/* SideBar — 左ナビゲーションレール
+   構造: aside.sidebar > h1 + nav>ul>li>Link + button.compose-button
+   Link を NavLink にすると .active / aria-current が付き、選択状態が出る。 */
+
 .sidebar {
-  padding: 20px;
+  height: 100vh;
+  border-right: 1px solid var(--line);
+  background: var(--panel);
+  display: flex;
+  flex-direction: column;
+  padding: 18px 10px;
 }
 
-/* メニュー */
-.sidebar-menu {
+/* ロゴ「Noa」。o をアクセント色に出したい場合は span で囲む。 */
+.sidebar h1 {
+  font-weight: 700;
+  font-size: 22px;
+  letter-spacing: -0.01em;
+  padding: 2px 14px;
+  margin-bottom: 14px;
+  color: var(--ink);
+}
+.sidebar h1 span {
+  color: var(--accent);
+}
+
+.sidebar nav ul {
   list-style: none;
-  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
 }
 
-/* 各項目 */
-.sidebar-menu li {
-  margin-bottom: 10px;
-}
-
-/* リンク全体をボタン化 */
-.sidebar-menu a {
+.sidebar nav li a {
   display: flex;
   align-items: center;
-  gap: 10px;
-
-  padding: 14px 16px;
-  border-radius: 16px;
-
-  text-decoration: none;
-  color: #444;
-
-  transition: 0.2s;
+  gap: 13px;
+  padding: 11px 14px;
+  border-radius: var(--r-md);
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--ink);
+  cursor: pointer;
+  transition: background 0.14s, color 0.14s;
+}
+.sidebar nav li a:hover {
+  background: #f1eee6;
+}
+/* NavLink のアクティブ状態 */
+.sidebar nav li a.active,
+.sidebar nav li a[aria-current="page"] {
+  background: var(--accent-bg);
+  color: var(--accent);
+  font-weight: 600;
 }
 
-/* アイコン */
-.sidebar-menu .icon {
-  font-size: 18px;
+/* 行頭アイコンを使う場合（svg を Link の先頭に置く） */
+.sidebar nav li a svg {
+  width: 22px;
+  height: 22px;
+  stroke: currentColor;
+  fill: none;
+  stroke-width: 1.7;
+  flex: none;
 }
 
-/* ホバー */
-.sidebar-menu a:hover {
-  background: #f3f4f6;
+/* 投稿ボタン（モーダルを開く） */
+.compose-button {
+  margin: 14px 6px 0;
+  background: var(--accent);
+  color: #fff;
+  border: none;
+  border-radius: var(--r-lg);
+  padding: 13px;
+  font-family: inherit;
+  font-weight: 600;
+  font-size: 15px;
+  cursor: pointer;
+  transition: background 0.14s;
+}
+.compose-button:hover {
+  background: var(--accent-d);
 }
 
-/* 選択中（画像の青いやつ） */
-.sidebar-menu li.active a {
-  background: #dbeafe; /* 薄い青 */
-  color: #1d4ed8;       /* 濃い青 */
-  font-weight: bold;
+/* 画面下に寄せる “自分” フッターを置く場合に使う（任意） */
+.sidebar .sidebar-me {
+  margin-top: auto;
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  padding: 9px 12px;
+  border-radius: var(--r-lg);
+  cursor: pointer;
+}
+.sidebar .sidebar-me:hover {
+  background: #f1eee6;
 }
 
-.sidebar-menu li.active a {
-  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-}
-
-.sidebar-menu a {
-  transition: all 0.2s ease;
+/* ナローでラベルを隠し、アイコンレールにする */
+@media (max-width: 1000px) {
+  .sidebar h1 {
+    text-align: center;
+    padding: 2px 0;
+  }
+  .sidebar nav li a {
+    justify-content: center;
+    gap: 0;
+  }
+  .sidebar nav li a span {
+    display: none;
+  }
+  .compose-button {
+    font-size: 0;
+    padding: 13px 0;
+  }
+  .compose-button::after {
+    content: "＋";
+    font-size: 20px;
+  }
 }

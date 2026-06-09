@@ -1,0 +1,235 @@
+/* PostDetailThread.css — 投稿詳細「履歴＋スレッド」2カラム（採用レイアウト）
+   ============================================================================
+   ※ これは “デザイン（CSS）の先行用意” です。対応するJSXの作り込みは別途。
+   想定する将来のマークアップ構造:
+
+     <section class="detail">
+       <aside class="history">                      ← 開いた投稿の履歴（312px）
+         <div class="hist-head">
+           <button class="backbtn">‹ 戻る</button>
+           <div class="hist-title">開いた投稿（履歴）<span class="hist-count">3</span></div>
+         </div>
+         <div class="hist-list">
+           <div class="hrow is-selected">           ← .is-selected で選択中
+             <div class="avatar is-sm tone-1"></div>
+             <div class="hrow-main">
+               <div class="hrow-head">
+                 <span class="hrow-id user-handle">id:7f3a92</span>
+                 <span class="hrow-time">3時間前</span>
+               </div>
+               <div class="hrow-snippet">新案件のAPI、認証は OIDC に…</div>
+             </div>
+           </div>
+           …
+         </div>
+       </aside>
+
+       <div class="thread">                          ← 親＋返信
+         <div class="thread-head">
+           <h2>スレッド</h2><span class="thread-who user-handle">· id:7f3a92</span>
+         </div>
+         <div class="thread-body">
+           <article class="pc parent"> … 親投稿（.post-card と同じ中身でOK） </article>
+           <div class="section-title">返信 3件</div>
+           <article class="pc reply"> … 返信 </article>
+           <div class="tomb">この返信は削除されました</div>     ← 削除済み
+           <div class="noreply">まだ返信はありません。…</div>     ← 返信ゼロ時
+         </div>
+         <div class="composer">
+           <div class="avatar is-sm"></div>
+           <div class="composer-box">返信を書く…　＃タグ</div>
+         </div>
+       </div>
+     </section>
+   ============================================================================ */
+
+.detail {
+  height: calc(100vh - 60px);
+  display: flex;
+}
+
+/* ---- 左：履歴ペイン ---- */
+.history {
+  width: 312px;
+  flex: none;
+  border-right: 1px solid var(--line);
+  background: var(--panel);
+  display: flex;
+  flex-direction: column;
+}
+.hist-head {
+  flex: none;
+  border-bottom: 1px solid var(--line);
+  padding: 13px 16px;
+}
+.hist-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 12px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--soft);
+}
+.hist-count {
+  font-family: var(--mono-font);
+  font-size: 10.5px;
+  color: #fff;
+  background: var(--accent);
+  border-radius: var(--r-pill);
+  padding: 1px 8px;
+  font-weight: 500;
+}
+.hist-list {
+  flex: 1;
+  overflow-y: auto;
+}
+.hrow {
+  display: flex;
+  gap: 10px;
+  padding: 13px 16px;
+  border-bottom: 1px solid var(--line2);
+  align-items: flex-start;
+  cursor: pointer;
+  position: relative;
+  transition: background 0.12s;
+}
+.hrow:hover {
+  background: #f4f1ea;
+}
+.hrow.is-selected {
+  background: var(--accent-bg);
+}
+.hrow.is-selected::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 3px;
+  background: var(--accent);
+}
+.hrow-main {
+  min-width: 0;
+  flex: 1;
+}
+.hrow-head {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+.hrow-id {
+  font-size: 10.5px;
+}
+.hrow-time {
+  font-size: 10px;
+  color: var(--faint);
+  margin-left: auto;
+}
+.hrow-snippet {
+  font-size: 12.5px;
+  color: #3a4047;
+  margin-top: 3px;
+  line-height: 1.5;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* ---- 右：スレッドペイン ---- */
+.thread {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  background: var(--panel);
+}
+.thread-head {
+  flex: none;
+  position: sticky;
+  top: 0;
+  background: rgba(251, 249, 243, 0.93);
+  backdrop-filter: blur(8px);
+  border-bottom: 1px solid var(--line);
+  padding: 15px 22px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.thread-head h2 {
+  font-size: 16px;
+  font-weight: 600;
+}
+.thread-who {
+  font-size: 12px;
+}
+.thread-body {
+  flex: 1;
+  overflow-y: auto;
+}
+
+/* 親投稿 / 返信（.pc は post-card と同等。ここでは差分のみ） */
+.pc {
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--line2);
+}
+.pc.parent {
+  background: #faf7f0;
+}
+.pc.reply {
+  padding-left: 30px;
+}
+
+/* 削除済み返信 */
+.tomb {
+  padding: 16px 22px 16px 46px;
+  border-bottom: 1px solid var(--line2);
+  font-size: 13px;
+  color: var(--faint);
+  font-style: italic;
+  display: flex;
+  align-items: center;
+  gap: 11px;
+}
+.tomb::before {
+  content: "";
+  width: 42px;
+  height: 42px;
+  border-radius: var(--r-md);
+  background: repeating-linear-gradient(45deg, #eceae1 0 5px, #f3f1e8 5px 10px);
+  flex: none;
+}
+
+.noreply {
+  padding: 26px 22px;
+  font-size: 13px;
+  color: var(--faint);
+  text-align: center;
+}
+
+/* 返信コンポーザ（下部固定） */
+.composer {
+  flex: none;
+  display: flex;
+  gap: 11px;
+  padding: 13px 18px;
+  border-top: 1px solid var(--line);
+  background: #f6f3ec;
+}
+.composer-box {
+  flex: 1;
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: var(--r-md);
+  padding: 11px 15px;
+  font-size: 13.5px;
+  color: var(--faint);
+  cursor: pointer;
+}
+
+@media (max-width: 760px) {
+  .history {
+    display: none;
+  }
+}
