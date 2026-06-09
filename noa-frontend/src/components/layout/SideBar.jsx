@@ -77,7 +77,7 @@ function SideBar({ onCompose }) {
           投稿する
         </button>
       </aside>
-    </>
+    </aside>
   );
 }
 
