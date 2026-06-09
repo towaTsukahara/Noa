@@ -39,11 +39,12 @@ export default function SearchPage() {
 
     };
 
-    const handleSearch = async () => {
+    const search = async (word) => {
         try {
-            const response = await fetch(`/api/v1/search?keyword=${encodeURIComponent(keyword)}`, {
-                credentials: "include",
-            });
+            const response = await fetch(
+                `/api/v1/search?keyword=${encodeURIComponent(word)}`,
+                { credentials: "include" }
+            );
 
             if (!response.ok) {
                 throw new Error("検索失敗");
@@ -51,14 +52,23 @@ export default function SearchPage() {
 
             const data = await response.json();
 
-            console.log(data.posts);
-
             setPosts(data.posts);
             setTags(data.tags);
 
         } catch (error) {
             console.error(error);
         }
+    };
+
+    const handleSearch = async () => {
+        await search(keyword);
+    };
+
+    const handleSuggestionClick = async (tagName) => {
+        setKeyword(tagName);
+        setSuggestions([]);
+
+        await search(tagName);
     };
 
     const handleLikeToggle = async (post) => {
@@ -160,10 +170,7 @@ export default function SearchPage() {
                     {suggestions.map((tag) => (
                         <div
                             key={tag.id}
-                            onClick={() => {
-                                setKeyword(tag.name);
-                                setSuggestions([]);
-                            }}
+                            onClick={() => handleSuggestionClick(tag.name)}
                             style={{ cursor: "pointer" }}
                         >
                             {tag.name}
