@@ -1,5 +1,6 @@
-import { useState, useEffect } from "react";
-import { useParams } from "react-router-dom";
+import { useState, useEffect, useRef } from "react";
+import { useParams, useSearchParams } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
 import { api } from "../api/client";
 import "./PostDetailPage.css";
 
@@ -7,120 +8,77 @@ import LikeButton from "../components/post/LikeButton";
 import CommentList from "../components/post/CommentList";
 import CommentForm from "../components/post/CommentForm";
 
-const dummyPosts = [
-    {
-        id: 1,
-        author: "Noa-001",
-        body: "Spring Bootで@Transactionalの境界、サービス層に付けるかリポジトリ層か、みんなどうしてる？",
-        tags: ["spring boot", "質問"],
-        likeCount: 2,
-        comments: [],
-    },
-    {
-        id: 2,
-        author: "Noa-002",
-        body: "ReactのuseEffectの依存配列、ESLintのexhaustive-depsを入れてから事故が減った。",
-        tags: ["react"],
-        likeCount: 1,
-        comments: [],
-    },
-    {
-        id: 21,
-        author: "Noa-003",
-        body: "EXPLAIN ANALYZE が読めるようになると、遅いクエリの原因がすぐ分かる。",
-        tags: ["postgresql"],
-        likeCount: 4,
-        comments: [
-            {
-                id: 1,
-                author: "Noa-001",
-                body: "実行計画を読むの大事ですよね。",
-                mine: false,
-            },
-            {
-                id: 2,
-                author: "Noa-002",
-                body: "最近勉強し始めました！",
-                mine: false,
-            },
-            {
-                id: 3,
-                author: "自分",
-                body: "勉強になります！",
-                mine: true,
-            },
-        ],
-    },
-];
-
 function PostDetailPage() {
     const { id } = useParams();
+    const [searchParams] = useSearchParams();
 
     const [post, setPost] = useState(null);
     const [loading, setLoading] = useState(true);
     const [comments, setComments] = useState([]);
 
+    const commentRef = useRef(null); // 返信欄への参照（フォーカス用）
+    const { user } = useAuth();
+
+    const loadComments = async () => {
+        const data = await api(`/comments?postId=${id}`);
+        setComments(
+            data.map((c) => ({
+                id: c.id,
+                authorHandle: c.authorName,
+                body: c.body,
+                mine: user && c.authorName === user.handle, // 自分のコメントか（handleで判定）
+            }))
+        );
+    };
+
     useEffect(() => {
-        const fetchPost = async () => {
+        const fetchAll = async () => {
             try {
                 const data = await api(`/posts/${id}`);
                 setPost(data);
-
-                const commentsData = await api(`/comments?postId=${id}`);
-
-                setComments(
-                    commentsData.map((comment) => ({
-                        id: comment.id,
-                        author: comment.authorName,
-                        body: comment.body,
-                        mine: false,
-                    }))
-                );
+                await loadComments();
             } catch (error) {
                 console.error("投稿取得失敗", error);
             } finally {
                 setLoading(false);
             }
         };
-
-        fetchPost();
+        fetchAll();
     }, [id]);
+
+    // ?reply=1 で来たら返信欄にフォーカス＋スクロール
+    useEffect(() => {
+        if (!loading && searchParams.get("reply") === "1" && commentRef.current) {
+            commentRef.current.focus();
+            commentRef.current.scrollIntoView({ behavior: "smooth", block: "center" });
+        }
+    }, [loading, searchParams]);
 
     const handleAddComment = async (text) => {
         try {
             await api(`/comments`, {
                 method: "POST",
-                body: JSON.stringify({
-                    postId: Number(id),
-                    body: text,
-                }),
+                body: JSON.stringify({ postId: Number(id), body: text }),
             });
-
-            const commentsData = await api(`/comments?postId=${id}`);
-
-            setComments(
-                commentsData.map((comment) => ({
-                    id: comment.id,
-                    author: comment.authorName,
-                    body: comment.body,
-                    mine: false,
-                }))
-            );
+            await loadComments(); // 投稿後に再読込
         } catch (error) {
             console.error("コメント投稿失敗", error);
+            alert("返信できませんでした。");
         }
     };
 
-    const handleDeleteComment = (commentId) => {
-        setComments(
-            comments.filter((comment) => comment.id !== commentId)
-        );
+    const handleDeleteComment = async (commentId) => {
+        try {
+            await api(`/comments/${commentId}`, { method: "DELETE" });
+            await loadComments(); // 削除後に再読込
+        } catch (e) {
+            alert("削除できませんでした。");
+        }
     };
 
     if (loading) {
         return <div className="post-detail page"><p className="empty-note">読み込み中...</p></div>;
     }
-
     if (!post) {
         return <div className="post-detail page"><p className="empty-note">投稿が見つかりません</p></div>;
     }
@@ -141,16 +99,16 @@ function PostDetailPage() {
                 </div>
 
                 <div className="detail-actions">
-                    <LikeButton initialCount={post.likeCount} />
+                    <LikeButton
+                        postId={post.id}
+                        initialCount={post.likeCount}
+                        initialLiked={post.likedByMe}
+                    />
                 </div>
             </div>
 
-            <CommentList
-                comments={comments}
-                onDeleteComment={handleDeleteComment}
-            />
-
-            <CommentForm onAddComment={handleAddComment} />
+            <CommentList comments={comments} onDeleteComment={handleDeleteComment} />
+            <CommentForm ref={commentRef} onAddComment={handleAddComment} />
         </div>
     );
 }
