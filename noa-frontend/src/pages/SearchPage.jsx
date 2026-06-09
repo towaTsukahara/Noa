@@ -1,5 +1,9 @@
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
+import { relativeTime } from "../utils/relativeTime";
+import UserHandle from "../components/user/UserHandle";
+
+import "./TimelinePage.css";
 
 export default function SearchPage() {
     const [keyword, setKeyword] = useState("");
@@ -47,6 +51,8 @@ export default function SearchPage() {
 
             const data = await response.json();
 
+            console.log(data.posts);
+
             setPosts(data.posts);
             setTags(data.tags);
 
@@ -54,6 +60,34 @@ export default function SearchPage() {
             console.error(error);
         }
     };
+
+    const handleLikeToggle = async (post) => {
+
+        try {
+            await fetch(`/api/v1/posts/${post.id}/like`, {
+                method: post.likedByMe ? "DELETE" : "POST",
+                credentials: "include",
+            });
+
+            setPosts((prev) =>
+                prev.map((p) =>
+                    p.id === post.id
+                        ? {
+                            ...p,
+                            likedByMe: !p.likedByMe,
+                            likeCount: p.likedByMe
+                                ? p.likeCount - 1
+                                : p.likeCount + 1
+                        }
+                        : p
+                )
+            );
+
+        } catch (error) {
+            console.error(error);
+
+        }
+    }
 
     const fetchFollowingTags = async () => {
         try {
@@ -118,6 +152,9 @@ export default function SearchPage() {
                     fetchSuggestions(value);
                 }}
             />
+
+            <button onClick={handleSearch}>検索</button>
+
             {suggestions.length > 0 && (
                 <div>
                     {suggestions.map((tag) => (
@@ -134,7 +171,6 @@ export default function SearchPage() {
                     ))}
                 </div>
             )}
-            <button onClick={handleSearch}>検索</button>
 
             <div>
                 <button onClick={() => setSelectedTab("posts")}>投稿</button>
@@ -146,15 +182,71 @@ export default function SearchPage() {
             {selectedTab === "posts" ? (
                 <div>
                     {posts.map((post) => (
-                        <div
-                            key={post.id}
-                            onClick={() => navigate(`/posts/${post.id}`)}
-                            style={{ cursor: "pointer" }}
-                        >
-                            <div>{post.body}</div>
-                            <hr />
-                        </div>
-                    ))}
+                        <article key={post.id} className="post-card">
+
+                            <div className="post-header">
+                                <div className="avatar"></div>
+
+                                <div>
+                                    <div className="nickname">
+                                        <Link
+                                            to={`/users/${post.author?.handle}`}
+                                        >
+                                            <UserHandle
+                                                user={post.author ?? { handle: "Unknown" }}
+                                            />
+                                        </Link>
+                                    </div>
+
+                                    <div className="date">
+                                        {relativeTime(
+                                            post.createdAt
+                                        )}
+                                    </div>
+                                </div>
+                            </div>
+
+                            <p className="content">
+                                {post.body}
+                            </p>
+
+                            <Link
+                                to={`/post/${post.id}`}
+                                className="post-detail-link"
+                            >
+                                詳細...
+                            </Link>
+
+                            <div className="tags">
+                                {post.tags.map((tag) => (
+                                    <span key={tag}>
+                                        #{tag}
+                                    </span>
+                                ))}
+                            </div>
+
+                            <div className="actions">
+
+                                <button
+                                    onClick={() =>
+                                        handleLikeToggle(post)
+                                    }
+                                >
+                                    {post.likedByMe
+                                        ? "♥"
+                                        : "♡"}{" "}
+                                    {post.likeCount}
+                                </button>
+
+                                <span>
+                                    💬 {post.replyCount}
+                                </span>
+
+                            </div>
+
+                        </article>
+                    ))
+                    }
                 </div>
             ) : (
                 <div>
