@@ -83,13 +83,13 @@ function PostDetailPage() {
             <h2>投稿詳細</h2>
 
             <p>
-                <strong>{post.author.handle}</strong>
+                <strong>{post.author?.handle}</strong>
             </p>
 
             <p>{post.body}</p>
 
             <div>
-                {post.tags.map((tag) => (
+                {post.tags?.map((tag) => (
                     <span
                         key={tag}
                         style={{

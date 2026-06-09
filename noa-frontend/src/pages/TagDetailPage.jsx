@@ -1,6 +1,10 @@
 //名前変更予定
 import { useEffect, useState } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, Link } from "react-router-dom";
+import { relativeTime } from "../utils/relativeTime";
+import UserHandle from "../components/user/UserHandle";
+
+import "./TimelinePage.css";
 
 export default function TagDetailPage() {
 
@@ -8,9 +12,11 @@ export default function TagDetailPage() {
     const [loading, setLoading] = useState(true);
 
     const { tagId } = useParams();
-    const navigate = useNavigate();
 
     const fetchTag = async () => {
+
+        setLoading(true);
+
         try {
             const response = await fetch(`/api/v1/tags/${tagId}`, { credentials: "include", });
 
@@ -46,7 +52,7 @@ export default function TagDetailPage() {
         try {
             const response = await fetch(
                 `/api/v1/tags/${encodeURIComponent(tag.name)}/follow`,
-                { method: tag.followed ? "DELETE" : "POST" , credentials: "include", }
+                { method: tag.followed ? "DELETE" : "POST", credentials: "include", }
             );
 
             if (!response.ok) {
@@ -54,6 +60,40 @@ export default function TagDetailPage() {
             }
 
             fetchTag();
+
+        } catch (error) {
+            console.error(error);
+        }
+    };
+
+    const handleLikeToggle = async (post) => {
+        try {
+            const response = await fetch(
+                `/api/v1/posts/${post.id}/like`,
+                {
+                    method: post.likedByMe ? "DELETE" : "POST",
+                    credentials: "include",
+                }
+            );
+
+            if (!response.ok) {
+                throw new Error("いいね失敗");
+            }
+
+            setTag((prev) => ({
+                ...prev,
+                posts: prev.posts.map((p) =>
+                    p.id === post.id
+                        ? {
+                            ...p,
+                            likedByMe: !p.likedByMe,
+                            likeCount: p.likedByMe
+                                ? p.likeCount - 1
+                                : p.likeCount + 1,
+                        }
+                        : p
+                ),
+            }));
 
         } catch (error) {
             console.error(error);
@@ -70,15 +110,69 @@ export default function TagDetailPage() {
             <hr />
 
             <h2>タグが付いた投稿</h2>
-            {tag.posts.map((post) => (
-                <div 
+            {tag.posts?.map((post) => (
+                <article
                     key={post.id}
-                    onClick={() => navigate(`/posts/${post.id}`)}
-                    style={{ cursor: "pointer" }}
+                    className="post-card"
                 >
-                    <div>{post.body}</div>
-                    <hr />
-                </div>
+                    <div className="post-header">
+                        <div className="avatar"></div>
+
+                        <div>
+                            <div className="nickname">
+                                <Link
+                                    to={`/users/${post.author?.handle}`}
+                                >
+                                    {post.author && (
+                                        <UserHandle user={post.author} />
+                                    )}
+                                </Link>
+                            </div>
+
+                            <div className="date">
+                                {relativeTime(
+                                    post.createdAt
+                                )}
+                            </div>
+                        </div>
+                    </div>
+
+                    <p className="content">
+                        {post.body}
+                    </p>
+
+                    <Link
+                        to={`/post/${post.id}`}
+                        className="post-detail-link"
+                    >
+                        詳細...
+                    </Link>
+
+                    <div className="tags">
+                        {post.tags.map((tag) => (
+                            <span
+                                key={tag}
+                                style={{ cursor: "pointer" }}
+                            >
+                                #{tag}
+                            </span>
+                        ))}
+                    </div>
+
+                    <div className="actions">
+                        <button
+                            onClick={() => handleLikeToggle(post)}
+                        >
+                            {post.likedByMe ? "♥" : "♡"}
+                            {" "}
+                            {post.likeCount}
+                        </button>
+
+                        <span>
+                            💬 {post.replyCount}
+                        </span>
+                    </div>
+                </article>
             ))}
         </div>
     )
