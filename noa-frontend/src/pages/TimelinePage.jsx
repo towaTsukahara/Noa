@@ -5,6 +5,9 @@ import { api } from "../api/client";
 import UserHandle from "../components/user/UserHandle";
 import { relativeTime } from "../utils/relativeTime";
 import { Link, useOutletContext } from "react-router-dom";
+import heart_filled from '/icons/heart_filled.svg';
+import heart from '/icons/heart.svg';
+import reply from '/icons/reply.svg';
 
 function TimelinePage() {
   const [posts, setPosts] = useState([]);
@@ -112,11 +115,17 @@ function TimelinePage() {
               className={`like-button ${post.likedByMe ? "liked" : ""}`}
               onClick={() => handleLikeToggle(post)}
             >
-              {post.likedByMe ? "♥" : "♡"} {post.likeCount}
+              <img
+                src={post.likedByMe ? heart_filled : heart}
+                alt="いいね"
+                className="icon-like"
+              />
+              <span>{post.likeCount}</span>
             </button>
-            <Link to={`/post/${post.id}?reply=1`} className="reply-button">
-              💬 {post.replyCount}
-            </Link>
+            <span className="reply">
+              <img src={reply} alt="返信" className="icon-reply" />
+              <span>{post.replyCount}</span>
+            </span>
           </div>
         </article>
       ))}
