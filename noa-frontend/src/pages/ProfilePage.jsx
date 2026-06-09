@@ -3,6 +3,10 @@ import { useNavigate } from "react-router-dom";
 import { api } from "../api/client";
 import { useAuth } from "../context/AuthContext";
 import "./ProfilePage.css";
+import heart_filled from '/icons/heart_filled.svg';
+import heart from '/icons/heart.svg';
+import reply from '/icons/reply.svg';
+import trashcan from '/icons/trashcan.svg';
 
 function ProfilePage() {
     const navigate = useNavigate();
@@ -158,12 +162,28 @@ function ProfilePage() {
                     className={`mini-like ${post.likedByMe ? "liked" : ""}`}
                     onClick={() => onLike(post)}
                 >
-                    {post.likedByMe ? "♥" : "♡"} {post.likeCount}
+                    <img
+                        src={post.likedByMe ? heart_filled : heart}
+                        alt="いいね"
+                        className="icon-like"
+                    />
+                    <span>{post.likeCount}</span>
                 </button>
-                <span>💬 {post.replyCount}</span>
+                <span className="mini-reply">
+                    <img
+                        src={reply}
+                        alt="返信"
+                        className="icon-reply"
+                    />
+                    <span>{post.replyCount}</span>
+                </span>
                 {onLike === handleLikeToggle && (
                     <button className="mini-delete" onClick={() => handleDelete(post.id)}>
-                        削除
+                        <img
+                            src={trashcan}
+                            alt="削除"
+                            className="icon-delete"
+                        />
                     </button>
                 )}
             </div>
