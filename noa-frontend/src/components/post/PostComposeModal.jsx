@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { api } from "../../api/client";
-import "../../pages/TimelinePage.css"; // モーダル用のクラスはここに定義
+import "./PostComposeModal.css";
 
 function PostComposePage({ onClose, onPosted }) {
   const [body, setBody] = useState("");
@@ -35,7 +35,7 @@ function PostComposePage({ onClose, onPosted }) {
     <div className="modal-overlay" onClick={onClose}>
       <div className="modal-card" onClick={(e) => e.stopPropagation()}>
         <div className="modal-head">
-          <h2 style={{ margin: 0 }}>呼称ほしい</h2>
+          <h2>呼称ほしい</h2>
           <button className="modal-close" onClick={onClose}>×</button>
         </div>
 
@@ -54,7 +54,7 @@ function PostComposePage({ onClose, onPosted }) {
           onChange={(e) => setTagsInput(e.target.value)}
           placeholder="タグ（カンマ区切り。例: React, 質問）"
         />
-        
+
         <div className="modal-counter">{body.length}/1000</div>
 
         {error && <p className="modal-error">{error}</p>}

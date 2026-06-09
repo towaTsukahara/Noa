@@ -1,7 +1,8 @@
 package noa.service;
 
 import noa.dto.CommentResponse;
-import java.util.List;
+import noa.dto.MyCommentResponse;
+import noa.dto.MyCommentResponse;
 import noa.dto.CommentCreateRequest;
 import noa.entity.Comment;
 import noa.entity.Post;
@@ -9,6 +10,9 @@ import noa.entity.User;
 import noa.repository.CommentRepository;
 import noa.repository.PostRepository;
 import org.springframework.stereotype.Service;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Service
 public class CommentService {
@@ -54,5 +58,20 @@ public class CommentService {
                     return response;
                 })
                 .toList();
+    }
+
+    public List<MyCommentResponse> getMyComments(User user) {
+        List<MyCommentResponse> result = new ArrayList<>();
+        for (Comment c : commentRepository.findByAuthorIdOrderByIdDesc(user.getId())) {
+            Post p = c.getPost();
+            if (p == null || p.isDeleted()) continue; // 元投稿が消えていたらスキップ
+            result.add(new MyCommentResponse(
+                c.getId(),
+                c.getBody(),
+                c.getCreatedAt(),
+                p.getId()
+            ));
+        }
+        return result;
     }
 }

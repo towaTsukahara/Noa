@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import "./NotificationPage.css";
 
 const NotificationPage = () => {
     const [notifications, setNotifications] = useState([]);
@@ -35,71 +36,45 @@ const NotificationPage = () => {
         const diff = Math.floor((now - date) / 1000); // 秒差
 
         if (diff < 0) return "今";
-
-        if (diff < 60) {
-            return `${diff}秒前`;
-        }
+        if (diff < 60) return `${diff}秒前`;
 
         const minutes = Math.floor(diff / 60);
-        if (minutes < 60) {
-            return `${minutes}分前`;
-        }
+        if (minutes < 60) return `${minutes}分前`;
 
         const hours = Math.floor(minutes / 60);
-        if (hours < 24) {
-            return `${hours}時間前`;
-        }
+        if (hours < 24) return `${hours}時間前`;
 
         const days = Math.floor(hours / 24);
-        if (days < 7) {
-            return `${days}日前`;
-        }
+        if (days < 7) return `${days}日前`;
 
         // 1週間以上は日付表示
         return date.toLocaleDateString();
     };
 
     return (
-        <div style={{ padding: "20px", textAlign: "left" }}>
-            <h2>通知</h2>
+        <div className="notifications page">
+            <h2 className="page-title">通知</h2>
+            <div className="sub-note">いいね・返信のみ通知します（フォローは非通知）</div>
+
             {notifications.length === 0 ? (
-                <p>通知はありません</p>
+                <p className="empty-note">通知はありません</p>
             ) : (
-                <div>
-                    {notifications.map(n => (
-                        <div
-                            key={n.id}
-                            style={{
-                                padding: "12px",
-                                borderBottom: "1px solid #ddd",
-                                backgroundColor: n.isRead ? "#fff" : "#eef6ff" // 未読強調
-                            }}
-                        >
-                            {/* メインメッセージ */}
-                            <div style={{ fontWeight: "bold" }}>
-                                {/* 🔵 未読マーク */}
-                                {!n.isRead && (
-                                    <span style={{ color: "blue", fontSize: "12px" }}>● </span>
-                                )}
-                                <span style={{ color: n.type === "LIKE" ? "red" : "blue" }}>
-                                    {n.type === "LIKE" ? "♡" : "@"}
-                                </span>{" "}
-                                {n.actor.name}さんが
+                notifications.map((n) => (
+                    <div key={n.id} className={`notif ${n.isRead ? "" : "unread"}`}>
+                        <div className={`notif-icon ${n.type === "LIKE" ? "is-like" : "is-reply"}`}>
+                            {n.type === "LIKE" ? "♥" : "@"}
+                        </div>
+                        <div className="notif-main">
+                            <div className="notif-text">
+                                <b className="notif-actor">{n.actor.name}</b> さんが
                                 {n.type === "LIKE" ? "いいねしました" : "返信しました"}
                             </div>
-
-                            {/* 投稿内容表示 */}
-                            <div style={{ color: "gray", marginTop: "4px" }}>
-                                {n.post.body}
-                            </div>
-
-                            {/* 時刻 */}
-                            <div style={{ fontSize: "12px", color: "#999", marginTop: "4px" }}>
-                                {formatRelativeTime(n.createdAt)}
-                            </div>
+                            <div className="notif-snippet">{n.post.body}</div>
+                            <div className="notif-time">{formatRelativeTime(n.createdAt)}</div>
                         </div>
-                    ))}
-                </div>
+                        {!n.isRead && <div className="notif-dot"></div>}
+                    </div>
+                ))
             )}
         </div>
     );

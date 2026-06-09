@@ -7,6 +7,8 @@
  *   - 氏名・役職・社員番号などは「一切表示しない」。このため、
  *     ここに渡すデータは handle / nickname だけを前提にする。
  *
+ * 見た目: .user-handle（等幅・ハンドル色）。スタイルは theme.css に定義。
+ *
  * 使い方:
  *   <UserHandle user={post.author} />
  *   user は { handle, nickname } を持つオブジェクト（UserSummary や投稿の author）。

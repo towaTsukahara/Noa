@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import { api } from "../api/client";
+import "./PostDetailPage.css";
 
 import LikeButton from "../components/post/LikeButton";
 import CommentList from "../components/post/CommentList";
@@ -117,41 +118,31 @@ function PostDetailPage() {
     };
 
     if (loading) {
-        return <h2>読み込み中...</h2>;
+        return <div className="post-detail page"><p className="empty-note">読み込み中...</p></div>;
     }
 
     if (!post) {
-        return <h2>投稿が見つかりません</h2>;
+        return <div className="post-detail page"><p className="empty-note">投稿が見つかりません</p></div>;
     }
 
     return (
-        <div style={{ padding: "20px" }}>
-            <h2>投稿詳細</h2>
+        <div className="post-detail page">
+            <div className="page-pad detail-main">
+                <div className="detail-author">
+                    <span className="user-handle">{post.author.handle}</span>
+                </div>
 
-            <p>
-                <strong>{post.author.handle}</strong>
-            </p>
+                <p className="detail-body">{post.body}</p>
 
-            <p>{post.body}</p>
+                <div className="detail-tags">
+                    {post.tags.map((tag) => (
+                        <span key={tag} className="tag">#{tag}</span>
+                    ))}
+                </div>
 
-            <div>
-                {post.tags.map((tag) => (
-                    <span
-                        key={tag}
-                        style={{
-                            border: "1px solid #ccc",
-                            padding: "4px 8px",
-                            marginRight: "8px",
-                            borderRadius: "20px",
-                        }}
-                    >
-                        #{tag}
-                    </span>
-                ))}
-            </div>
-
-            <div style={{ marginTop: "20px" }}>
-                <LikeButton initialCount={post.likeCount} />
+                <div className="detail-actions">
+                    <LikeButton initialCount={post.likeCount} />
+                </div>
             </div>
 
             <CommentList

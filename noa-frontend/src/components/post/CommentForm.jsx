@@ -1,4 +1,5 @@
 import { useState } from "react";
+import "./CommentList.css";
 
 function CommentForm({ onAddComment }) {
   const [text, setText] = useState("");
@@ -12,24 +13,15 @@ function CommentForm({ onAddComment }) {
   };
 
   return (
-    <div style={{ marginTop: "20px" }}>
+    <div className="comment-form">
       <textarea
         placeholder="コメントを書く"
         value={text}
         onChange={(e) => setText(e.target.value)}
         rows={3}
-        style={{
-          width: "100%",
-          padding: "8px",
-        }}
       />
 
-      <button
-        onClick={handleSubmit}
-        style={{
-          marginTop: "8px",
-        }}
-      >
+      <button onClick={handleSubmit}>
         返信する
       </button>
     </div>

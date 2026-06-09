@@ -1,0 +1,77 @@
+/* NavBar — メイン列上部のバー（検索・通知・ログインユーザー・ログアウト）
+   構造: nav.header > input + button(🔔) + span(handle) + button(ログアウト) */
+
+.header {
+  position: sticky;
+  top: 0;
+  z-index: 6;
+  height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 12px;
+  padding: 0 22px;
+  background: rgba(251, 249, 243, 0.93);
+  backdrop-filter: blur(8px);
+  border-bottom: 1px solid var(--line);
+}
+
+/* 検索入力（仮）。.field の見た目に寄せる */
+.header input {
+  width: 280px;
+  font-family: inherit;
+  font-size: 13.5px;
+  color: var(--ink);
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: var(--r-pill);
+  padding: 9px 16px;
+  outline: none;
+  transition: border-color 0.13s, box-shadow 0.13s;
+}
+.header input::placeholder {
+  color: var(--faint);
+}
+.header input:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-bg);
+}
+
+/* 通知ベル等のアイコンボタン */
+.header button {
+  border: 1px solid var(--line);
+  background: #fff;
+  color: var(--soft);
+  border-radius: var(--r-pill);
+  height: 38px;
+  min-width: 38px;
+  padding: 0 12px;
+  font-size: 15px;
+  cursor: pointer;
+  transition: background 0.13s, border-color 0.13s, color 0.13s;
+}
+.header button:hover {
+  background: #f1eee6;
+  color: var(--ink);
+}
+
+/* ログインユーザーのハンドル表示 */
+.header span {
+  font-family: var(--mono-font);
+  font-size: 12.5px;
+  color: var(--mono);
+}
+
+/* ログアウトはテキスト寄りの控えめボタンに */
+.header button:last-of-type {
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 500;
+  min-width: 0;
+}
+
+@media (max-width: 720px) {
+  .header input {
+    width: 150px;
+  }
+}

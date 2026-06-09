@@ -5,8 +5,10 @@ import noa.entity.Post;
 import noa.entity.User;
 import noa.entity.Tag;
 import noa.entity.PostLike;
+import noa.repository.CommentRepository;
 import noa.repository.LikeRepository;
 import noa.repository.PostRepository;
+import noa.repository.TagRepository;
 import org.springframework.stereotype.Service;
 import noa.dto.PostResponse;
 import org.springframework.data.domain.PageRequest;
@@ -28,12 +30,14 @@ public class PostService {
         private final PostRepository postRepository;
         private final LikeRepository likeRepository;
         private final TagService tagService;
+        private final CommentRepository commentRepository;
 
         public PostService(PostRepository postRepository, LikeRepository likeRepository,
-                        TagService tagService) {
+                        TagService tagService, CommentRepository commentRepository) {
                 this.postRepository = postRepository;
                 this.likeRepository = likeRepository;
                 this.tagService = tagService;
+                this.commentRepository = commentRepository;
         }
 
         // 通常投稿を作成する（タグも一緒に保存）
@@ -85,8 +89,7 @@ public class PostService {
                                                 p,
                                                 likeRepository.countByPostId(p.getId()),
                                                 likedIds.contains(p.getId()),
-                                                postRepository.countReplies(p.getId()) // 返信数
-                                ))
+                                                commentRepository.countByPostId(p.getId())))
                                 .toList();
 
                 Long nextCursor = (posts.size() == limit && !posts.isEmpty())
@@ -148,7 +151,7 @@ public class PostService {
                                                 p,
                                                 likeRepository.countByPostId(p.getId()),
                                                 true,
-                                                postRepository.countReplies(p.getId())))
+                                                commentRepository.countByPostId(p.getId())))
                                 .toList();
 
                 // カーソルは likes の id（いいね順のしおり）
@@ -171,32 +174,6 @@ public class PostService {
 
                 long likeCount = likeRepository.countByPostId(id);
                 boolean likedByMe = likeRepository.existsByUserIdAndPostId(viewer.getId(), id);
-                return PostResponse.from(post, likeCount, likedByMe, postRepository.countReplies(id));
-        }
-
-        // === 返信一覧（カーソル）。組み立ては既存の buildPageResponse を再利用 ===
-        public Map<String, Object> getReplies(Long parentId, Long cursor, int limit, User viewer) {
-                if (!postRepository.existsById(parentId))
-                        throw new ResponseStatusException(HttpStatus.NOT_FOUND, "投稿が見つかりません");
-                Pageable pageable = PageRequest.of(0, limit);
-                List<Post> replies = (cursor == null)
-                                ? postRepository.findRepliesFirst(parentId, pageable)
-                                : postRepository.findRepliesAfter(parentId, cursor, pageable);
-                return buildPageResponse(replies, limit, viewer);
-        }
-
-        // === 返信作成（親IDつきの投稿として保存）===
-        public Post createReply(Long parentId, User author, PostCreateRequest req) {
-                Post parent = postRepository.findById(parentId)
-                                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "投稿が見つかりません"));
-                if (parent.isDeleted())
-                        throw new ResponseStatusException(HttpStatus.NOT_FOUND, "投稿が見つかりません");
-
-                Post reply = new Post();
-                reply.setAuthor(author);
-                reply.setBody(req.body());
-                reply.setParentId(parentId); // ← これが「返信」の印
-                // TODO(F-117): 親投稿の作者へ返信通知を生成する
-                return postRepository.save(reply);
+                return PostResponse.from(post, likeCount, likedByMe, commentRepository.countByPostId(id));
         }
 }
