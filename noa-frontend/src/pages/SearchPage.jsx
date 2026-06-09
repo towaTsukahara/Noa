@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 
 export default function SearchPage() {
@@ -6,11 +6,12 @@ export default function SearchPage() {
     const [selectedTab, setSelectedTab] = useState("posts");
     const [posts, setPosts] = useState([]);
     const [tags, setTags] = useState([]);
+    const [followingTags, setFollowingTags] = useState([]);
     const navigate = useNavigate();
 
     const handleSearch = async () => {
         try {
-            const response = await fetch(`/api/v1/search?keyword=${encodeURIComponent(keyword)}`,{
+            const response = await fetch(`/api/v1/search?keyword=${encodeURIComponent(keyword)}`, {
                 credentials: "include",
             });
 
@@ -27,14 +28,53 @@ export default function SearchPage() {
             console.error(error);
         }
     };
-    
-    const toggleFollow = (tagName) => {
-        if (
-            myFollowedTags.includes(tagName)
-        ) {
-            unfollowTag(tagName);
-        } else {
-            followTag(tagName);
+
+    const fetchFollowingTags = async () => {
+        try {
+            const response = await fetch(
+                "/api/v1/me/following/tags",
+                {
+                    credentials: "include",
+                }
+            );
+
+            if (!response.ok) {
+                return;
+            }
+
+            const data = await response.json();
+
+            setFollowingTags(data.map((tag) => tag.name));
+
+        } catch (error) {
+            console.error(error);
+        }
+    };
+
+    useEffect(() => {
+        fetchFollowingTags();
+    }, []);
+
+    const toggleFollow = async (tagName) => {
+        const isFollowed = followingTags.includes(tagName);
+
+        try {
+            const response = await fetch(
+                `/api/v1/tags/${encodeURIComponent(tagName)}/follow`,
+                {
+                    method: isFollowed ? "DELETE" : "POST",
+                    credentials: "include",
+                }
+            );
+
+            if (!response.ok) {
+                throw new Error();
+            }
+
+            await fetchFollowingTags();
+
+        } catch (error) {
+            console.error(error);
         }
     };
 
@@ -60,9 +100,12 @@ export default function SearchPage() {
             {selectedTab === "posts" ? (
                 <div>
                     {posts.map((post) => (
-                        <div key={post.id}>
+                        <div
+                            key={post.id}
+                            onClick={() => navigate(`/posts/${post.id}`)}
+                            style={{ cursor: "pointer" }}
+                        >
                             <div>{post.body}</div>
-
                             <hr />
                         </div>
                     ))}
@@ -70,7 +113,8 @@ export default function SearchPage() {
             ) : (
                 <div>
                     {tags.map((tag) => {
-                        const isFollowed = myFollowedTags.includes(tag.name);
+
+                        const isFollowed = followingTags.includes(tag.name);
 
                         return (
                             <div key={tag.id}>
@@ -81,7 +125,8 @@ export default function SearchPage() {
                                 </span>
 
                                 <button onClick={() => toggleFollow(tag.name)}>
-                                    {isFollowed ? "フォローをやめる" : "フォローする"}</button>
+                                    {isFollowed ? "フォローをやめる" : "フォローする"}
+                                </button>
 
                                 <hr />
                             </div>

@@ -6,52 +6,6 @@ import LikeButton from "../components/post/LikeButton";
 import CommentList from "../components/post/CommentList";
 import CommentForm from "../components/post/CommentForm";
 
-const dummyPosts = [
-    {
-        id: 1,
-        author: "Noa-001",
-        body: "Spring Bootで@Transactionalの境界、サービス層に付けるかリポジトリ層か、みんなどうしてる？",
-        tags: ["spring boot", "質問"],
-        likeCount: 2,
-        comments: [],
-    },
-    {
-        id: 2,
-        author: "Noa-002",
-        body: "ReactのuseEffectの依存配列、ESLintのexhaustive-depsを入れてから事故が減った。",
-        tags: ["react"],
-        likeCount: 1,
-        comments: [],
-    },
-    {
-        id: 21,
-        author: "Noa-003",
-        body: "EXPLAIN ANALYZE が読めるようになると、遅いクエリの原因がすぐ分かる。",
-        tags: ["postgresql"],
-        likeCount: 4,
-        comments: [
-            {
-                id: 1,
-                author: "Noa-001",
-                body: "実行計画を読むの大事ですよね。",
-                mine: false,
-            },
-            {
-                id: 2,
-                author: "Noa-002",
-                body: "最近勉強し始めました！",
-                mine: false,
-            },
-            {
-                id: 3,
-                author: "自分",
-                body: "勉強になります！",
-                mine: true,
-            },
-        ],
-    },
-];
-
 function PostDetailPage() {
     const { id } = useParams();
 
