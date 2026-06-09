@@ -8,7 +8,7 @@ function CommentList({ comments, onDeleteComment }) {
 
       {comments.map((comment) => (
         <div key={comment.id} className="comment">
-          <strong className="comment-author">{comment.author}</strong>
+          <strong className="comment-author">{comment.authorHandle}</strong>
 
           <p className="comment-body">{comment.body}</p>
 

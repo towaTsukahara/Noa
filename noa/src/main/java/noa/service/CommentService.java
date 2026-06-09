@@ -2,7 +2,6 @@ package noa.service;
 
 import noa.dto.CommentResponse;
 import noa.dto.MyCommentResponse;
-import noa.dto.MyCommentResponse;
 import noa.dto.CommentCreateRequest;
 import noa.entity.Comment;
 import noa.entity.Post;
@@ -10,6 +9,9 @@ import noa.entity.User;
 import noa.repository.CommentRepository;
 import noa.repository.PostRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
+import org.springframework.http.HttpStatus;
+import jakarta.transaction.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -73,5 +75,20 @@ public class CommentService {
             ));
         }
         return result;
+    }
+
+    // コメント削除（本人のみ・物理削除）
+    @jakarta.transaction.Transactional
+    public void delete(Long commentId, User requester) {
+        Comment comment = commentRepository.findById(commentId)
+                .orElseThrow(() -> new org.springframework.web.server.ResponseStatusException(
+                        org.springframework.http.HttpStatus.NOT_FOUND, "コメントが見つかりません"));
+
+        // 作者チェック: 自分のコメントだけ削除できる
+        if (!comment.getAuthor().getId().equals(requester.getId())) {
+            throw new org.springframework.web.server.ResponseStatusException(
+                    org.springframework.http.HttpStatus.FORBIDDEN, "自分のコメントのみ削除できます");
+        }
+        commentRepository.delete(comment);
     }
 }

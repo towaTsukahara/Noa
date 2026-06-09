@@ -113,3 +113,12 @@
   color: var(--like);
   font-weight: 600;
 }
+
+/* コメントタブのカード（クリックで元投稿へ） */
+.profile-comment {
+  cursor: pointer;
+  transition: background 0.12s;
+}
+.profile-comment:hover {
+  background: var(--accent-bg);
+}

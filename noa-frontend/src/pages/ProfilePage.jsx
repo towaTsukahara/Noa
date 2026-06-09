@@ -18,14 +18,12 @@ function ProfilePage() {
     const [likedPosts, setLikedPosts] = useState([]);
     const [likesLoading, setLikesLoading] = useState(false);
 
+    // ===== 自分のコメント（/comments/me） =====
+    const [myComments, setMyComments] = useState([]);
+    const [commentsLoading, setCommentsLoading] = useState(false);
+
     // ===== プロフィール表示部（F-104・別担当のためモックのまま） =====
     const [profile, setProfile] = useState(null);
-
-    useEffect(() => {
-        api("/me")
-            .then((me) => setProfile(me))
-            .catch(() => setProfile(null));
-    }, [])
 
     // 自分の投稿をAPIから取得
     const loadPosts = async () => {
@@ -56,6 +54,19 @@ function ProfilePage() {
             // 失敗時は空のまま
         } finally {
             setLikesLoading(false);
+        }
+    };
+
+    // 自分のコメント一覧を取得（クリックで元投稿へ飛ぶ）
+    const loadMyComments = async () => {
+        setCommentsLoading(true);
+        try {
+            const data = await api("/comments/me"); // MyCommentResponse[]
+            setMyComments(data);
+        } catch (e) {
+            // 失敗時は空のまま
+        } finally {
+            setCommentsLoading(false);
         }
     };
 
@@ -107,6 +118,11 @@ function ProfilePage() {
         } catch (e) {
             alert("いいねできませんでした。");
         }
+    };
+
+    const handleCommentsClick = () => {
+        setActiveTab("comments");
+        loadMyComments(); // タブを開いたタイミングで取得
     };
 
     // いいねタブの♥トグル（その場では一覧から消さず、押し直しできるようにする）
@@ -230,6 +246,12 @@ function ProfilePage() {
                 >
                     いいね
                 </button>
+                <button
+                    className={`tab ${activeTab === "comments" ? "active" : ""}`}
+                    onClick={handleCommentsClick}
+                >
+                    コメント
+                </button>
             </div>
 
             {/* ===== 投稿タブ ===== */}
@@ -252,6 +274,25 @@ function ProfilePage() {
                         <p className="empty-note">いいねした投稿はありません。</p>
                     )}
                     {likedPosts.map((post) => renderPostCard(post, handleLikedTabToggle))}
+                </>
+            )}
+
+            {/* ===== コメントタブ（/comments/me。クリックで元投稿へ） ===== */}
+            {activeTab === "comments" && (
+                <>
+                    {commentsLoading && <p className="empty-note">読み込み中...</p>}
+                    {!commentsLoading && myComments.length === 0 && (
+                        <p className="empty-note">コメントした投稿はありません。</p>
+                    )}
+                    {myComments.map((c) => (
+                        <div
+                            key={c.commentId}
+                            className="mini-post profile-comment"
+                            onClick={() => navigate(`/post/${c.postId}`)}
+                        >
+                            <div className="mini-body">{c.commentBody}</div>
+                        </div>
+                    ))}
                 </>
             )}
         </div>
