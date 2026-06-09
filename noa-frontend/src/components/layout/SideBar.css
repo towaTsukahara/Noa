@@ -1,0 +1,55 @@
+/* サイドバー全体 */
+.sidebar {
+  padding: 20px;
+}
+
+/* メニュー */
+.sidebar-menu {
+  list-style: none;
+  padding: 0;
+}
+
+/* 各項目 */
+.sidebar-menu li {
+  margin-bottom: 10px;
+}
+
+/* リンク全体をボタン化 */
+.sidebar-menu a {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+
+  padding: 14px 16px;
+  border-radius: 16px;
+
+  text-decoration: none;
+  color: #444;
+
+  transition: 0.2s;
+}
+
+/* アイコン */
+.sidebar-menu .icon {
+  font-size: 18px;
+}
+
+/* ホバー */
+.sidebar-menu a:hover {
+  background: #f3f4f6;
+}
+
+/* 選択中（画像の青いやつ） */
+.sidebar-menu li.active a {
+  background: #dbeafe; /* 薄い青 */
+  color: #1d4ed8;       /* 濃い青 */
+  font-weight: bold;
+}
+
+.sidebar-menu li.active a {
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+}
+
+.sidebar-menu a {
+  transition: all 0.2s ease;
+}
