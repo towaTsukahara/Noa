@@ -42,4 +42,9 @@ public interface PostRepository extends JpaRepository<Post, Long> {
 
     //検索機能用
     List<Post> findByBodyContainingIgnoreCase(String keyword);
+
+    @Query("""
+            select p from Post p join p.tags t where t.id = :tagId and p.isDeleted = false order by p.id desc
+            """)
+    List<Post> findByTagId(Long tagId);
 }

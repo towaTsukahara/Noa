@@ -1,5 +1,6 @@
 package noa.service;
 
+import noa.dto.PostResponse;
 import noa.dto.search.*;
 import noa.entity.Post;
 import noa.entity.Tag;
@@ -22,10 +23,10 @@ public class SearchService {
     }
 
     public SearchResponse search(String keyword) {
-        List<SearchPostResponse> posts = postRepository
+        List<PostResponse> posts = postRepository
                 .findByBodyContainingIgnoreCase(keyword)
                 .stream()
-                .map(this::toPostResponse)
+                .map(post -> PostResponse.from(post, 0, false, 0))
                 .toList();
         List<SearchTagResponse> tags = tagRepository
                 .findByNameContainingIgnoreCase(keyword)

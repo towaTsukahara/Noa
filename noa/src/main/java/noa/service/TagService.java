@@ -86,4 +86,9 @@ public class TagService {
         }
     }
 
+    public Tag findById(Long id) {
+        return tagRepository.findById(id).orElseThrow(() ->
+            new RuntimeException("Tag not found"));
+    }
+
 }

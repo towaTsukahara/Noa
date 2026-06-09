@@ -1,18 +1,50 @@
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { useNavigate, Link } from "react-router-dom";
+import { relativeTime } from "../utils/relativeTime";
+import UserHandle from "../components/user/UserHandle";
+
+import "./TimelinePage.css";
 
 export default function SearchPage() {
     const [keyword, setKeyword] = useState("");
     const [selectedTab, setSelectedTab] = useState("posts");
     const [posts, setPosts] = useState([]);
     const [tags, setTags] = useState([]);
+    const [followingTags, setFollowingTags] = useState([]);
+    const [suggestions, setSuggestions] = useState([]);
     const navigate = useNavigate();
 
-    const handleSearch = async () => {
+    const fetchSuggestions = async (value) => {
+
+        if (!value.trim()) {
+            setSuggestions([]);
+            return;
+        }
+
         try {
-            const response = await fetch(`/api/v1/search?keyword=${encodeURIComponent(keyword)}`,{
-                credentials: "include",
-            });
+            const response = await fetch(`/api/v1/tags?q=${encodeURIComponent(value)}`,
+                { credentials: "include", });
+
+            if (!response.ok) {
+                return;
+            }
+
+            const data = await response.json();
+
+            setSuggestions(data.slice(0, 5));
+
+        } catch (error) {
+            console.error(error);
+        }
+
+    };
+
+    const search = async (word) => {
+        try {
+            const response = await fetch(
+                `/api/v1/search?keyword=${encodeURIComponent(word)}`,
+                { credentials: "include" }
+            );
 
             if (!response.ok) {
                 throw new Error("検索失敗");
@@ -27,14 +59,92 @@ export default function SearchPage() {
             console.error(error);
         }
     };
-    
-    const toggleFollow = (tagName) => {
-        if (
-            myFollowedTags.includes(tagName)
-        ) {
-            unfollowTag(tagName);
-        } else {
-            followTag(tagName);
+
+    const handleSearch = async () => {
+        await search(keyword);
+    };
+
+    const handleSuggestionClick = async (tagName) => {
+        setKeyword(tagName);
+        setSuggestions([]);
+
+        await search(tagName);
+    };
+
+    const handleLikeToggle = async (post) => {
+
+        try {
+            await fetch(`/api/v1/posts/${post.id}/like`, {
+                method: post.likedByMe ? "DELETE" : "POST",
+                credentials: "include",
+            });
+
+            setPosts((prev) =>
+                prev.map((p) =>
+                    p.id === post.id
+                        ? {
+                            ...p,
+                            likedByMe: !p.likedByMe,
+                            likeCount: p.likedByMe
+                                ? p.likeCount - 1
+                                : p.likeCount + 1
+                        }
+                        : p
+                )
+            );
+
+        } catch (error) {
+            console.error(error);
+
+        }
+    }
+
+    const fetchFollowingTags = async () => {
+        try {
+            const response = await fetch(
+                "/api/v1/me/following/tags",
+                {
+                    credentials: "include",
+                }
+            );
+
+            if (!response.ok) {
+                return;
+            }
+
+            const data = await response.json();
+
+            setFollowingTags(data.map((tag) => tag.name));
+
+        } catch (error) {
+            console.error(error);
+        }
+    };
+
+    useEffect(() => {
+        fetchFollowingTags();
+    }, []);
+
+    const toggleFollow = async (tagName) => {
+        const isFollowed = followingTags.includes(tagName);
+
+        try {
+            const response = await fetch(
+                `/api/v1/tags/${encodeURIComponent(tagName)}/follow`,
+                {
+                    method: isFollowed ? "DELETE" : "POST",
+                    credentials: "include",
+                }
+            );
+
+            if (!response.ok) {
+                throw new Error();
+            }
+
+            await fetchFollowingTags();
+
+        } catch (error) {
+            console.error(error);
         }
     };
 
@@ -46,9 +156,28 @@ export default function SearchPage() {
                 type="text"
                 placeholder="キーワードを入力"
                 value={keyword}
-                onChange={(e) => setKeyword(e.target.value)}
+                onChange={(e) => {
+                    const value = e.target.value;
+                    setKeyword(value);
+                    fetchSuggestions(value);
+                }}
             />
+
             <button onClick={handleSearch}>検索</button>
+
+            {suggestions.length > 0 && (
+                <div>
+                    {suggestions.map((tag) => (
+                        <div
+                            key={tag.id}
+                            onClick={() => handleSuggestionClick(tag.name)}
+                            style={{ cursor: "pointer" }}
+                        >
+                            {tag.name}
+                        </div>
+                    ))}
+                </div>
+            )}
 
             <div>
                 <button onClick={() => setSelectedTab("posts")}>投稿</button>
@@ -60,17 +189,77 @@ export default function SearchPage() {
             {selectedTab === "posts" ? (
                 <div>
                     {posts.map((post) => (
-                        <div key={post.id}>
-                            <div>{post.body}</div>
+                        <article key={post.id} className="post-card">
 
-                            <hr />
-                        </div>
-                    ))}
+                            <div className="post-header">
+                                <div className="avatar"></div>
+
+                                <div>
+                                    <div className="nickname">
+                                        <Link
+                                            to={`/users/${post.author?.handle}`}
+                                        >
+                                            <UserHandle
+                                                user={post.author ?? { handle: "Unknown" }}
+                                            />
+                                        </Link>
+                                    </div>
+
+                                    <div className="date">
+                                        {relativeTime(
+                                            post.createdAt
+                                        )}
+                                    </div>
+                                </div>
+                            </div>
+
+                            <p className="content">
+                                {post.body}
+                            </p>
+
+                            <Link
+                                to={`/post/${post.id}`}
+                                className="post-detail-link"
+                            >
+                                詳細...
+                            </Link>
+
+                            <div className="tags">
+                                {post.tags.map((tag) => (
+                                    <span key={tag}>
+                                        #{tag}
+                                    </span>
+                                ))}
+                            </div>
+
+                            <div className="actions">
+
+                                <button
+                                    onClick={() =>
+                                        handleLikeToggle(post)
+                                    }
+                                >
+                                    {post.likedByMe
+                                        ? "♥"
+                                        : "♡"}{" "}
+                                    {post.likeCount}
+                                </button>
+
+                                <span>
+                                    💬 {post.replyCount}
+                                </span>
+
+                            </div>
+
+                        </article>
+                    ))
+                    }
                 </div>
             ) : (
                 <div>
                     {tags.map((tag) => {
-                        const isFollowed = myFollowedTags.includes(tag.name);
+
+                        const isFollowed = followingTags.includes(tag.name);
 
                         return (
                             <div key={tag.id}>
@@ -81,7 +270,8 @@ export default function SearchPage() {
                                 </span>
 
                                 <button onClick={() => toggleFollow(tag.name)}>
-                                    {isFollowed ? "フォローをやめる" : "フォローする"}</button>
+                                    {isFollowed ? "フォローをやめる" : "フォローする"}
+                                </button>
 
                                 <hr />
                             </div>

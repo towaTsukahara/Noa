@@ -2,8 +2,10 @@ package noa.dto.search;
 
 import java.util.List;
 
+import noa.dto.PostResponse;
+
 public record SearchResponse(
-    List<SearchPostResponse> posts,
+    List<PostResponse> posts,
     List<SearchTagResponse> tags
 ) {
     
