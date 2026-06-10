@@ -16,8 +16,6 @@ function NavBar() {
     <nav className="header">
       {/* TODO(F-116): 検索は未実装。入力欄は仮置き */}
       <input type="text" placeholder="検索..." />
-      {/* TODO(F-117): 通知ベルは未実装 */}
-      <button>🔔</button>
 
       {loading ? null : user ? (
         <>
