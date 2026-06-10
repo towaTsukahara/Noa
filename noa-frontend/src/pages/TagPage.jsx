@@ -55,13 +55,13 @@ const TagPage = ({ type }) => {
             <div>
                 {TAGS[type].map((tag) => (
                     <span
-                        key={tag}
+                        key={tag.id}
                         onClick={() => toggleTag(tag)}
                         style={{
                             margin: "5px",
                         }}
                     >
-                        {tag}
+                        {tag.name}
                     </span>
                 ))}
             </div>

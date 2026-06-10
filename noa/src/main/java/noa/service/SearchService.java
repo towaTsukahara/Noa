@@ -28,7 +28,7 @@ public class SearchService {
 
     public SearchResponse search(String keyword) {
         List<PostResponse> posts = postRepository
-                .findByBodyContainingIgnoreCase(keyword)
+                .searchPosts(keyword)
                 .stream()
                 .map(post -> {
                     long likeCount = likeRepository.countByPostId(post.getId());

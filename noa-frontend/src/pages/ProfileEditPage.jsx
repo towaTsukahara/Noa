@@ -51,7 +51,7 @@ function ProfileEditPage() {
             <div>
                 <h3>技術タグ</h3>
                 {form.skill.map((tag) => (
-                    <div key={tag}>{tag}</div>
+                    <div key={tag.id}>{tag.name}</div>
                 ))}
                 <button onClick={() => editTags("skill")}>さらに表示</button>
             </div>
@@ -59,7 +59,7 @@ function ProfileEditPage() {
             <div>
                 <h3>興味タグ</h3>
                 {form.hobby.map((tag) => (
-                    <div key={tag}>{tag}</div>
+                    <div key={tag.id}>{tag.name}</div>
                 ))}
                 <button onClick={() => editTags("hobby")}>さらに表示</button>
             </div>
@@ -67,7 +67,7 @@ function ProfileEditPage() {
             <div>
                 <h3>趣味タグ</h3>
                 {form.cert.map((tag) => (
-                    <div key={tag}>{tag}</div>
+                    <div key={tag.id}>{tag.name}</div>
                 ))}
                 <button onClick={() => editTags("cert")}>さらに表示</button>
             </div>

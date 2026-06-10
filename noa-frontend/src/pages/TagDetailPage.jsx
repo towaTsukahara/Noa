@@ -149,12 +149,12 @@ export default function TagDetailPage() {
                     </Link>
 
                     <div className="tags">
-                        {post.tags.map((tag) => (
+                        {post.tags?.map((tag) => (
                             <span
-                                key={tag}
+                                key={tag.id}
                                 style={{ cursor: "pointer" }}
                             >
-                                #{tag}
+                                #{tag.name}
                             </span>
                         ))}
                     </div>

@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useNavigate, Link } from "react-router-dom";
+import { useNavigate, Link, useSearchParams } from "react-router-dom";
 import { relativeTime } from "../utils/relativeTime";
 import UserHandle from "../components/user/UserHandle";
 
@@ -12,6 +12,7 @@ export default function SearchPage() {
     const [tags, setTags] = useState([]);
     const [followingTags, setFollowingTags] = useState([]);
     const [suggestions, setSuggestions] = useState([]);
+    const [searchParams, setSearchParams] = useSearchParams();
     const navigate = useNavigate();
 
     const fetchSuggestions = async (value) => {
@@ -52,6 +53,9 @@ export default function SearchPage() {
 
             const data = await response.json();
 
+            console.log(data.posts);
+            console.log("tags =", data.posts[0]?.tags);
+
             setPosts(data.posts);
             setTags(data.tags);
 
@@ -61,13 +65,30 @@ export default function SearchPage() {
     };
 
     const handleSearch = async () => {
+        setSearchParams({ keyword });
+
         await search(keyword);
     };
 
     const handleSuggestionClick = async (tag) => {
+        setKeyword(tag.name);
         setSuggestions([]);
-        navigate(`/tag/${tag.id}`);
+
+        setSearchParams({
+            keyword: tag.name,
+        });
+
+        await search(tag.name);
     };
+
+    useEffect(() => {
+        const keywordFromUrl = searchParams.get("keyword");
+
+        if (keywordFromUrl) {
+            setKeyword(keywordFromUrl);
+            search(keywordFromUrl);
+        }
+    }, []);
 
     const handleLikeToggle = async (post) => {
         try {
@@ -234,8 +255,8 @@ export default function SearchPage() {
 
                             <div className="tags">
                                 {post.tags.map((tag) => (
-                                    <span key={tag}>
-                                        #{tag}
+                                    <span key={tag.id}>
+                                        #{tag.name}
                                     </span>
                                 ))}
                             </div>
