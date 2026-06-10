@@ -19,4 +19,6 @@ public interface FollowRepository extends JpaRepository<Follow, Long> {
 
     @Query("select f from Follow f where f.followerId = :followerId and f.id < :cursor order by f.id desc")
     List<Follow> findFollowingAfter(Long followerId, Long cursor, Pageable pageable);
+
+    java.util.List<Follow> findByFollowerId(Long followerId);
 }

@@ -13,6 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -24,7 +25,8 @@ public class FollowService {
     private final UserRepository userRepository;
     private final ProfileService profileService;
 
-    public FollowService(FollowRepository followRepository, UserRepository userRepository, ProfileService profileService) {
+    public FollowService(FollowRepository followRepository, UserRepository userRepository,
+            ProfileService profileService) {
         this.followRepository = followRepository;
         this.userRepository = userRepository;
         this.profileService = profileService;
@@ -64,14 +66,11 @@ public class FollowService {
         // フォロー順を保ったまま相手ユーザーを解決
         List<UserSummaryResponse> items = new ArrayList<>();
         for (Follow f : follows) {
-            userRepository.findById(f.getFolloweeId()).ifPresent(u ->
-                items.add(UserSummaryResponse.from(
-                        u,
-                        profileService.tagsOf(u),
-                        true,              // フォロー中一覧なので必ず true
-                        f.getNickname()
-                ))
-            );
+            userRepository.findById(f.getFolloweeId()).ifPresent(u -> items.add(UserSummaryResponse.from(
+                    u,
+                    profileService.tagsOf(u),
+                    true, // フォロー中一覧なので必ず true
+                    f.getNickname())));
         }
 
         Long nextCursor = (follows.size() == limit && !follows.isEmpty())
@@ -96,5 +95,30 @@ public class FollowService {
         tags.put("hobby", List.of());
         tags.put("cert", List.of());
         return tags;
+    }
+
+    // ニックネームを設定/変更する（フォローしている相手のみ）
+    @Transactional
+    public void setNickname(User follower, String targetHandle, String nickname) {
+        User target = findActiveUser(targetHandle);
+        Follow follow = followRepository.findByFollowerIdAndFolloweeId(follower.getId(), target.getId())
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.BAD_REQUEST, "フォローしている相手にのみニックネームを設定できます"));
+
+        // 空文字・空白だけなら削除扱い（nullに）
+        String trimmed = (nickname == null) ? null : nickname.trim();
+        follow.setNickname((trimmed == null || trimmed.isEmpty()) ? null : trimmed);
+        followRepository.save(follow);
+    }
+
+    // ニックネームを削除する（nullに戻す）
+    @Transactional
+    public void clearNickname(User follower, String targetHandle) {
+        User target = findActiveUser(targetHandle);
+        followRepository.findByFollowerIdAndFolloweeId(follower.getId(), target.getId())
+                .ifPresent(follow -> {
+                    follow.setNickname(null);
+                    followRepository.save(follow);
+                });
     }
 }

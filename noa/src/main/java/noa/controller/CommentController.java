@@ -25,9 +25,12 @@ public class CommentController {
 
     @GetMapping
     public List<CommentResponse> getComments(
-            @RequestParam Long postId) {
-
-        return commentService.getComments(postId);
+            @RequestParam Long postId,
+            @AuthenticationPrincipal CustomUserDetails principal) {
+        if (principal == null) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "ログインが必要です");
+        }
+        return commentService.getComments(postId, principal.getUser());
     }
 
     @PostMapping
@@ -35,11 +38,7 @@ public class CommentController {
     public CommentResponse create(
             @RequestBody CommentCreateRequest request,
             @AuthenticationPrincipal CustomUserDetails principal) {
-
-        System.out.println("principal = " + principal);
-        System.out.println("postId = " + request.getPostId());
-        System.out.println("body = " + request.getBody());
-
+                
         if (principal == null) {
             throw new ResponseStatusException(
                     HttpStatus.UNAUTHORIZED,
@@ -72,7 +71,7 @@ public class CommentController {
     @DeleteMapping("/{commentId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void delete(@PathVariable Long commentId,
-                       @AuthenticationPrincipal CustomUserDetails principal) {
+            @AuthenticationPrincipal CustomUserDetails principal) {
         if (principal == null) {
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "ログインが必要です");
         }
