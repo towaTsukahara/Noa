@@ -64,20 +64,24 @@ export default function SearchPage() {
         await search(keyword);
     };
 
-    const handleSuggestionClick = async (tagName) => {
-        setKeyword(tagName);
+    const handleSuggestionClick = async (tag) => {
         setSuggestions([]);
-
-        await search(tagName);
+        navigate(`/tag/${tag.id}`);
     };
 
     const handleLikeToggle = async (post) => {
-
         try {
-            await fetch(`/api/v1/posts/${post.id}/like`, {
-                method: post.likedByMe ? "DELETE" : "POST",
-                credentials: "include",
-            });
+            const response = await fetch(
+                `/api/v1/posts/${post.id}/like`,
+                {
+                    method: post.likedByMe ? "DELETE" : "POST",
+                    credentials: "include",
+                }
+            );
+
+            if (!response.ok) {
+                throw new Error("いいね失敗");
+            }
 
             setPosts((prev) =>
                 prev.map((p) =>
@@ -87,7 +91,7 @@ export default function SearchPage() {
                             likedByMe: !p.likedByMe,
                             likeCount: p.likedByMe
                                 ? p.likeCount - 1
-                                : p.likeCount + 1
+                                : p.likeCount + 1,
                         }
                         : p
                 )
@@ -95,9 +99,8 @@ export default function SearchPage() {
 
         } catch (error) {
             console.error(error);
-
         }
-    }
+    };
 
     const fetchFollowingTags = async () => {
         try {
@@ -161,6 +164,11 @@ export default function SearchPage() {
                     setKeyword(value);
                     fetchSuggestions(value);
                 }}
+                onKeyDown={(e) => {
+                    if (e.key === "Enter") {
+                        handleSearch();
+                    }
+                }}
             />
 
             <button onClick={handleSearch}>検索</button>
@@ -170,7 +178,7 @@ export default function SearchPage() {
                     {suggestions.map((tag) => (
                         <div
                             key={tag.id}
-                            onClick={() => handleSuggestionClick(tag.name)}
+                            onClick={() => handleSuggestionClick(tag)}
                             style={{ cursor: "pointer" }}
                         >
                             {tag.name}
@@ -233,22 +241,15 @@ export default function SearchPage() {
                             </div>
 
                             <div className="actions">
+                                <div style={{ marginTop: "20px" }}>
+                                    <button onClick={() => handleLikeToggle(post)}>
+                                        {post.likedByMe ? "♥" : "♡"} {post.likeCount}
+                                    </button>
 
-                                <button
-                                    onClick={() =>
-                                        handleLikeToggle(post)
-                                    }
-                                >
-                                    {post.likedByMe
-                                        ? "♥"
-                                        : "♡"}{" "}
-                                    {post.likeCount}
-                                </button>
-
-                                <span>
-                                    💬 {post.replyCount}
-                                </span>
-
+                                    <span style={{ marginLeft: "12px" }}>
+                                        💬 {post.replyCount}
+                                    </span>
+                                </div>
                             </div>
 
                         </article>
