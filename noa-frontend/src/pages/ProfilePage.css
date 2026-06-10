@@ -114,6 +114,41 @@
   font-weight: 600;
 }
 
+/* アイコンサイズ */
+.icon-like,
+.icon-reply,
+.icon-delete {
+  width: 17px;
+  height: 17px;
+  display: block;
+}
+
+.mini-like,
+.mini-reply {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.mini-delete {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  padding: 4px;
+  margin-left: auto;
+}
+
+/* hoverで赤くする（超おすすめ） */
+.mini-delete:hover .icon-delete {
+  filter: invert(24%) sepia(93%) saturate(7425%) hue-rotate(355deg);
+}
+
+/* hover全体 */
+.mini-delete:hover {
+  background: rgba(255, 0, 0, 0.08);
 /* コメントタブのカード（クリックで元投稿へ） */
 .profile-comment {
   cursor: pointer;
