@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useNavigate, Link } from "react-router-dom";
+import { useNavigate, Link, useSearchParams } from "react-router-dom";
 import { relativeTime } from "../utils/relativeTime";
 import UserHandle from "../components/user/UserHandle";
 
@@ -12,6 +12,7 @@ export default function SearchPage() {
     const [tags, setTags] = useState([]);
     const [followingTags, setFollowingTags] = useState([]);
     const [suggestions, setSuggestions] = useState([]);
+    const [searchParams, setSearchParams] = useSearchParams();
     const navigate = useNavigate();
 
     const fetchSuggestions = async (value) => {
@@ -52,6 +53,9 @@ export default function SearchPage() {
 
             const data = await response.json();
 
+            console.log(data.posts);
+            console.log("tags =", data.posts[0]?.tags);
+
             setPosts(data.posts);
             setTags(data.tags);
 
@@ -61,23 +65,44 @@ export default function SearchPage() {
     };
 
     const handleSearch = async () => {
+        setSearchParams({ keyword });
+
         await search(keyword);
     };
 
-    const handleSuggestionClick = async (tagName) => {
-        setKeyword(tagName);
+    const handleSuggestionClick = async (tag) => {
+        setKeyword(tag.name);
         setSuggestions([]);
 
-        await search(tagName);
+        setSearchParams({
+            keyword: tag.name,
+        });
+
+        await search(tag.name);
     };
 
-    const handleLikeToggle = async (post) => {
+    useEffect(() => {
+        const keywordFromUrl = searchParams.get("keyword");
 
+        if (keywordFromUrl) {
+            setKeyword(keywordFromUrl);
+            search(keywordFromUrl);
+        }
+    }, []);
+
+    const handleLikeToggle = async (post) => {
         try {
-            await fetch(`/api/v1/posts/${post.id}/like`, {
-                method: post.likedByMe ? "DELETE" : "POST",
-                credentials: "include",
-            });
+            const response = await fetch(
+                `/api/v1/posts/${post.id}/like`,
+                {
+                    method: post.likedByMe ? "DELETE" : "POST",
+                    credentials: "include",
+                }
+            );
+
+            if (!response.ok) {
+                throw new Error("いいね失敗");
+            }
 
             setPosts((prev) =>
                 prev.map((p) =>
@@ -87,7 +112,7 @@ export default function SearchPage() {
                             likedByMe: !p.likedByMe,
                             likeCount: p.likedByMe
                                 ? p.likeCount - 1
-                                : p.likeCount + 1
+                                : p.likeCount + 1,
                         }
                         : p
                 )
@@ -95,9 +120,8 @@ export default function SearchPage() {
 
         } catch (error) {
             console.error(error);
-
         }
-    }
+    };
 
     const fetchFollowingTags = async () => {
         try {
@@ -161,6 +185,11 @@ export default function SearchPage() {
                     setKeyword(value);
                     fetchSuggestions(value);
                 }}
+                onKeyDown={(e) => {
+                    if (e.key === "Enter") {
+                        handleSearch();
+                    }
+                }}
             />
 
             <button onClick={handleSearch}>検索</button>
@@ -170,7 +199,7 @@ export default function SearchPage() {
                     {suggestions.map((tag) => (
                         <div
                             key={tag.id}
-                            onClick={() => handleSuggestionClick(tag.name)}
+                            onClick={() => handleSuggestionClick(tag)}
                             style={{ cursor: "pointer" }}
                         >
                             {tag.name}
@@ -226,29 +255,22 @@ export default function SearchPage() {
 
                             <div className="tags">
                                 {post.tags.map((tag) => (
-                                    <span key={tag}>
-                                        #{tag}
+                                    <span key={tag.id}>
+                                        #{tag.name}
                                     </span>
                                 ))}
                             </div>
 
                             <div className="actions">
+                                <div style={{ marginTop: "20px" }}>
+                                    <button onClick={() => handleLikeToggle(post)}>
+                                        {post.likedByMe ? "♥" : "♡"} {post.likeCount}
+                                    </button>
 
-                                <button
-                                    onClick={() =>
-                                        handleLikeToggle(post)
-                                    }
-                                >
-                                    {post.likedByMe
-                                        ? "♥"
-                                        : "♡"}{" "}
-                                    {post.likeCount}
-                                </button>
-
-                                <span>
-                                    💬 {post.replyCount}
-                                </span>
-
+                                    <span style={{ marginLeft: "12px" }}>
+                                        💬 {post.replyCount}
+                                    </span>
+                                </div>
                             </div>
 
                         </article>

@@ -91,7 +91,7 @@ function PostDetailPage() {
             <div>
                 {post.tags?.map((tag) => (
                     <span
-                        key={tag}
+                        key={tag.id}
                         style={{
                             border: "1px solid #ccc",
                             padding: "4px 8px",
@@ -99,7 +99,7 @@ function PostDetailPage() {
                             borderRadius: "20px",
                         }}
                     >
-                        #{tag}
+                        #{tag.name}
                     </span>
                 ))}
             </div>
