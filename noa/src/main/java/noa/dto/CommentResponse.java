@@ -10,6 +10,8 @@ public class CommentResponse {
 
     private String authorName;
 
+    private String authorNickname;
+
     private String body;
 
     private OffsetDateTime createdAt;
@@ -36,6 +38,14 @@ public class CommentResponse {
 
     public void setAuthorName(String authorName) {
         this.authorName = authorName;
+    }
+
+    public String getAuthorNickname() {
+        return authorNickname;
+    }
+
+    public void setAuthorNickname(String authorNickname) {
+        this.authorNickname = authorNickname;
     }
 
     public String getBody() {
