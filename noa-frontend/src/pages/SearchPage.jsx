@@ -1,9 +1,9 @@
+
 import { useState, useEffect } from "react";
 import { useNavigate, Link, useSearchParams } from "react-router-dom";
 import { relativeTime } from "../utils/relativeTime";
 import UserHandle from "../components/user/UserHandle";
-
-import "./TimelinePage.css";
+import "./SearchPage.css";
 
 export default function SearchPage() {
     const [keyword, setKeyword] = useState("");
@@ -173,34 +173,42 @@ export default function SearchPage() {
     };
 
     return (
-        <div>
-            <h1>検索</h1>
+        <div className="search page">
+            <h1 className="page-title">検索</h1>
 
-            <input
-                type="text"
-                placeholder="キーワードを入力"
-                value={keyword}
-                onChange={(e) => {
-                    const value = e.target.value;
-                    setKeyword(value);
-                    fetchSuggestions(value);
-                }}
-                onKeyDown={(e) => {
-                    if (e.key === "Enter") {
-                        handleSearch();
-                    }
-                }}
-            />
+            <div className="search-bar">
+                <input
+                    className="field"
+                    type="text"
+                    placeholder="キーワードを入力"
+                    value={keyword}
+                    onChange={(e) => {
+                        const value = e.target.value;
+                        setKeyword(value);
+                        fetchSuggestions(value);
+                    }}
+                    onKeyDown={(e) => {
+                        if (e.key === "Enter") {
+                            handleSearch();
+                        }
+                    }}
+                />
 
-            <button onClick={handleSearch}>検索</button>
+                <button
+                    className="btn"
+                    onClick={handleSearch}
+                >
+                    検索
+                </button>
+            </div>
 
             {suggestions.length > 0 && (
-                <div>
+                <div className="search-suggestions">
                     {suggestions.map((tag) => (
                         <div
                             key={tag.id}
+                            className="search-suggestion"
                             onClick={() => handleSuggestionClick(tag)}
-                            style={{ cursor: "pointer" }}
                         >
                             {tag.name}
                         </div>
@@ -208,17 +216,25 @@ export default function SearchPage() {
                 </div>
             )}
 
-            <div>
-                <button onClick={() => setSelectedTab("posts")}>投稿</button>
-                <button onClick={() => setSelectedTab("tags")}>タグ</button>
+            <div className="tabs">
+                <button
+                    className={`tab ${selectedTab === "posts" ? "active" : ""}`}
+                    onClick={() => setSelectedTab("posts")}
+                >
+                    投稿
+                </button>
+                <button
+                    className={`tab ${selectedTab === "tags" ? "active" : ""}`}
+                    onClick={() => setSelectedTab("tags")}
+                >
+                    タグ
+                </button>
             </div>
 
-            <hr />
-
             {selectedTab === "posts" ? (
-                <div>
+                <div className="search-results">
                     {posts.map((post) => (
-                        <article key={post.id} className="post-card">
+                        <article key={post.id} className="mini-post">
 
                             <div className="post-header">
                                 <div className="avatar"></div>
@@ -234,15 +250,13 @@ export default function SearchPage() {
                                         </Link>
                                     </div>
 
-                                    <div className="date">
-                                        {relativeTime(
-                                            post.createdAt
-                                        )}
+                                    <div className="search-date">
+                                        {relativeTime(post.createdAt)}
                                     </div>
                                 </div>
                             </div>
 
-                            <p className="content">
+                            <p className="search-snippet">
                                 {post.body}
                             </p>
 
@@ -253,7 +267,7 @@ export default function SearchPage() {
                                 詳細...
                             </Link>
 
-                            <div className="tags">
+                            <div className="tg">
                                 {post.tags.map((tag) => (
                                     <span key={tag.id}>
                                         #{tag.name}
@@ -278,29 +292,34 @@ export default function SearchPage() {
                     }
                 </div>
             ) : (
-                <div>
+                <div className="search-results">
                     {tags.map((tag) => {
 
                         const isFollowed = followingTags.includes(tag.name);
 
                         return (
-                            <div key={tag.id}>
+                            <div
+                                key={tag.id}
+                                className="row-between tag-result"
+                            >
                                 <span
+                                    className="search-tagname"
                                     onClick={() => navigate(`/tag/${tag.id}`)}
-                                    style={{ cursor: "pointer" }}>
+                                >
                                     {tag.name}
                                 </span>
 
-                                <button onClick={() => toggleFollow(tag.name)}>
+                                <button
+                                    className="btn"
+                                    onClick={() => toggleFollow(tag.name)}>
                                     {isFollowed ? "フォローをやめる" : "フォローする"}
                                 </button>
 
-                                <hr />
                             </div>
                         );
                     })}
                 </div>
             )}
-        </div >
+        </div>
     );
 }

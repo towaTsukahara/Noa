@@ -2,6 +2,11 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { api } from "../api/client";
 import { useAuth } from "../context/AuthContext";
+import "./ProfilePage.css";
+import heart_filled from '/icons/heart_filled.svg';
+import heart from '/icons/heart.svg';
+import reply from '/icons/reply.svg';
+import trashcan from '/icons/trashcan.svg';
 
 function ProfilePage() {
     const navigate = useNavigate();
@@ -17,16 +22,12 @@ function ProfilePage() {
     const [likedPosts, setLikedPosts] = useState([]);
     const [likesLoading, setLikesLoading] = useState(false);
 
-    // ===== プロフィール表示部（F-104・別担当のためモックのまま） =====
-    // TODO(F-104): /me から bio・タグを取得して表示に差し替える（担当メンバーの範囲）
-    // TODO(F-104/F-112): 投稿数・いいね数の実数表示も後で対応
-    const [profile, setProfile] = useState(null);
+    // ===== 自分のコメント（/comments/me） =====
+    const [myComments, setMyComments] = useState([]);
+    const [commentsLoading, setCommentsLoading] = useState(false);
 
-    useEffect(() => {
-        api("/me")
-            .then((me) => setProfile(me))
-            .catch(() => setProfile(null));
-    }, [])
+    // ===== プロフィール表示部（F-104・別担当のためモックのまま） =====
+    const [profile, setProfile] = useState(null);
 
     // 自分の投稿をAPIから取得
     const loadPosts = async () => {
@@ -36,7 +37,6 @@ function ProfilePage() {
         try {
             const data = await api(`/users/${user.handle}/posts`);
             setPosts(data.items);
-            // TODO(表示の仕上げ): data.nextCursor を使った「もっと見る」は後で実装
         } catch (e) {
             setPostsError("投稿の取得に失敗しました。");
         } finally {
@@ -54,11 +54,23 @@ function ProfilePage() {
         try {
             const data = await api("/me/likes");
             setLikedPosts(data.items);
-            // TODO(表示の仕上げ): nextCursor の「もっと見る」は後で
         } catch (e) {
             // 失敗時は空のまま
         } finally {
             setLikesLoading(false);
+        }
+    };
+
+    // 自分のコメント一覧を取得（クリックで元投稿へ飛ぶ）
+    const loadMyComments = async () => {
+        setCommentsLoading(true);
+        try {
+            const data = await api("/comments/me"); // MyCommentResponse[]
+            setMyComments(data);
+        } catch (e) {
+            // 失敗時は空のまま
+        } finally {
+            setCommentsLoading(false);
         }
     };
 
@@ -112,6 +124,11 @@ function ProfilePage() {
         }
     };
 
+    const handleCommentsClick = () => {
+        setActiveTab("comments");
+        loadMyComments(); // タブを開いたタイミングで取得
+    };
+
     // いいねタブの♥トグル（その場では一覧から消さず、押し直しできるようにする）
     const handleLikedTabToggle = async (post) => {
         try {
@@ -135,7 +152,6 @@ function ProfilePage() {
     };
 
     // ===== 画面遷移・タブ切替 =====
-    // dev側で追加された /follow への導線（F-113 フォロー中一覧の画面を想定）
     const handleFollowClick = () => {
         navigate("/follow");
     };
@@ -149,128 +165,157 @@ function ProfilePage() {
         loadLikes(); // タブを開いたタイミングで取得
     };
 
-    // ※投稿の「編集」はフェーズ1の機能一覧・API仕様に存在しないため未実装。
-    //   必要なら要件追加をチームで合意してから実装する。
+    const renderTags = (arr) =>
+        (arr || []).map((t) => (
+            <span key={t} className="tag">#{t}</span>
+        ));
+
+    const renderPostCard = (post, onLike) => (
+        <div key={post.id} className="mini-post">
+            <div className="mini-body">{post.body}</div>
+            <div className="mini-meta">
+                <button
+                    className={`mini-like ${post.likedByMe ? "liked" : ""}`}
+                    onClick={() => onLike(post)}
+                >
+                    <img
+                        src={post.likedByMe ? heart_filled : heart}
+                        alt="いいね"
+                        className="icon-like"
+                    />
+                    <span>{post.likeCount}</span>
+                </button>
+                <span className="mini-reply">
+                    <img
+                        src={reply}
+                        alt="返信"
+                        className="icon-reply"
+                    />
+                    <span>{post.replyCount}</span>
+                </span>
+                {onLike === handleLikeToggle && (
+                    <button className="mini-delete" onClick={() => handleDelete(post.id)}>
+                        <img
+                            src={trashcan}
+                            alt="削除"
+                            className="icon-delete"
+                        />
+                    </button>
+                )};
+            </div>
+        </div>
+    );
+
 
     return (
-        <div>
+        <div className="profile page">
             {/* ===== プロフィール表示部（F-104・モックのまま） ===== */}
-            <div>
-                <div>
-                    {/* <img src={profile.icon} alt="プロフィール画像" /> */}
-                    <div>{profile?.handle}</div>
-                    <div>社員番号: {profile?.employeeNo}</div>
-                    <div>メールアドレス: {profile?.email}</div>
+            <div className="profile-hero">
+                <div className="profile-hero-top">
+                    <div className="avatar is-lg"></div>
+                    <div className="profile-id">
+                        <div className="user-handle">{profile?.handle}</div>
+                        <div className="profile-name">あなた</div>
+                        <div className="profile-sub">
+                            社員番号: {profile?.employeeNo} ・ {profile?.email}
+                        </div>
+                    </div>
+                    <div className="profile-actions">
+                        <button className="btn btn-ghost" onClick={() => navigate("/profile/edit")}>
+                            プロフィールを編集
+                        </button>
+                        <button className="btn btn-ghost" onClick={handleFollowClick}>
+                            フォロー
+                        </button>
+                    </div>
                 </div>
-                <div>
-                    <div>投稿数 {profile?.postCount ?? 0}</div>
-                    <div>いいね数 {profile?.likeCount ?? 0}</div>
+
+                <div className="profile-stats">
+                    <span>投稿 <b>{profile?.postCount ?? 0}</b></span>
+                    <span>いいね <b>{profile?.likeCount ?? 0}</b></span>
+                </div>
+
+                {profile?.bio && <p className="profile-bio">{profile.bio}</p>}
+
+                <div className="profile-tagset">
+                    <div className="tag-group">
+                        <div className="tag-group-label">技術スタック</div>
+                        <div className="tag-row">{renderTags(profile?.tags?.tech)}</div>
+                    </div>
+                    <div className="tag-group">
+                        <div className="tag-group-label">興味</div>
+                        <div className="tag-row">{renderTags(profile?.tags?.hobby)}</div>
+                    </div>
+                    <div className="tag-group">
+                        <div className="tag-group-label">趣味</div>
+                        <div className="tag-row">{renderTags(profile?.tags?.cert)}</div>
+                    </div>
                 </div>
             </div>
 
-            <div>
-                <div>自己紹介エリア: {profile?.bio}</div>
-
-                <h3>技術タグ</h3>
-                {profile?.tags?.tech.map((t) => <span key={t}>{t} </span>)}
-
-                <h3>興味タグ</h3>
-                {profile?.tags?.hobby.map((t) => <span key={t}>{t} </span>)}
-
-                <h3>趣味タグ</h3>
-                {profile?.tags?.cert.map((t) => <span key={t}>{t} </span>)}
+            {/* ===== タブ ===== */}
+            <div className="tabs">
+                <button
+                    className={`tab ${activeTab === "posts" ? "active" : ""}`}
+                    onClick={handlePostsClick}
+                >
+                    投稿
+                </button>
+                <button
+                    className={`tab ${activeTab === "likes" ? "active" : ""}`}
+                    onClick={handleLikesClick}
+                >
+                    いいね
+                </button>
+                <button
+                    className={`tab ${activeTab === "comments" ? "active" : ""}`}
+                    onClick={handleCommentsClick}
+                >
+                    コメント
+                </button>
             </div>
 
-            <button onClick={handleFollowClick}>フォロー</button>
-            <button onClick={() => navigate("/profile/edit")}>プロフィールを編集</button>
+            {/* ===== 投稿タブ ===== */}
+            {activeTab === "posts" && (
+                <>
+                    {postsLoading && <p className="empty-note">読み込み中...</p>}
+                    {postsError && <p className="empty-note">{postsError}</p>}
+                    {!postsLoading && !postsError && posts.length === 0 && (
+                        <p className="empty-note">まだ投稿がありません。</p>
+                    )}
+                    {posts.map((post) => renderPostCard(post, handleLikeToggle))}
+                </>
+            )}
 
-            <div>
-                <button onClick={handlePostsClick}>投稿</button>
-                <button onClick={handleLikesClick}>いいね ({profile?.likedPostCount ?? 0})</button>
-            </div>
+            {/* ===== いいねタブ（F-111: /me/likes） ===== */}
+            {activeTab === "likes" && (
+                <>
+                    {likesLoading && <p className="empty-note">読み込み中...</p>}
+                    {!likesLoading && likedPosts.length === 0 && (
+                        <p className="empty-note">いいねした投稿はありません。</p>
+                    )}
+                    {likedPosts.map((post) => renderPostCard(post, handleLikedTabToggle))}
+                </>
+            )}
 
-            <div>
-                {/* ===== 投稿タブ（API取得・削除・いいねトグル） ===== */}
-                {activeTab === "posts" && (
-                    <>
-                        {postsLoading && <p>読み込み中...</p>}
-                        {postsError && <p style={{ color: "red" }}>{postsError}</p>}
-                        {!postsLoading && !postsError && posts.length === 0 && (
-                            <p>まだ投稿がありません。</p>
-                        )}
-
-                        {posts.map((post) => (
-                            <div
-                                key={post.id}
-                                style={{
-                                    border: "1px solid #ccc",
-                                    padding: "10px",
-                                    marginBottom: "10px",
-                                }}
-                            >
-                                <div style={{ overflowWrap: "anywhere", whiteSpace: "pre-wrap" }}>{post.body}</div>
-                                <div style={{ color: "#666", fontSize: "13px", marginTop: "6px" }}>
-                                    <button
-                                        onClick={() => handleLikeToggle(post)}
-                                        style={{
-                                            border: "none",
-                                            background: "none",
-                                            cursor: "pointer",
-                                            padding: 0,
-                                            fontSize: "13px",
-                                            color: post.likedByMe ? "#e0245e" : "#666",
-                                            fontWeight: post.likedByMe ? "bold" : "normal",
-                                        }}
-                                    >
-                                        {post.likedByMe ? "♥" : "♡"} {post.likeCount}
-                                    </button>
-                                    💬 {post.replyCount}
-                                </div>
-                                <button onClick={() => handleDelete(post.id)}>削除</button>
-                            </div>
-                        ))}
-                    </>
-                )}
-
-                {/* ===== いいねタブ（F-111: /me/likes） ===== */}
-                {activeTab === "likes" && (
-                    <>
-                        {likesLoading && <p>読み込み中...</p>}
-                        {!likesLoading && likedPosts.length === 0 && (
-                            <p>いいねした投稿はありません。</p>
-                        )}
-                        {likedPosts.map((post) => (
-                            <div
-                                key={post.id}
-                                style={{
-                                    border: "1px solid #ccc",
-                                    padding: "10px",
-                                    marginBottom: "10px",
-                                }}
-                            >
-                                <div style={{ overflowWrap: "anywhere", whiteSpace: "pre-wrap" }}>{post.body}</div>
-                                <div style={{ color: "#666", fontSize: "13px", marginTop: "6px" }}>
-                                    <button
-                                        onClick={() => handleLikedTabToggle(post)}
-                                        style={{
-                                            border: "none",
-                                            background: "none",
-                                            cursor: "pointer",
-                                            padding: 0,
-                                            fontSize: "13px",
-                                            color: post.likedByMe ? "#e0245e" : "#666",
-                                            fontWeight: post.likedByMe ? "bold" : "normal",
-                                        }}
-                                    >
-                                        {post.likedByMe ? "♥" : "♡"} {post.likeCount}
-                                    </button>
-                                    💬 {post.replyCount}
-                                </div>
-                            </div>
-                        ))}
-                    </>
-                )}
-            </div>
+            {/* ===== コメントタブ（/comments/me。クリックで元投稿へ） ===== */}
+            {activeTab === "comments" && (
+                <>
+                    {commentsLoading && <p className="empty-note">読み込み中...</p>}
+                    {!commentsLoading && myComments.length === 0 && (
+                        <p className="empty-note">コメントした投稿はありません。</p>
+                    )}
+                    {myComments.map((c) => (
+                        <div
+                            key={c.commentId}
+                            className="mini-post profile-comment"
+                            onClick={() => navigate(`/post/${c.postId}`)}
+                        >
+                            <div className="mini-body">{c.commentBody}</div>
+                        </div>
+                    ))}
+                </>
+            )}
         </div>
     );
 }

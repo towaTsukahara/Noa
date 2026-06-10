@@ -1,5 +1,6 @@
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
+import "./NavBar.css";
 
 // 上部バー（検索枠・通知・ログインユーザー表示・ログアウト）
 function NavBar() {
@@ -12,11 +13,9 @@ function NavBar() {
   };
 
   return (
-    <nav className="header" style={{ gap: 12 }}>
+    <nav className="header">
       {/* TODO(F-116): 検索は未実装。入力欄は仮置き */}
       <input type="text" placeholder="検索..." />
-      {/* TODO(F-117): 通知ベルは未実装 */}
-      <button>🔔</button>
 
       {loading ? null : user ? (
         <>

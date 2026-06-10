@@ -1,0 +1,18 @@
+/* FollowTagEditPage — タグをフォロー/解除（フラット）
+   構造（リファクタ後）:
+     .follow-tag-edit.page
+       > h2.page-title
+       > .page-pad > input.field
+       > .tag-cloud > span.tag-toggle(.is-on)
+       > .edit-actions (戻る) */
+
+.tag-cloud {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 4px 22px 20px;
+}
+.tag-cloud > p {
+  font-size: 13px;
+  color: var(--faint);
+}

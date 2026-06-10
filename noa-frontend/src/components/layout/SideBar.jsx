@@ -1,28 +1,51 @@
-import { Link } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { NavLink, useLocation } from "react-router-dom";
+import { api } from "../../api/client";
+import "./SideBar.css";
 
 // 左サイドバー（ログイン・登録以外の全画面に共通表示）
 function SideBar({ onCompose }) {
+  const [unread, setUnread] = useState(0);
+  const location = useLocation();
+
+  // 画面遷移のたびに未読数を取り直す
+  useEffect(() => {
+    api("/me/notifications/unread-count")
+      .then((d) => setUnread(d.count))
+      .catch(() => setUnread(0));
+  }, [location.pathname]);
+
   return (
     <aside className="sidebar">
       <h1>Noa</h1>
       <nav>
         <ul>
           <li>
-            <Link to="/">タイムライン</Link>
+            <NavLink to="/" end>
+              <span>タイムライン</span>
+            </NavLink>
           </li>
-          {/* TODO: 以下は画面未作成（F-116 検索 / F-111 いいね一覧ページ / F-117 通知）。
-              作成されたら App.jsx のレイアウト内ルートに追加する */}
+          {/* TODO: 検索は未作成（F-116）。作成したらレイアウト内ルートに追加 */}
           <li>
-            <Link to="/search">検索</Link>
-          </li>
-          <li>
-            <Link to="/likes">いいね一覧</Link>
-          </li>
-          <li>
-            <Link to="/notifications">通知</Link>
+            <NavLink to="/search">
+              <span>検索</span>
+            </NavLink>
           </li>
           <li>
-            <Link to="/profile">プロフィール</Link>
+            <NavLink to="/follow">
+              <span>フォロー</span>
+            </NavLink>
+          </li>
+          <li>
+            <NavLink to="/notifications">
+              <span>通知</span>
+              {unread > 0 && <span className="nav-badge">{unread}</span>}
+            </NavLink>
+          </li>
+          <li>
+            <NavLink to="/profile">
+              <span>プロフィール</span>
+            </NavLink>
           </li>
         </ul>
       </nav>

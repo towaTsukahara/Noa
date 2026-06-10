@@ -1,9 +1,13 @@
 import { useState, useEffect } from "react";
 import "./TimelinePage.css";
+import "../components/post/LikeButton.css"; // インラインの .like-button 用
 import { api } from "../api/client";
 import UserHandle from "../components/user/UserHandle";
 import { relativeTime } from "../utils/relativeTime";
 import { Link, useOutletContext } from "react-router-dom";
+import heart_filled from '/icons/heart_filled.svg';
+import heart from '/icons/heart.svg';
+import reply from '/icons/reply.svg';
 
 function TimelinePage() {
   const [posts, setPosts] = useState([]);
@@ -76,7 +80,7 @@ function TimelinePage() {
   return (
     <section className="timeline">
       {loading && <p>読み込み中...</p>}
-      {error && <p style={{ color: "red" }}>{error}</p>}
+      {error && <p>{error}</p>}
       {!loading && !error && posts.length === 0 && <p>まだ投稿がありません。</p>}
 
       {posts.map((post) => (
@@ -111,9 +115,17 @@ function TimelinePage() {
               className={`like-button ${post.likedByMe ? "liked" : ""}`}
               onClick={() => handleLikeToggle(post)}
             >
-              {post.likedByMe ? "♥" : "♡"} {post.likeCount}
+              <img
+                src={post.likedByMe ? heart_filled : heart}
+                alt="いいね"
+                className="icon-like"
+              />
+              <span>{post.likeCount}</span>
             </button>
-            <span>💬 {post.replyCount}</span>
+            <span className="reply">
+              <img src={reply} alt="返信" className="icon-reply" />
+              <span>{post.replyCount}</span>
+            </span>
           </div>
         </article>
       ))}

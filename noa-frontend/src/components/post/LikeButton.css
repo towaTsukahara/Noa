@@ -1,0 +1,27 @@
+/* LikeButton / いいねボタン
+   タイムライン・スレッドの .actions 内で使う。
+   構造: button.like-button(.liked) — 「♥ n」/「♡ n」 */
+
+.like-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  border: none;
+  background: none;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 13px;
+  color: var(--soft);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+  padding: 2px 4px;
+  border-radius: var(--r-sm);
+  transition: color 0.12s;
+}
+.like-button:hover {
+  color: var(--like);
+}
+.like-button.liked {
+  color: var(--like);
+  font-weight: 600;
+}

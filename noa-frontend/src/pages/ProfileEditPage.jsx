@@ -1,6 +1,7 @@
 import { useNavigate, useLocation } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { api } from "../api/client";
+import "./ProfileEditPage.css";
 
 function ProfileEditPage() {
     const navigate = useNavigate();
@@ -21,7 +22,7 @@ function ProfileEditPage() {
         }));
     }, [location.state]);
 
-    if (!form) return <p>読み込み中...</p>;
+    if (!form) return <div className="profile-edit page"><p className="empty-note">読み込み中...</p></div>;
 
     const editTags = (type) => navigate(`/tags/${type}edit`, { state: { form } });
 
@@ -39,48 +40,69 @@ function ProfileEditPage() {
         navigate("/profile");
     };
 
+    // /meのレスポンスが["Java", "React"]なら残す。[{id:1,name:"Java"}]なら消す
+    // const renderTags = (arr) =>
+    //     (arr || []).map((tag) => (
+    //         <span key={tag} className="tag">#{tag}</span>
+    //     ));
+
     return (
-        <div>
-            <h1>プロフィール編集</h1>
+        <div className="profile-edit page">
+            <h1 className="page-title">プロフィール編集</h1>
 
-            <div>
+            <div className="edit-block">
                 <h3>自己紹介</h3>
-                <textarea value={form.bio} onChange={(e) => setForm({ ...form, bio: e.target.value })} />
+                <textarea
+                    className="field"
+                    value={form.bio}
+                    onChange={(e) => setForm({ ...form, bio: e.target.value })}
+                />
             </div>
 
-            <div>
+            <div className="edit-block">
                 <h3>技術タグ</h3>
-                {form.skill.map((tag) => (
-                    <div key={tag.id}>{tag.name}</div>
-                ))}
+                <div className="edit-taglist">
+                    {form.skill.map((tag) => (
+                        <span key={tag.id} className="tag">
+                            #{tag.name}
+                        </span>
+                    ))}</div>
                 <button onClick={() => editTags("skill")}>さらに表示</button>
-            </div>
+            </div >
 
-            <div>
+            <div className="edit-block">
                 <h3>興味タグ</h3>
-                {form.hobby.map((tag) => (
-                    <div key={tag.id}>{tag.name}</div>
-                ))}
+                <div className="edit-taglist">
+                    {form.hobby.map((tag) => (
+                        <span key={tag.id} className="tag">
+                            #{tag.name}
+                        </span>
+                    ))}
+                </div>
                 <button onClick={() => editTags("hobby")}>さらに表示</button>
-            </div>
+            </div >
 
-            <div>
+            <div className="edit-block">
                 <h3>趣味タグ</h3>
-                {form.cert.map((tag) => (
-                    <div key={tag.id}>{tag.name}</div>
-                ))}
+                <div className="edit-taglist">
+                    {form.cert.map((tag) => (
+                        <span key={tag.id} className="tag">
+                            #{tag.name}
+                        </span>
+                    ))}
+                </div>
                 <button onClick={() => editTags("cert")}>さらに表示</button>
-            </div>
+            </div >
 
-            <div>
-                <button onClick={() => navigate("/profile")}>
+            <div className="edit-actions">
+                <button className="btn btn-quiet" onClick={() => navigate("/profile")}>
                     キャンセル
                 </button>
-                <button onClick={handleSave}>
+                <button className="btn" onClick={handleSave}>
                     保存
                 </button>
             </div>
-        </div>
+        </div >
     );
 }
 

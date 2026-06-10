@@ -2,9 +2,8 @@
 import { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import { relativeTime } from "../utils/relativeTime";
-import UserHandle from "../components/user/UserHandle";
 
-import "./TimelinePage.css";
+import "./TagDetailPage.css";
 
 export default function TagDetailPage() {
 
@@ -101,59 +100,61 @@ export default function TagDetailPage() {
     };
 
     return (
-        <div>
-            <h1>{tag.name}</h1>
-            <button onClick={toggleFollow}>
-                {tag.followed ? "フォローをやめる" : "フォローする"}
-            </button>
+        <div className="tag-detail page">
+            <div className="tag-hero">
 
-            <hr />
+                <div className="tag-hero-name">
+                    #{tag.name}
+                </div>
 
-            <h2>タグが付いた投稿</h2>
+                <div className="tag-hero-desc">
+                    このタグが付いた投稿を、新着順で表示します
+                </div>
+
+                <button
+                    className={`btn ${tag.followed ? "btn-ghost" : ""}`}
+                    onClick={toggleFollow}
+                >
+                    {tag.followed
+                        ? "フォロー中 ✓"
+                        : "このトピックをフォロー"}
+                </button>
+
+            </div>
+
+            <div className="section-title">
+                投稿
+            </div>
+
+            {tag.posts?.length === 0 && (
+                <p className="empty-note">
+                    このタグの投稿はまだありません。
+                </p>
+            )}
+
             {tag.posts?.map((post) => (
                 <article
                     key={post.id}
-                    className="post-card"
+                    className="mini-post"
                 >
-                    <div className="post-header">
-                        <div className="avatar"></div>
-
-                        <div>
-                            <div className="nickname">
-                                <Link
-                                    to={`/users/${post.author?.handle}`}
-                                >
-                                    {post.author && (
-                                        <UserHandle user={post.author} />
-                                    )}
-                                </Link>
-                            </div>
-
-                            <div className="date">
-                                {relativeTime(
-                                    post.createdAt
-                                )}
-                            </div>
-                        </div>
+                    <div className="search-date">
+                        {relativeTime(post.createdAt)}
                     </div>
 
-                    <p className="content">
+                    <div className="search-snippet">
                         {post.body}
-                    </p>
+                    </div>
 
                     <Link
                         to={`/post/${post.id}`}
-                        className="post-detail-link"
+                        className="search-title"
                     >
-                        詳細...
+                        詳細を見る
                     </Link>
 
                     <div className="tags">
                         {post.tags?.map((tag) => (
-                            <span
-                                key={tag.id}
-                                style={{ cursor: "pointer" }}
-                            >
+                            <span key={tag.id}>
                                 #{tag.name}
                             </span>
                         ))}
@@ -163,8 +164,7 @@ export default function TagDetailPage() {
                         <button
                             onClick={() => handleLikeToggle(post)}
                         >
-                            {post.likedByMe ? "♥" : "♡"}
-                            {" "}
+                            {post.likedByMe ? "♥" : "♡"}{" "}
                             {post.likeCount}
                         </button>
 
@@ -175,5 +175,5 @@ export default function TagDetailPage() {
                 </article>
             ))}
         </div>
-    )
+    );
 }

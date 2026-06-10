@@ -1,0 +1,44 @@
+/* FollowPage — フォロー中（ユーザー / タグ）
+   構造（リファクタ後）:
+     .follow.page
+       > .follow-search > input.field
+       > .tabs > button.tab（ユーザー / タグ）
+       > .follow-list
+           ユーザー: .row-between(> span.follow-name>UserHandle + button.btn-quiet)
+           タグ:     .row-between(> span.follow-tag + button.btn-quiet)
+       > .follow-add (＋ タグを追加・編集) */
+
+.follow-search {
+  padding: 16px 22px 4px;
+}
+
+.follow-list h2 {
+  padding: 14px 22px 2px;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--soft);
+  letter-spacing: 0.02em;
+}
+.follow-list > p {
+  padding: 18px 22px;
+  font-size: 13px;
+  color: var(--faint);
+}
+
+.follow-name {
+  font-size: 14px;
+  color: var(--ink);
+  cursor: pointer;
+}
+.follow-name:hover .user-handle {
+  color: var(--accent);
+}
+.follow-tag {
+  font-family: var(--mono-font);
+  font-size: 13.5px;
+  color: var(--accent);
+}
+
+.follow-add {
+  margin: 16px 22px 0;
+}
