@@ -16,10 +16,6 @@ function NavBar() {
     <nav className="header">
       {/* TODO(F-116): 検索は未実装。入力欄は仮置き */}
       <input type="text" placeholder="検索..." />
-      {/* TODO(F-117): 通知ベルは未実装 */}
-      <button>
-        <img src="/icons/bell.png" alt="通知" className="icon-bell" />
-      </button>
 
       {loading ? null : user ? (
         <>

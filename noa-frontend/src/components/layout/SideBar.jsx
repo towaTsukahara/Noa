@@ -1,30 +1,51 @@
-import { NavLink } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { NavLink, useLocation } from "react-router-dom";
+import { api } from "../../api/client";
 import "./SideBar.css";
 
 // 左サイドバー（ログイン・登録以外の全画面に共通表示）
-// Link → NavLink にすることで、現在地のメニューに .active が付く（選択状態の見た目）。
 function SideBar({ onCompose }) {
+  const [unread, setUnread] = useState(0);
+  const location = useLocation();
+
+  // 画面遷移のたびに未読数を取り直す
+  useEffect(() => {
+    api("/me/notifications/unread-count")
+      .then((d) => setUnread(d.count))
+      .catch(() => setUnread(0));
+  }, [location.pathname]);
+
   return (
     <aside className="sidebar">
-      <h1>N<span>o</span>a</h1>
+      <h1>Noa</h1>
       <nav>
         <ul>
           <li>
-            <NavLink to="/" end>タイムライン</NavLink>
+            <NavLink to="/" end>
+              <span>タイムライン</span>
+            </NavLink>
           </li>
-          {/* TODO: 以下は画面未作成（F-116 検索 / F-111 いいね一覧ページ / F-117 通知）。
-              作成されたら App.jsx のレイアウト内ルートに追加する */}
+          {/* TODO: 検索は未作成（F-116）。作成したらレイアウト内ルートに追加 */}
           <li>
-            <NavLink to="/search">検索</NavLink>
-          </li>
-          <li>
-            <NavLink to="/likes">フォロータグ</NavLink>
-          </li>
-          <li>
-            <NavLink to="/notifications">通知</NavLink>
+            <NavLink to="/search">
+              <span>検索</span>
+            </NavLink>
           </li>
           <li>
-            <NavLink to="/profile">プロフィール</NavLink>
+            <NavLink to="/follow">
+              <span>フォロー</span>
+            </NavLink>
+          </li>
+          <li>
+            <NavLink to="/notifications">
+              <span>通知</span>
+              {unread > 0 && <span className="nav-badge">{unread}</span>}
+            </NavLink>
+          </li>
+          <li>
+            <NavLink to="/profile">
+              <span>プロフィール</span>
+            </NavLink>
           </li>
         </ul>
       </nav>
