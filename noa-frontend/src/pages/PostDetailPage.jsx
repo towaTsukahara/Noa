@@ -25,8 +25,9 @@ function PostDetailPage() {
             data.map((c) => ({
                 id: c.id,
                 authorHandle: c.authorName,
+                authorNickname: c.authorNickname,
                 body: c.body,
-                mine: user && c.authorName === user.handle, // 自分のコメントか（handleで判定）
+                mine: user && c.authorName === user.handle,
             }))
         );
     };

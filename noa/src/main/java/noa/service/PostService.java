@@ -1,6 +1,5 @@
 package noa.service;
 
-import noa.dto.PostCreateRequest;
 import noa.entity.Post;
 import noa.entity.User;
 import noa.entity.Tag;
@@ -9,8 +8,10 @@ import noa.repository.CommentRepository;
 import noa.repository.LikeRepository;
 import noa.repository.PostRepository;
 import noa.repository.TagRepository;
-import org.springframework.stereotype.Service;
 import noa.dto.PostResponse;
+import noa.dto.PostCreateRequest;
+
+import org.springframework.stereotype.Service;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -31,13 +32,16 @@ public class PostService {
         private final LikeRepository likeRepository;
         private final TagService tagService;
         private final CommentRepository commentRepository;
+        private final NicknameService nicknameService;
 
         public PostService(PostRepository postRepository, LikeRepository likeRepository,
-                        TagService tagService, CommentRepository commentRepository) {
+                        TagService tagService, CommentRepository commentRepository,
+                        NicknameService nicknameService) {
                 this.postRepository = postRepository;
                 this.likeRepository = likeRepository;
                 this.tagService = tagService;
                 this.commentRepository = commentRepository;
+                this.nicknameService = nicknameService;
         }
 
         // 通常投稿を作成する（タグも一緒に保存）
@@ -72,7 +76,6 @@ public class PostService {
                 return buildPageResponse(posts, limit, viewer);
         }
 
-        // 共通: 投稿リストを items + nextCursor の形に組み立てる
         // 共通: 投稿リストを items + nextCursor の形に組み立てる（likeCount/likedByMe を実数で）
         private Map<String, Object> buildPageResponse(List<Post> posts, int limit, User viewer) {
                 List<Long> postIds = posts.stream().map(Post::getId).toList();
@@ -84,12 +87,16 @@ public class PostService {
                                                 .map(PostLike::getPostId)
                                                 .collect(Collectors.toSet());
 
+                // viewer が付けたニックネーム辞書（handle → nickname）を1回だけ取得
+                Map<String, String> nickMap = nicknameService.nicknameMapOf(viewer);
+
                 List<PostResponse> items = posts.stream()
                                 .map(p -> PostResponse.from(
                                                 p,
                                                 likeRepository.countByPostId(p.getId()),
                                                 likedIds.contains(p.getId()),
-                                                commentRepository.countByPostId(p.getId())))
+                                                commentRepository.countByPostId(p.getId()),
+                                                nickMap.get(p.getAuthor().getHandle())))
                                 .toList();
 
                 Long nextCursor = (posts.size() == limit && !posts.isEmpty())
@@ -146,12 +153,16 @@ public class PostService {
                                         .ifPresent(posts::add);
                 }
 
+                // viewer が付けたニックネーム辞書
+                Map<String, String> nickMap = nicknameService.nicknameMapOf(viewer);
+
                 List<PostResponse> items = posts.stream()
                                 .map(p -> PostResponse.from(
                                                 p,
                                                 likeRepository.countByPostId(p.getId()),
                                                 true,
-                                                commentRepository.countByPostId(p.getId())))
+                                                commentRepository.countByPostId(p.getId()),
+                                                nickMap.get(p.getAuthor().getHandle())))
                                 .toList();
 
                 // カーソルは likes の id（いいね順のしおり）
@@ -174,6 +185,7 @@ public class PostService {
 
                 long likeCount = likeRepository.countByPostId(id);
                 boolean likedByMe = likeRepository.existsByUserIdAndPostId(viewer.getId(), id);
-                return PostResponse.from(post, likeCount, likedByMe, commentRepository.countByPostId(id));
+                String nickname = nicknameService.nicknameMapOf(viewer).get(post.getAuthor().getHandle());
+                return PostResponse.from(post, likeCount, likedByMe, commentRepository.countByPostId(id), nickname);
         }
 }

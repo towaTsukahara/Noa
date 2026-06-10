@@ -2,6 +2,7 @@ package noa.controller;
 
 import noa.security.CustomUserDetails;
 import noa.service.FollowService;
+import noa.dto.NicknameRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
@@ -21,7 +22,7 @@ public class FollowController {
     @PostMapping("/users/{handle}/follow")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void follow(@PathVariable String handle,
-                       @AuthenticationPrincipal CustomUserDetails principal) {
+            @AuthenticationPrincipal CustomUserDetails principal) {
         requireLogin(principal);
         followService.follow(principal.getUser(), handle);
     }
@@ -29,7 +30,7 @@ public class FollowController {
     @DeleteMapping("/users/{handle}/follow")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void unfollow(@PathVariable String handle,
-                         @AuthenticationPrincipal CustomUserDetails principal) {
+            @AuthenticationPrincipal CustomUserDetails principal) {
         requireLogin(principal);
         followService.unfollow(principal.getUser(), handle);
     }
@@ -47,5 +48,22 @@ public class FollowController {
         if (principal == null) {
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "ログインが必要です");
         }
+    }
+
+    @PutMapping("/users/{handle}/nickname")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void setNickname(@PathVariable String handle,
+            @RequestBody NicknameRequest req,
+            @AuthenticationPrincipal CustomUserDetails principal) {
+        requireLogin(principal);
+        followService.setNickname(principal.getUser(), handle, req.getNickname());
+    }
+
+    @DeleteMapping("/users/{handle}/nickname")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void clearNickname(@PathVariable String handle,
+            @AuthenticationPrincipal CustomUserDetails principal) {
+        requireLogin(principal);
+        followService.clearNickname(principal.getUser(), handle);
     }
 }

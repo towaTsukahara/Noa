@@ -22,14 +22,17 @@ public class CommentService {
     private final CommentRepository commentRepository;
     private final PostRepository postRepository;
     private final NotificationService notificationService;
+    private final NicknameService nicknameService;
 
     public CommentService(
             CommentRepository commentRepository,
             PostRepository postRepository,
-            NotificationService notificationService) {
+            NotificationService notificationService,
+            NicknameService nicknameService) {
         this.commentRepository = commentRepository;
         this.postRepository = postRepository;
         this.notificationService = notificationService;
+        this.nicknameService = nicknameService;
     }
 
     @Transactional
@@ -49,16 +52,20 @@ public class CommentService {
         return saved;
     }
 
-    public List<CommentResponse> getComments(Long postId) {
+    public List<CommentResponse> getComments(Long postId, User viewer) {
+        // viewer が付けたニックネーム辞書（handle → nickname）
+        java.util.Map<String, String> nickMap = nicknameService.nicknameMapOf(viewer);
 
         return commentRepository.findByPostId(postId)
                 .stream()
                 .map(comment -> {
                     CommentResponse response = new CommentResponse();
 
+                    String handle = comment.getAuthor().getHandle();
                     response.setId(comment.getId());
                     response.setAuthorId(comment.getAuthor().getId());
-                    response.setAuthorName(comment.getAuthor().getHandle());
+                    response.setAuthorName(handle);
+                    response.setAuthorNickname(nickMap.get(handle)); // 呼び名（なければ null）
                     response.setBody(comment.getBody());
                     response.setCreatedAt(comment.getCreatedAt());
 

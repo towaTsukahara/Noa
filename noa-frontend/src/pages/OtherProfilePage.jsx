@@ -16,6 +16,10 @@ export default function OtherProfilePage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
+  const [editingNick, setEditingNick] = useState(false); // ニックネーム編集モードか
+  const [nickInput, setNickInput] = useState("");        // 入力中のニックネーム
+
+
   // 自分自身のhandleなら自分のプロフィールへ
   useEffect(() => {
     if (user && user.handle === handle) {
@@ -46,6 +50,32 @@ export default function OtherProfilePage() {
   if (error) return <div className="other-profile page"><p className="empty-note">{error}</p></div>;
   if (!profile) return null;
 
+  // ニックネーム保存（空なら削除扱い）
+  const handleSaveNickname = async () => {
+    try {
+      const trimmed = nickInput.trim();
+      if (trimmed === "") {
+        // 空で保存＝削除
+        await api(`/users/${handle}/nickname`, { method: "DELETE" });
+      } else {
+        await api(`/users/${handle}/nickname`, {
+          method: "PUT",
+          body: JSON.stringify({ nickname: trimmed }),
+        });
+      }
+      setEditingNick(false);
+      await load(); // 表示を更新（nicknameが反映される）
+    } catch (e) {
+      alert("ニックネームの保存に失敗しました。");
+    }
+  };
+
+  // 編集を開始（今のニックネームを入力欄に入れる）
+  const startEditNickname = () => {
+    setNickInput(profile.nickname || "");
+    setEditingNick(true);
+  };
+
   return (
     <div className="other-profile page">
       <div className="op-hero">
@@ -55,8 +85,32 @@ export default function OtherProfilePage() {
         {/* 表示名：nickname優先・なければhandle（F-105の秘匿ルール） */}
         <div className="op-name">{profile.nickname || profile.handle}</div>
         {profile.nickname && <div className="op-handle">{profile.handle}</div>}
-        {/* TODO(F-114): ニックネームの設定・変更UIは nickname API 本実装後にここへ */}
 
+        {/* ニックネーム編集（フォローしている相手にのみ表示） */}
+        {profile.isFollowing && (
+          <div className="op-nick">
+            {editingNick ? (
+              <div className="op-nick-edit">
+                <input
+                  type="text"
+                  className="field op-nick-input"
+                  value={nickInput}
+                  onChange={(e) => setNickInput(e.target.value)}
+                  placeholder="呼び名（自分だけに表示）"
+                  maxLength={30}
+                />
+                <div className="op-nick-actions">
+                  <button className="btn" onClick={handleSaveNickname}>保存</button>
+                  <button className="btn btn-quiet" onClick={() => setEditingNick(false)}>やめる</button>
+                </div>
+              </div>
+            ) : (
+              <button className="btn-link op-nick-edit-btn" onClick={startEditNickname}>
+                {profile.nickname ? "呼び名を変更" : "呼び名をつける"}
+              </button>
+            )}
+          </div>
+        )}
         <div className="op-follow">
           <FollowButton handle={profile.handle} initialFollowing={profile.isFollowing} />
         </div>
