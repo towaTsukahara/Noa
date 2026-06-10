@@ -23,7 +23,12 @@ public interface PostRepository extends JpaRepository<Post, Long> {
     // 同・カーソルの続き（cursorより小さいid）
     @Query("select p from Post p where p.author.id = :authorId and p.parentId is null and p.isDeleted = false and p.id < :cursor order by p.id desc")
     List<Post> findUserPostsAfter(Long authorId, Long cursor, Pageable pageable);
-    
+
+    // 投稿への返信数（未削除のみ）
+    @Query("select count(p) from Post p where p.parentId = :parentId and p.isDeleted = false")
+    long countReplies(Long parentId);
+    // ここから下、付け足した部分
+
     // 返信一覧（1ページ目）: parent_id = この投稿、未削除、新しい順
     @Query("select p from Post p where p.parentId = :parentId and p.isDeleted = false order by p.id desc")
     List<Post> findRepliesFirst(Long parentId, Pageable pageable);
@@ -32,6 +37,26 @@ public interface PostRepository extends JpaRepository<Post, Long> {
     @Query("select p from Post p where p.parentId = :parentId and p.isDeleted = false and p.id < :cursor order by p.id desc")
     List<Post> findRepliesAfter(Long parentId, Long cursor, Pageable pageable);
 
-    //投稿数カウント用
+    // 投稿数カウント用
     long countByAuthorIdAndParentIdIsNullAndIsDeletedFalse(Long authorId);
+
+    // 検索機能用
+    List<Post> findByBodyContainingIgnoreCase(String keyword);
+
+    @Query("""
+            select p from Post p join p.tags t where t.id = :tagId and p.isDeleted = false order by p.id desc
+            """)
+    List<Post> findByTagId(Long tagId);
+
+    // 本文かタグ一致検索用
+    @Query("""
+                select distinct p from Post p left join p.tags t where p.isDeleted = false and ( lower(p.body) like lower(concat('%', :keyword, '%')) or lower(t.name) like lower(concat('%', :keyword, '%')) ) order by p.id desc
+            """)
+    List<Post> searchPosts(String keyword);
+
+    // タグ検索用
+    @Query("""
+            select distinct p from Post p join p.tags t where lower(t.name) like lower(concat('%', :keyword, '%')) and p.isDeleted = false order by p.id desc
+            """)
+    List<Post> findByNameContaining(String keyword);
 }

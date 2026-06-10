@@ -58,11 +58,11 @@ const TagPage = ({ type }) => {
             <div className="tag-cloud">
                 {TAGS[type].map((tag) => (
                     <span
-                        key={tag}
+                        key={tag.id}
                         className={`tag-toggle ${selected.includes(tag) ? "is-on" : ""}`}
                         onClick={() => toggleTag(tag)}
                     >
-                        {tag}
+                        {tag.name}
                     </span>
                 ))}
             </div>

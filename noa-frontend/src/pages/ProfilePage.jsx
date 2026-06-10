@@ -201,10 +201,11 @@ function ProfilePage() {
                             className="icon-delete"
                         />
                     </button>
-                )}
+                )};
             </div>
         </div>
     );
+
 
     return (
         <div className="profile page">

@@ -38,6 +38,7 @@ function App() {
           <Route path="/users/:handle" element={<OtherProfilePage />} />
           <Route path="/follow/tags" element={<FollowTagEditPage />} />
           <Route path="/search" element={<SearchPage />} />
+          <Route path="/posts/:id" element={<PostDetailPage />} />
           <Route path="/tag/:tagId" element={<TagDetailPage />} />
           <Route path="/notifications" element={<NotificationPage />} />
         </Route>

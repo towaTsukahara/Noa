@@ -38,6 +38,7 @@ public class ProfileController {
                 principal.getUser(),
                 profileService.tagsOf(principal.getUser()),
                 profileService.getPostCounts(principal.getUser()),
-                profileService.getLikeCount(principal.getUser()));
+                profileService.getLikeCount(principal.getUser()),
+                profileService.getLikedPostCount(principal.getUser()));
         }
 }
