@@ -43,7 +43,7 @@ function ProfileEditPage() {
     // /meのレスポンスが["Java", "React"]なら残す。[{id:1,name:"Java"}]なら消す
     // const renderTags = (arr) =>
     //     (arr || []).map((tag) => (
-    //         <span key={tag} className="tag">#{tag}</span>
+    //         <span key={tag,id} className="tag">#{tag.name}</span>
     //     ));
 
     return (

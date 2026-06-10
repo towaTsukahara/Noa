@@ -56,6 +56,14 @@ export default function SearchPage() {
             console.log(data.posts);
             console.log("tags =", data.posts[0]?.tags);
 
+            console.log("posts =", data.posts);
+
+            data.posts.forEach((post) => {
+                console.log("post", post.id);
+                console.log("replyCount", post.replyCount);
+                console.log("tags", post.tags);
+            });
+
             setPosts(data.posts);
             setTags(data.tags);
 
@@ -267,12 +275,16 @@ export default function SearchPage() {
                                 詳細...
                             </Link>
 
-                            <div className="tg">
-                                {post.tags.map((tag) => (
-                                    <span key={tag.id}>
-                                        #{tag.name}
-                                    </span>
-                                ))}
+                            <div className="tags">
+                                {post.tags.map((tag) => {
+                                    console.log("rendering tag", tag);
+
+                                return(
+                                <span key={tag.id}>
+                                    #{tag.name}
+                                </span>
+                                );
+                                })}
                             </div>
 
                             <div className="actions">
@@ -294,6 +306,7 @@ export default function SearchPage() {
             ) : (
                 <div className="search-results">
                     {tags.map((tag) => {
+                        console.log("render tag", tag);
 
                         const isFollowed = followingTags.includes(tag.name);
 

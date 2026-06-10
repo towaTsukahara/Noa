@@ -93,12 +93,6 @@ function PostDetailPage() {
                 <p className="detail-body">{post.body}</p>
 
                 <div className="detail-tags">
-                    {post.tags.map((tag) => (
-                        <span key={tag} className="tag">#{tag}</span>
-                    ))}
-                </div>
-
-                <div className="detail-tags">
                     {post.tags?.map((tag) => (
                         <span key={tag.id} className="tag">
                             #{tag.name}
