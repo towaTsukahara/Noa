@@ -22,11 +22,13 @@ public record PostResponse(
         OffsetDateTime createdAt)
 
 {
-    public static PostResponse from(Post post, long likeCount, boolean likedByMe, long replyCount) {
-        Map<String, Object> author = Map.of(
-                "handle", post.getAuthor().getHandle());
-        // タグ名のリスト（post_tags 経由）。null なら空に
-        List<TagSummaryResponse> tags = (post.getTags() == null)
+        public static PostResponse from(Post post, long likeCount, boolean likedByMe, long replyCount, String authorNickname) {
+        // author は handle と nickname（nickname は viewer が付けていれば値、なければ null）
+        Map<String, Object> author = new java.util.HashMap<>();
+        author.put("handle", post.getAuthor().getHandle());
+        author.put("nickname", authorNickname);
+
+        List<String> tagNames = (post.getTags() == null)
                 ? List.of()
                 : post.getTags().stream().map(TagSummaryResponse::from).toList();
         return new PostResponse(

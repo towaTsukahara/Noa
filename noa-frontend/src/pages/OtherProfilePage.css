@@ -56,3 +56,24 @@
 .op-section p + p {
   margin-top: 4px;
 }
+/* ニックネーム編集（フォロー中の相手のみ） */
+.op-nick {
+  margin-top: 12px;
+}
+.op-nick-edit {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+.op-nick-input {
+  max-width: 260px;
+  text-align: center;
+}
+.op-nick-actions {
+  display: flex;
+  gap: 8px;
+}
+.op-nick-edit-btn {
+  /* btn-link を流用。中央寄せの hero に合わせる */
+}
