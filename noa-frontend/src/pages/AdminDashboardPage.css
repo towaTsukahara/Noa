@@ -1,0 +1,59 @@
+/* AdminDashboardPage — 管理ダッシュボード（管理者専用） */
+
+.admin-table-wrap {
+  padding: 8px 22px 22px;
+  overflow-x: auto;
+}
+
+.admin-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+.admin-table th {
+  text-align: left;
+  padding: 10px 12px;
+  border-bottom: 2px solid var(--line);
+  color: var(--soft);
+  font-weight: 600;
+  white-space: nowrap;
+}
+.admin-table td {
+  padding: 11px 12px;
+  border-bottom: 1px solid var(--line2);
+  color: var(--ink);
+  white-space: nowrap;
+}
+.admin-table tr:hover td {
+  background: #f1eee6;
+}
+
+.admin-status {
+  font-family: var(--mono-font);
+  font-size: 11px;
+  padding: 2px 9px;
+  border-radius: var(--r-pill);
+}
+.admin-status.is-active {
+  background: var(--accent-bg);
+  color: var(--accent);
+}
+.admin-status.is-suspended {
+  background: #f7ece9;
+  color: var(--danger);
+}
+
+.admin-btn-sm {
+  font-size: 11.5px;
+  padding: 4px 12px;
+}
+.admin-muted {
+  color: var(--faint);
+}
+
+.admin-post-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 6px;
+}

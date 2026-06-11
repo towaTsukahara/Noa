@@ -1,39 +1,183 @@
-import { useState } from "react";
-import { POSTS, TAGS } from "../date/mockData";
-import { useNavigate } from "react-router-dom";
+
+import { useState, useEffect } from "react";
+import { useNavigate, Link, useSearchParams } from "react-router-dom";
+import { relativeTime } from "../utils/relativeTime";
+import UserHandle from "../components/user/UserHandle";
 import "./SearchPage.css";
 
 export default function SearchPage() {
     const [keyword, setKeyword] = useState("");
     const [selectedTab, setSelectedTab] = useState("posts");
-    const [followedTags, setFollowedTags] = useState(["React", "AWS",]);
+    const [posts, setPosts] = useState([]);
+    const [tags, setTags] = useState([]);
+    const [followingTags, setFollowingTags] = useState([]);
+    const [suggestions, setSuggestions] = useState([]);
+    const [searchParams, setSearchParams] = useSearchParams();
     const navigate = useNavigate();
 
-    const filteredPosts = POSTS
-        .filter((post) => {
-            if (!keyword.trim()) return true;
+    const fetchSuggestions = async (value) => {
 
-            const searchWord = keyword.toLowerCase();
+        if (!value.trim()) {
+            setSuggestions([]);
+            return;
+        }
 
-            return (
-                post.title.toLowerCase().includes(searchWord) ||
-                post.content.toLowerCase().includes(searchWord)
+        try {
+            const response = await fetch(`/api/v1/tags?q=${encodeURIComponent(value)}`,
+                { credentials: "include", });
+
+            if (!response.ok) {
+                return;
+            }
+
+            const data = await response.json();
+
+            setSuggestions(data.slice(0, 5));
+
+        } catch (error) {
+            console.error(error);
+        }
+
+    };
+
+    const search = async (word) => {
+        try {
+            const response = await fetch(
+                `/api/v1/search?keyword=${encodeURIComponent(word)}`,
+                { credentials: "include" }
             );
-        })
-        .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
 
-    const filteredTags = TAGS.filter((tag) => {
-        if (!keyword.trim()) return true;
+            if (!response.ok) {
+                throw new Error("検索失敗");
+            }
 
-        return tag.name.toLowerCase().includes(keyword.toLowerCase());
-    });
+            const data = await response.json();
 
-    const toggleFollow = (tagName) => {
-        setFollowedTags((prev) =>
-            prev.includes(tagName)
-                ? prev.filter((name) => name !== tagName)
-                : [...prev, tagName]
-        );
+            console.log(data.posts);
+            console.log("tags =", data.posts[0]?.tags);
+
+            console.log("posts =", data.posts);
+
+            data.posts.forEach((post) => {
+                console.log("post", post.id);
+                console.log("replyCount", post.replyCount);
+                console.log("tags", post.tags);
+            });
+
+            setPosts(data.posts);
+            setTags(data.tags);
+
+        } catch (error) {
+            console.error(error);
+        }
+    };
+
+    const handleSearch = async () => {
+        setSearchParams({ keyword });
+
+        await search(keyword);
+    };
+
+    const handleSuggestionClick = async (tag) => {
+        setKeyword(tag.name);
+        setSuggestions([]);
+
+        setSearchParams({
+            keyword: tag.name,
+        });
+
+        await search(tag.name);
+    };
+
+    useEffect(() => {
+        const keywordFromUrl = searchParams.get("keyword");
+
+        if (keywordFromUrl) {
+            setKeyword(keywordFromUrl);
+            search(keywordFromUrl);
+        }
+    }, []);
+
+    const handleLikeToggle = async (post) => {
+        try {
+            const response = await fetch(
+                `/api/v1/posts/${post.id}/like`,
+                {
+                    method: post.likedByMe ? "DELETE" : "POST",
+                    credentials: "include",
+                }
+            );
+
+            if (!response.ok) {
+                throw new Error("いいね失敗");
+            }
+
+            setPosts((prev) =>
+                prev.map((p) =>
+                    p.id === post.id
+                        ? {
+                            ...p,
+                            likedByMe: !p.likedByMe,
+                            likeCount: p.likedByMe
+                                ? p.likeCount - 1
+                                : p.likeCount + 1,
+                        }
+                        : p
+                )
+            );
+
+        } catch (error) {
+            console.error(error);
+        }
+    };
+
+    const fetchFollowingTags = async () => {
+        try {
+            const response = await fetch(
+                "/api/v1/me/following/tags",
+                {
+                    credentials: "include",
+                }
+            );
+
+            if (!response.ok) {
+                return;
+            }
+
+            const data = await response.json();
+
+            setFollowingTags(data.map((tag) => tag.name));
+
+        } catch (error) {
+            console.error(error);
+        }
+    };
+
+    useEffect(() => {
+        fetchFollowingTags();
+    }, []);
+
+    const toggleFollow = async (tagName) => {
+        const isFollowed = followingTags.includes(tagName);
+
+        try {
+            const response = await fetch(
+                `/api/v1/tags/${encodeURIComponent(tagName)}/follow`,
+                {
+                    method: isFollowed ? "DELETE" : "POST",
+                    credentials: "include",
+                }
+            );
+
+            if (!response.ok) {
+                throw new Error();
+            }
+
+            await fetchFollowingTags();
+
+        } catch (error) {
+            console.error(error);
+        }
     };
 
     return (
@@ -44,15 +188,41 @@ export default function SearchPage() {
                 <input
                     className="field"
                     type="text"
-                    placeholder="本文・タグ・ユーザータグを検索"
+                    placeholder="キーワードを入力"
                     value={keyword}
-                    onChange={(e) => setKeyword(e.target.value)}
+                    onChange={(e) => {
+                        const value = e.target.value;
+                        setKeyword(value);
+                        fetchSuggestions(value);
+                    }}
+                    onKeyDown={(e) => {
+                        if (e.key === "Enter") {
+                            handleSearch();
+                        }
+                    }}
                 />
-                {/* 入力に応じてリアルタイムで絞り込むため、ボタンは送信トリガーのみ */}
-                <button className="btn" onClick={() => { }}>
+
+                <button
+                    className="btn"
+                    onClick={handleSearch}
+                >
                     検索
                 </button>
             </div>
+
+            {suggestions.length > 0 && (
+                <div className="search-suggestions">
+                    {suggestions.map((tag) => (
+                        <div
+                            key={tag.id}
+                            className="search-suggestion"
+                            onClick={() => handleSuggestionClick(tag)}
+                        >
+                            {tag.name}
+                        </div>
+                    ))}
+                </div>
+            )}
 
             <div className="tabs">
                 <button
@@ -71,40 +241,93 @@ export default function SearchPage() {
 
             {selectedTab === "posts" ? (
                 <div className="search-results">
-                    {filteredPosts.length === 0 && (
-                        <p className="empty-note">該当する投稿はありません。</p>
-                    )}
-                    {filteredPosts.map((post) => (
-                        <div key={post.id} className="mini-post">
-                            <div className="search-title">{post.title}</div>
-                            <div className="search-snippet">{post.content}</div>
-                            <div className="search-date">{post.createdAt}</div>
-                        </div>
-                    ))}
+                    {posts.map((post) => (
+                        <article key={post.id} className="mini-post">
+
+                            <div className="post-header">
+                                <div className="avatar"></div>
+
+                                <div>
+                                    <div className="nickname">
+                                        <Link
+                                            to={`/users/${post.author?.handle}`}
+                                        >
+                                            <UserHandle
+                                                user={post.author ?? { handle: "Unknown" }}
+                                            />
+                                        </Link>
+                                    </div>
+
+                                    <div className="search-date">
+                                        {relativeTime(post.createdAt)}
+                                    </div>
+                                </div>
+                            </div>
+
+                            <p className="search-snippet">
+                                {post.body}
+                            </p>
+
+                            <Link
+                                to={`/post/${post.id}`}
+                                className="post-detail-link"
+                            >
+                                詳細...
+                            </Link>
+
+                            <div className="tags">
+                                {post.tags.map((tag) => {
+                                    console.log("rendering tag", tag);
+
+                                return(
+                                <span key={tag.id}>
+                                    #{tag.name}
+                                </span>
+                                );
+                                })}
+                            </div>
+
+                            <div className="actions">
+                                <div style={{ marginTop: "20px" }}>
+                                    <button onClick={() => handleLikeToggle(post)}>
+                                        {post.likedByMe ? "♥" : "♡"} {post.likeCount}
+                                    </button>
+
+                                    <span style={{ marginLeft: "12px" }}>
+                                        💬 {post.replyCount}
+                                    </span>
+                                </div>
+                            </div>
+
+                        </article>
+                    ))
+                    }
                 </div>
             ) : (
                 <div className="search-results">
-                    {filteredTags.length === 0 && (
-                        <p className="empty-note">該当するタグはありません。</p>
-                    )}
-                    {filteredTags.map((tag) => {
-                        const isFollowed = followedTags.includes(tag.name);
+                    {tags.map((tag) => {
+                        console.log("render tag", tag);
+
+                        const isFollowed = followingTags.includes(tag.name);
 
                         return (
-                            <div key={tag.id} className="row-between">
+                            <div
+                                key={tag.id}
+                                className="row-between tag-result"
+                            >
                                 <span
                                     className="search-tagname"
-                                    onClick={() => navigate(`tag/${tag.id}`)}
+                                    onClick={() => navigate(`/tag/${tag.id}`)}
                                 >
-                                    #{tag.name}
+                                    {tag.name}
                                 </span>
 
                                 <button
-                                    className={`btn ${isFollowed ? "btn-quiet" : "btn-ghost"}`}
-                                    onClick={() => toggleFollow(tag.name)}
-                                >
+                                    className="btn"
+                                    onClick={() => toggleFollow(tag.name)}>
                                     {isFollowed ? "フォローをやめる" : "フォローする"}
                                 </button>
+
                             </div>
                         );
                     })}

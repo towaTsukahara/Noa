@@ -40,10 +40,11 @@ function ProfileEditPage() {
         navigate("/profile");
     };
 
-    const renderTags = (arr) =>
-        (arr || []).map((tag) => (
-            <span key={tag} className="tag">#{tag}</span>
-        ));
+    // /meのレスポンスが["Java", "React"]なら残す。[{id:1,name:"Java"}]なら消す
+    // const renderTags = (arr) =>
+    //     (arr || []).map((tag) => (
+    //         <span key={tag,id} className="tag">#{tag.name}</span>
+    //     ));
 
     return (
         <div className="profile-edit page">
@@ -60,21 +61,38 @@ function ProfileEditPage() {
 
             <div className="edit-block">
                 <h3>技術タグ</h3>
-                <div className="edit-taglist">{renderTags(form.skill)}</div>
+                <div className="edit-taglist">
+                    {form.skill.map((tag) => (
+                        <span key={tag.id} className="tag">
+                            #{tag.name}
+                        </span>
+                    ))}</div>
                 <button onClick={() => editTags("skill")}>さらに表示</button>
-            </div>
+            </div >
 
             <div className="edit-block">
                 <h3>興味タグ</h3>
-                <div className="edit-taglist">{renderTags(form.hobby)}</div>
+                <div className="edit-taglist">
+                    {form.hobby.map((tag) => (
+                        <span key={tag.id} className="tag">
+                            #{tag.name}
+                        </span>
+                    ))}
+                </div>
                 <button onClick={() => editTags("hobby")}>さらに表示</button>
-            </div>
+            </div >
 
             <div className="edit-block">
                 <h3>趣味タグ</h3>
-                <div className="edit-taglist">{renderTags(form.cert)}</div>
+                <div className="edit-taglist">
+                    {form.cert.map((tag) => (
+                        <span key={tag.id} className="tag">
+                            #{tag.name}
+                        </span>
+                    ))}
+                </div>
                 <button onClick={() => editTags("cert")}>さらに表示</button>
-            </div>
+            </div >
 
             <div className="edit-actions">
                 <button className="btn btn-quiet" onClick={() => navigate("/profile")}>
@@ -84,7 +102,7 @@ function ProfileEditPage() {
                     保存
                 </button>
             </div>
-        </div>
+        </div >
     );
 }
 

@@ -206,6 +206,7 @@ function ProfilePage() {
         </div>
     );
 
+
     return (
         <div className="profile page">
             {/* ===== プロフィール表示部（F-104・モックのまま） ===== */}

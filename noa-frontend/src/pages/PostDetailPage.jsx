@@ -94,11 +94,12 @@ function PostDetailPage() {
                 <p className="detail-body">{post.body}</p>
 
                 <div className="detail-tags">
-                    {post.tags.map((tag) => (
-                        <span key={tag} className="tag">#{tag}</span>
+                    {post.tags?.map((tag) => (
+                        <span key={tag.id} className="tag">
+                            #{tag.name}
+                        </span>
                     ))}
                 </div>
-
                 <div className="detail-actions">
                     <LikeButton
                         postId={post.id}

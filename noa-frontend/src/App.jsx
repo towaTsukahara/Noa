@@ -14,6 +14,8 @@ import AppLayout from './components/layout/AppLayout';
 import SearchPage from './pages/SearchPage';
 import TagDetailPage from './pages/TagDetailPage';
 import NotificationPage from './pages/NotificationPage';
+import AdminDashboardPage from './pages/AdminDashboardPage';
+import AdminUserDetailPage from './pages/AdminUserDetailPage';
 
 function App() {
   return (
@@ -38,8 +40,11 @@ function App() {
           <Route path="/users/:handle" element={<OtherProfilePage />} />
           <Route path="/follow/tags" element={<FollowTagEditPage />} />
           <Route path="/search" element={<SearchPage />} />
+          <Route path="/posts/:id" element={<PostDetailPage />} />
           <Route path="/tag/:tagId" element={<TagDetailPage />} />
           <Route path="/notifications" element={<NotificationPage />} />
+          <Route path="/admin" element={<AdminDashboardPage />} />
+          <Route path="/admin/users/:id" element={<AdminUserDetailPage />} />
         </Route>
       </Routes>
     </BrowserRouter>

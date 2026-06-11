@@ -106,7 +106,7 @@ function TimelinePage() {
 
           <div className="tags">
             {post.tags.map((tag) => (
-              <span key={tag}>#{tag}</span>
+              <span key={tag.id}>#{tag.name}</span>
             ))}
           </div>
 

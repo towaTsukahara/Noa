@@ -13,29 +13,42 @@
   padding: 24px 22px 18px;
   border-bottom: 1px solid var(--line2);
 }
+
 .profile-hero-top {
   display: flex;
   gap: 18px;
   align-items: flex-start;
 }
+
+.avatar.is-lg {
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  background: var(--line);
+}
+
 .profile-id {
   flex: 1;
   min-width: 0;
 }
+
 .profile-id .user-handle {
   font-size: 14px;
 }
+
 .profile-name {
   font-size: 22px;
   font-weight: 700;
   color: var(--ink);
   margin: 2px 0;
 }
+
 .profile-sub {
   font-size: 12px;
   color: var(--faint);
   font-family: var(--mono-font);
 }
+
 .profile-actions {
   display: flex;
   gap: 10px;
@@ -47,10 +60,12 @@
   gap: 22px;
   margin-top: 16px;
 }
+
 .profile-stats span {
   font-size: 13px;
   color: var(--soft);
 }
+
 .profile-stats b {
   color: var(--ink);
   font-weight: 700;
@@ -87,6 +102,7 @@
   cursor: pointer;
   transition: background 0.12s, border-color 0.12s;
 }
+
 .mini-post .mini-delete:hover {
   background: #f7ece9;
   border-color: var(--danger);
@@ -106,9 +122,11 @@
   padding: 0;
   font-variant-numeric: tabular-nums;
 }
+
 .mini-post .mini-like:hover {
   color: var(--like);
 }
+
 .mini-post .mini-like.liked {
   color: var(--like);
   font-weight: 600;
@@ -149,11 +167,14 @@
 /* hover全体 */
 .mini-delete:hover {
   background: rgba(255, 0, 0, 0.08);
+}
+
 /* コメントタブのカード（クリックで元投稿へ） */
 .profile-comment {
   cursor: pointer;
   transition: background 0.12s;
 }
+
 .profile-comment:hover {
   background: var(--accent-bg);
 }

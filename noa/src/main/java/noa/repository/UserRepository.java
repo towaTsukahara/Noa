@@ -2,6 +2,7 @@ package noa.repository;
 
 import noa.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
+
 import java.util.Optional;
 
 public interface UserRepository extends JpaRepository<User, Long> {
@@ -17,4 +18,5 @@ public interface UserRepository extends JpaRepository<User, Long> {
     @org.springframework.data.jpa.repository.Query(
         "select max(cast(substring(u.handle, 5) as integer)) from User u where u.handle like 'Noa-%'")
     java.util.Optional<Long> findMaxHandleNumber();
+    java.util.List<User> findAllByOrderByIdAsc();
 }

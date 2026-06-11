@@ -14,7 +14,7 @@ public record PostResponse(
         Map<String, Object> author, // { handle, nickname }
         Long parentId,
         String body,
-        List<String> tags,
+        List<TagSummaryResponse> tags,
         int likeCount,
         boolean likedByMe,
         int replyCount,
@@ -28,15 +28,15 @@ public record PostResponse(
         author.put("handle", post.getAuthor().getHandle());
         author.put("nickname", authorNickname);
 
-        List<String> tagNames = (post.getTags() == null)
+        List<TagSummaryResponse> tagSummaries = (post.getTags() == null)
                 ? List.of()
-                : post.getTags().stream().map(noa.entity.Tag::getName).toList();
+                : post.getTags().stream().map(TagSummaryResponse::from).toList();
         return new PostResponse(
                 post.getId(),
                 author,
                 post.getParentId(),
                 post.getBody(),
-                tagNames,
+                tagSummaries,
                 (int) likeCount,
                 likedByMe,
                 (int) replyCount,
