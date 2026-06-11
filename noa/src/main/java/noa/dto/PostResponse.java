@@ -28,7 +28,7 @@ public record PostResponse(
         author.put("handle", post.getAuthor().getHandle());
         author.put("nickname", authorNickname);
 
-        List<String> tagNames = (post.getTags() == null)
+        List<TagSummaryResponse> tagSummaries = (post.getTags() == null)
                 ? List.of()
                 : post.getTags().stream().map(TagSummaryResponse::from).toList();
         return new PostResponse(
@@ -36,7 +36,7 @@ public record PostResponse(
                 author,
                 post.getParentId(),
                 post.getBody(),
-                tags,
+                tagSummaries,
                 (int) likeCount,
                 likedByMe,
                 (int) replyCount,

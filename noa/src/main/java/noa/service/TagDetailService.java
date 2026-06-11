@@ -12,6 +12,7 @@ import noa.repository.TagFollowRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Map;
 
 @Service
 public class TagDetailService {
@@ -20,16 +21,19 @@ public class TagDetailService {
     private final PostRepository postRepository;
     private final TagFollowRepository tagFollowRepository;
     private final LikeRepository likeRepository;
+    private final NicknameService nicknameService;
 
     public TagDetailService(
             TagService tagService,
             PostRepository postRepository,
             TagFollowRepository tagFollowRepository,
-            LikeRepository likeRepository) {
+            LikeRepository likeRepository,
+            NicknameService nicknameService) {
         this.tagService = tagService;
         this.postRepository = postRepository;
         this.tagFollowRepository = tagFollowRepository;
         this.likeRepository = likeRepository;
+        this.nicknameService = nicknameService;
     }
 
     public TagDetailResponse getTag(User user, Long tagId) {
@@ -37,6 +41,9 @@ public class TagDetailService {
         Tag tag = tagService.findById(tagId);
 
         boolean followed = tagFollowRepository.existsByUserIdAndTagId(user.getId(), tagId);
+
+        // viewer が付けたニックネーム辞書（handle → nickname）を1回だけ取得
+        Map<String, String> nickMap = nicknameService.nicknameMapOf(user);
 
         List<PostResponse> posts = postRepository.findByTagId(tagId)
                 .stream()
@@ -54,7 +61,8 @@ public class TagDetailService {
                             post,
                             likeCount,
                             likedByMe,
-                            replyCount);
+                            replyCount,
+                            nickMap.get(post.getAuthor().getHandle()));
                 })
                 .toList();
 

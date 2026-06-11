@@ -4,11 +4,13 @@ import noa.dto.PostResponse;
 import noa.dto.search.*;
 import noa.entity.Post;
 import noa.entity.Tag;
+import noa.entity.User;
 import noa.repository.LikeRepository;
 import noa.repository.PostRepository;
 import noa.repository.TagRepository;
 import org.springframework.stereotype.Service;
 import java.util.List;
+import java.util.Map;
 
 @Service
 public class SearchService {
@@ -16,25 +18,33 @@ public class SearchService {
     private final LikeRepository likeRepository;
     private final PostRepository postRepository;
     private final TagRepository tagRepository;
+    private final NicknameService nicknameService;
 
     public SearchService(
             PostRepository postRepository,
             TagRepository tagRepository,
-            LikeRepository likeRepository) {
+            LikeRepository likeRepository,
+            NicknameService nicknameService) {
         this.postRepository = postRepository;
         this.tagRepository = tagRepository;
         this.likeRepository = likeRepository;
+        this.nicknameService = nicknameService;
     }
 
-    public SearchResponse search(String keyword) {
+    public SearchResponse search(String keyword, User viewer) {
+        // viewer が付けたニックネーム辞書（handle → nickname）を1回だけ取得
+        Map<String, String> nickMap = nicknameService.nicknameMapOf(viewer);
+
         List<PostResponse> posts = postRepository
                 .searchPosts(keyword)
                 .stream()
                 .map(post -> {
                     long likeCount = likeRepository.countByPostId(post.getId());
                     long replyCount = postRepository.countReplies(post.getId());
+                    boolean likedByMe = likeRepository.existsByUserIdAndPostId(viewer.getId(), post.getId());
 
-                    return PostResponse.from(post, likeCount, false, replyCount);
+                    return PostResponse.from(post, likeCount, likedByMe, replyCount,
+                            nickMap.get(post.getAuthor().getHandle()));
                 })
                 .toList();
         List<SearchTagResponse> tags = tagRepository
