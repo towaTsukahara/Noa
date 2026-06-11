@@ -117,7 +117,7 @@ export default function TagDetailPage() {
                 >
                     {tag.followed
                         ? "フォロー中 ✓"
-                        : "このトピックをフォロー"}
+                        : "フォローする"}
                 </button>
 
             </div>
