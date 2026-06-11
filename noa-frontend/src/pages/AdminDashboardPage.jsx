@@ -1,0 +1,115 @@
+import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { api } from "../api/client";
+import { useAuth } from "../context/AuthContext";
+import "./AdminDashboardPage.css";
+
+export default function AdminDashboardPage() {
+    const navigate = useNavigate();
+    const { user } = useAuth();
+
+    const [users, setUsers] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
+
+    // 管理者以外がURL直打ちで来たら追い返す（フロント側のガード）
+    useEffect(() => {
+        if (user && user.role !== "ADMIN") {
+            navigate("/", { replace: true });
+        }
+    }, [user]);
+
+    const loadUsers = async () => {
+        setLoading(true);
+        setError(null);
+        try {
+            const data = await api("/admin/users"); // AdminUserResponse[]
+            setUsers(data);
+        } catch (e) {
+            setError("ユーザー一覧の取得に失敗しました。");
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    useEffect(() => {
+        loadUsers();
+    }, []);
+
+    // 停止/解除のトグル
+    const handleToggleStatus = async (u) => {
+        const willSuspend = u.status === "ACTIVE";
+        const action = willSuspend ? "停止" : "解除";
+        if (!window.confirm(`${u.handle} を${action}しますか？`)) return;
+        try {
+            await api(`/admin/users/${u.id}/${willSuspend ? "suspend" : "activate"}`, {
+                method: "POST",
+            });
+            await loadUsers(); // 一覧を再読込して状態を反映
+        } catch (e) {
+            alert(`${action}に失敗しました。`);
+        }
+    };
+
+    return (
+        <div className="admin page">
+            <h2 className="page-title">管理ダッシュボード</h2>
+            <div className="sub-note">管理者専用。ユーザーの状態確認・対応を行います。</div>
+
+            {loading && <p className="empty-note">読み込み中...</p>}
+            {error && <p className="empty-note">{error}</p>}
+
+            {!loading && !error && (
+                <div className="admin-table-wrap">
+                    <table className="admin-table">
+                        <thead>
+                            <tr>
+                                <th>ハンドル</th>
+                                <th>社員番号</th>
+                                <th>メール</th>
+                                <th>権限</th>
+                                <th>状態</th>
+                                <th>状態</th>
+                                <th>操作</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {users.map((u) => (
+                                <tr key={u.id}>
+                                    <td>{u.handle}</td>
+                                    <td>{u.employeeNo}</td>
+                                    <td>{u.email}</td>
+                                    <td>{u.role}</td>
+                                    <td>
+                                        <span className={`admin-status ${u.status === "ACTIVE" ? "is-active" : "is-suspended"}`}>
+                                            {u.status}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <button
+                                            className="btn-ghost admin-btn-sm"
+                                            onClick={() => navigate(`/admin/users/${u.id}`)}
+                                        >
+                                            投稿
+                                        </button>
+                                        {u.role === "ADMIN" ? (
+                                            <span className="admin-muted" style={{ marginLeft: 8 }}>—</span>
+                                        ) : (
+                                            <button
+                                                className={u.status === "ACTIVE" ? "btn-danger admin-btn-sm" : "btn-ghost admin-btn-sm"}
+                                                onClick={() => handleToggleStatus(u)}
+                                                style={{ marginLeft: 8 }}
+                                            >
+                                                {u.status === "ACTIVE" ? "停止" : "解除"}
+                                            </button>
+                                        )}
+                                    </td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+                </div>
+            )}
+        </div>
+    );
+}
