@@ -16,3 +16,30 @@
     overflow-y: auto;
     flex: 1;
 }
+/* 投稿詳細の中身（旧 PostDetailPage から移植） */
+.detail-panel .detail-author {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    margin-bottom: 10px;
+}
+.detail-panel .detail-body {
+    font-size: 14.5px;
+    line-height: 1.76;
+    color: #2b3038;
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+    margin-bottom: 12px;
+}
+.detail-panel .detail-tags {
+    display: flex;
+    gap: 7px;
+    flex-wrap: wrap;
+    margin-bottom: 14px;
+}
+.detail-panel .detail-actions {
+    padding-bottom: 14px;
+    border-bottom: 1px solid var(--line2);
+    margin-bottom: 4px;
+}

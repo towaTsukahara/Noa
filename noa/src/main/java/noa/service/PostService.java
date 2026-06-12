@@ -10,6 +10,7 @@ import noa.repository.PostRepository;
 import noa.repository.TagRepository;
 import noa.dto.PostResponse;
 import noa.dto.PostCreateRequest;
+import noa.dto.search.SearchResponse;
 
 import org.springframework.stereotype.Service;
 import org.springframework.data.domain.PageRequest;
@@ -189,5 +190,34 @@ public class PostService {
                 boolean likedByMe = likeRepository.existsByUserIdAndPostId(viewer.getId(), id);
                 String nickname = nicknameService.nicknameMapOf(viewer).get(post.getAuthor().getHandle());
                 return PostResponse.from(post, likeCount, likedByMe, commentRepository.countByPostId(id), nickname);
+        }
+
+        // 検索画面用
+        public SearchResponse getRecentPosts(User viewer, int limit) {
+
+                Pageable pageable = PageRequest.of(0, limit + 1);
+
+                List<Post> allPosts = postRepository.findRecentPosts(pageable);
+
+                boolean hasMore = allPosts.size() > limit;
+
+                Map<String, String> nickMap = nicknameService.nicknameMapOf(viewer);
+
+                List<PostResponse> posts = allPosts.stream()
+                                .limit(limit)
+                                .map(p -> PostResponse.from(
+                                                p,
+                                                likeRepository.countByPostId(p.getId()),
+                                                likeRepository.existsByUserIdAndPostId(
+                                                                viewer.getId(),
+                                                                p.getId()),
+                                                commentRepository.countByPostId(p.getId()),
+                                                nickMap.get(p.getAuthor().getHandle())))
+                                .toList();
+
+                return new SearchResponse(
+                                posts,
+                                List.of(),
+                                hasMore);
         }
 }

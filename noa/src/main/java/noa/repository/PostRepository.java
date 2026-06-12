@@ -8,59 +8,57 @@ import java.util.List;
 
 public interface PostRepository extends JpaRepository<Post, Long> {
 
-    // 1ページ目: 通常投稿(parent_id is null)・未削除を、新しい順にN件
-    @Query("select p from Post p where p.parentId is null and p.isDeleted = false order by p.id desc")
-    List<Post> findTimelineFirst(Pageable pageable);
+        // 1ページ目: 通常投稿(parent_id is null)・未削除を、新しい順にN件
+        @Query("select p from Post p where p.parentId is null and p.isDeleted = false order by p.id desc")
+        List<Post> findTimelineFirst(Pageable pageable);
 
-    // 2ページ目以降: 指定id(cursor)より小さいものを、新しい順にN件
-    @Query("select p from Post p where p.parentId is null and p.isDeleted = false and p.id < :cursor order by p.id desc")
-    List<Post> findTimelineAfter(Long cursor, Pageable pageable);
+        // 2ページ目以降: 指定id(cursor)より小さいものを、新しい順にN件
+        @Query("select p from Post p where p.parentId is null and p.isDeleted = false and p.id < :cursor order by p.id desc")
+        List<Post> findTimelineAfter(Long cursor, Pageable pageable);
 
-    // 特定ユーザーの通常投稿(未削除)を新しい順にN件（1ページ目）
-    @Query("select p from Post p where p.author.id = :authorId and p.parentId is null and p.isDeleted = false order by p.id desc")
-    List<Post> findUserPostsFirst(Long authorId, Pageable pageable);
+        // 特定ユーザーの通常投稿(未削除)を新しい順にN件（1ページ目）
+        @Query("select p from Post p where p.author.id = :authorId and p.parentId is null and p.isDeleted = false order by p.id desc")
+        List<Post> findUserPostsFirst(Long authorId, Pageable pageable);
 
-    // 同・カーソルの続き（cursorより小さいid）
-    @Query("select p from Post p where p.author.id = :authorId and p.parentId is null and p.isDeleted = false and p.id < :cursor order by p.id desc")
-    List<Post> findUserPostsAfter(Long authorId, Long cursor, Pageable pageable);
+        // 同・カーソルの続き（cursorより小さいid）
+        @Query("select p from Post p where p.author.id = :authorId and p.parentId is null and p.isDeleted = false and p.id < :cursor order by p.id desc")
+        List<Post> findUserPostsAfter(Long authorId, Long cursor, Pageable pageable);
 
-    // 投稿への返信数（未削除のみ）
-    @Query("select count(p) from Post p where p.parentId = :parentId and p.isDeleted = false")
-    long countReplies(Long parentId);
-    // ここから下、付け足した部分
+        // 投稿への返信数（未削除のみ）
+        @Query("select count(p) from Post p where p.parentId = :parentId and p.isDeleted = false")
+        long countReplies(Long parentId);
+        // ここから下、付け足した部分
 
-    // 返信一覧（1ページ目）: parent_id = この投稿、未削除、新しい順
-    @Query("select p from Post p where p.parentId = :parentId and p.isDeleted = false order by p.id desc")
-    List<Post> findRepliesFirst(Long parentId, Pageable pageable);
+        // 返信一覧（1ページ目）: parent_id = この投稿、未削除、新しい順
+        @Query("select p from Post p where p.parentId = :parentId and p.isDeleted = false order by p.id desc")
+        List<Post> findRepliesFirst(Long parentId, Pageable pageable);
 
-    // 返信一覧（続き）: cursor より小さい id
-    @Query("select p from Post p where p.parentId = :parentId and p.isDeleted = false and p.id < :cursor order by p.id desc")
-    List<Post> findRepliesAfter(Long parentId, Long cursor, Pageable pageable);
+        // 返信一覧（続き）: cursor より小さい id
+        @Query("select p from Post p where p.parentId = :parentId and p.isDeleted = false and p.id < :cursor order by p.id desc")
+        List<Post> findRepliesAfter(Long parentId, Long cursor, Pageable pageable);
 
-    // 投稿数カウント用
-    long countByAuthorIdAndParentIdIsNullAndIsDeletedFalse(Long authorId);
+        // 投稿数カウント用
+        long countByAuthorIdAndParentIdIsNullAndIsDeletedFalse(Long authorId);
 
-    // 検索機能用
-    List<Post> findByBodyContainingIgnoreCase(String keyword);
+        // 検索機能用
+        List<Post> findByBodyContainingIgnoreCase(String keyword);
 
-    @Query("""
-            select p from Post p join p.tags t where t.id = :tagId and p.isDeleted = false order by p.id desc
-            """)
-    List<Post> findByTagId(Long tagId);
+        @Query(" select p from Post p join p.tags t where t.id = :tagId and p.isDeleted = false order by p.id desc ")
+        List<Post> findByTagId(Long tagId);
 
-    // 本文かタグ一致検索用
-    @Query("""
-                select distinct p from Post p left join p.tags t where p.isDeleted = false and ( lower(p.body) like lower(concat('%', :keyword, '%')) or lower(t.name) like lower(concat('%', :keyword, '%')) ) order by p.id desc
-            """)
-    List<Post> searchPosts(String keyword);
+        // 本文かタグ一致検索用
+        @Query(" select distinct p from Post p left join p.tags t where p.isDeleted = false and ( lower(p.body) like lower(concat('%', :keyword, '%')) or lower(t.name) like lower(concat('%', :keyword, '%')) ) order by p.id desc ")
+        List<Post> searchPosts(String keyword);
 
-    // タグ検索用
-    @Query("""
-            select distinct p from Post p join p.tags t where lower(t.name) like lower(concat('%', :keyword, '%')) and p.isDeleted = false order by p.id desc
-            """)
-    List<Post> findByNameContaining(String keyword);
+        // タグ検索用
+        @Query(" select distinct p from Post p join p.tags t where lower(t.name) like lower(concat('%', :keyword, '%')) and p.isDeleted = false order by p.id desc ")
+        List<Post> findByNameContaining(String keyword);
 
-    // 特定ユーザーの生きている投稿（管理者用・新しい順）
-    @Query("select p from Post p where p.author.id = :authorId and p.isDeleted = false order by p.id desc")
-    java.util.List<Post> findAliveByAuthor(Long authorId);
+        // 特定ユーザーの生きている投稿（管理者用・新しい順）
+        @Query("select p from Post p where p.author.id = :authorId and p.isDeleted = false order by p.id desc")
+        java.util.List<Post> findAliveByAuthor(Long authorId);
+
+        // 空検索時、最新10件取得
+        @Query(" select p from Post p where p.parentId is null and p.isDeleted = false order by p.id desc ")
+        List<Post> findRecentPosts(Pageable pageable);
 }
