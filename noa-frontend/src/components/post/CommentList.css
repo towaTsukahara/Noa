@@ -95,3 +95,10 @@
 .comment-form button:hover {
   background: var(--accent-d);
 }
+
+.comment-head-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+}

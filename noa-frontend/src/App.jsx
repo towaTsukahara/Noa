@@ -16,6 +16,7 @@ import TagDetailPage from './pages/TagDetailPage';
 import NotificationPage from './pages/NotificationPage';
 import AdminDashboardPage from './pages/AdminDashboardPage';
 import AdminUserDetailPage from './pages/AdminUserDetailPage';
+import AdminReportsPage from './pages/AdminReportsPage';
 
 function App() {
   return (
@@ -45,6 +46,7 @@ function App() {
           <Route path="/notifications" element={<NotificationPage />} />
           <Route path="/admin" element={<AdminDashboardPage />} />
           <Route path="/admin/users/:id" element={<AdminUserDetailPage />} />
+          <Route path="/admin/reports" element={<AdminReportsPage />} />
         </Route>
       </Routes>
     </BrowserRouter>

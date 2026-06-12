@@ -7,6 +7,8 @@ import "./PostDetailPage.css";
 import LikeButton from "../components/post/LikeButton";
 import CommentList from "../components/post/CommentList";
 import CommentForm from "../components/post/CommentForm";
+import MoreMenu from "../components/common/MoreMenu";
+import ReportModal from "../components/report/ReportModal";
 
 function PostDetailPage() {
     const { id } = useParams();
@@ -15,6 +17,7 @@ function PostDetailPage() {
     const [post, setPost] = useState(null);
     const [loading, setLoading] = useState(true);
     const [comments, setComments] = useState([]);
+    const [reportTarget, setReportTarget] = useState(null); // { type, id } or null
 
     const commentRef = useRef(null); // 返信欄への参照（フォーカス用）
     const { user } = useAuth();
@@ -89,6 +92,9 @@ function PostDetailPage() {
             <div className="page-pad detail-main">
                 <div className="detail-author">
                     <span className="user-handle">{post.author.handle}</span>
+                    <MoreMenu items={[
+                        { label: "通報する", danger: true, onClick: () => setReportTarget({ type: "POST", id: post.id }) },
+                    ]} />
                 </div>
 
                 <p className="detail-body">{post.body}</p>
