@@ -1,5 +1,5 @@
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useNavigate, Link, useSearchParams } from "react-router-dom";
 import { relativeTime } from "../utils/relativeTime";
 import UserHandle from "../components/user/UserHandle";
@@ -12,8 +12,11 @@ export default function SearchPage() {
     const [tags, setTags] = useState([]);
     const [followingTags, setFollowingTags] = useState([]);
     const [suggestions, setSuggestions] = useState([]);
+    const [showSuggestions, setShowSuggestions] = useState(false);
     const [searchParams, setSearchParams] = useSearchParams();
+
     const navigate = useNavigate();
+    const searchRef = useRef(null);
 
     const fetchSuggestions = async (value) => {
 
@@ -39,6 +42,22 @@ export default function SearchPage() {
         }
 
     };
+
+    useEffect(() => {
+        const handleClickOutSide = (event) => {
+            if (
+                searchRef.current && !searchRef.current.contains(event.target)
+            ) {
+                setShowSuggestions(false);
+            }
+        };
+
+        document.addEventListener("mousedown", handleClickOutSide);
+
+        return () => {
+            document.removeEventListener("mousedown", handleClickOutSide);
+        };
+    }, []);
 
     const search = async (word) => {
         try {
@@ -73,6 +92,8 @@ export default function SearchPage() {
     };
 
     const handleSearch = async () => {
+        setShowSuggestions(false);
+
         setSearchParams({ keyword });
 
         await search(keyword);
@@ -81,6 +102,7 @@ export default function SearchPage() {
     const handleSuggestionClick = async (tag) => {
         setKeyword(tag.name);
         setSuggestions([]);
+        setShowSuggestions(false);
 
         setSearchParams({
             keyword: tag.name,
@@ -182,47 +204,56 @@ export default function SearchPage() {
 
     return (
         <div className="search page">
-            <h1 className="page-title">検索</h1>
+            <h1 className="page-title">投稿・タグを探す</h1>
 
-            <div className="search-bar">
-                <input
-                    className="field"
-                    type="text"
-                    placeholder="キーワードを入力"
-                    value={keyword}
-                    onChange={(e) => {
-                        const value = e.target.value;
-                        setKeyword(value);
-                        fetchSuggestions(value);
-                    }}
-                    onKeyDown={(e) => {
-                        if (e.key === "Enter") {
-                            handleSearch();
-                        }
-                    }}
-                />
+            <div className="search-area" ref={searchRef}>
+                <div className="search-bar">
+                    <input
+                        className="field"
+                        type="text"
+                        placeholder="キーワードを入力"
+                        value={keyword}
+                        onChange={(e) => {
+                            const value = e.target.value;
+                            setKeyword(value);
+                            setShowSuggestions(true);
+                            fetchSuggestions(value);
+                        }}
+                        onKeyDown={(e) => {
+                            if (e.key === "Enter") {
+                                handleSearch();
+                            }
+                        }}
+                        onFocus={() => {
+                            if (keyword.trim()) {
+                                fetchSuggestions(keyword);
+                                setShowSuggestions(true);
+                            }
+                        }}
+                    />
 
-                <button
-                    className="btn"
-                    onClick={handleSearch}
-                >
-                    検索
-                </button>
-            </div>
-
-            {suggestions.length > 0 && (
-                <div className="search-suggestions">
-                    {suggestions.map((tag) => (
-                        <div
-                            key={tag.id}
-                            className="search-suggestion"
-                            onClick={() => handleSuggestionClick(tag)}
-                        >
-                            {tag.name}
-                        </div>
-                    ))}
+                    <button
+                        className="btn"
+                        onClick={handleSearch}
+                    >
+                        検索
+                    </button>
                 </div>
-            )}
+
+                {showSuggestions && suggestions.length > 0 && (
+                    <div className="search-suggestions">
+                        {suggestions.map((tag) => (
+                            <div
+                                key={tag.id}
+                                className="search-suggestion"
+                                onClick={() => handleSuggestionClick(tag)}
+                            >
+                                {tag.name}
+                            </div>
+                        ))}
+                    </div>
+                )}
+            </div>
 
             <div className="tabs">
                 <button
@@ -279,11 +310,11 @@ export default function SearchPage() {
                                 {post.tags.map((tag) => {
                                     console.log("rendering tag", tag);
 
-                                return(
-                                <span key={tag.id}>
-                                    #{tag.name}
-                                </span>
-                                );
+                                    return (
+                                        <span key={tag.id}>
+                                            #{tag.name}
+                                        </span>
+                                    );
                                 })}
                             </div>
 

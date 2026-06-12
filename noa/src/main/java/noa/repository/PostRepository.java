@@ -59,4 +59,8 @@ public interface PostRepository extends JpaRepository<Post, Long> {
             select distinct p from Post p join p.tags t where lower(t.name) like lower(concat('%', :keyword, '%')) and p.isDeleted = false order by p.id desc
             """)
     List<Post> findByNameContaining(String keyword);
+
+    // 特定ユーザーの生きている投稿（管理者用・新しい順）
+    @Query("select p from Post p where p.author.id = :authorId and p.isDeleted = false order by p.id desc")
+    java.util.List<Post> findAliveByAuthor(Long authorId);
 }
