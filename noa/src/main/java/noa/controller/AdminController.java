@@ -2,6 +2,7 @@ package noa.controller;
 
 import noa.dto.AdminCommentResponse;
 import noa.dto.AdminPostResponse;
+import noa.dto.AdminReportResponse;
 import noa.dto.AdminUserResponse;
 import noa.security.CustomUserDetails;
 import noa.service.AdminService;
@@ -67,5 +68,18 @@ public class AdminController {
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteComment(@PathVariable Long commentId) {
         adminService.deleteComment(commentId);
+    }
+
+    // 通報一覧（?status=PENDING で未対応のみ等）
+    @GetMapping("/reports")
+    public List<AdminReportResponse> reports(@RequestParam(required = false) String status) {
+        return adminService.listReports(status);
+    }
+
+    // 通報を対応済みにする
+    @PostMapping("/reports/{reportId}/resolve")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void resolveReport(@PathVariable Long reportId) {
+        adminService.resolveReport(reportId);
     }
 }

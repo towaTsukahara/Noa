@@ -1,0 +1,48 @@
+.more-menu {
+    position: relative;
+    display: inline-block;
+}
+.more-menu-trigger {
+    border: none;
+    background: none;
+    cursor: pointer;
+    font-size: 18px;
+    line-height: 1;
+    color: var(--faint);
+    padding: 2px 8px;
+    border-radius: var(--r-sm);
+}
+.more-menu-trigger:hover {
+    background: #f1eee6;
+    color: var(--soft);
+}
+.more-menu-list {
+    position: absolute;
+    right: 0;
+    top: 100%;
+    margin-top: 4px;
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: var(--r-md);
+    box-shadow: var(--shadow-soft);
+    min-width: 140px;
+    z-index: 50;
+    overflow: hidden;
+}
+.more-menu-item {
+    display: block;
+    width: 100%;
+    text-align: left;
+    border: none;
+    background: none;
+    cursor: pointer;
+    font-size: 13px;
+    color: var(--ink);
+    padding: 10px 14px;
+}
+.more-menu-item:hover {
+    background: #f1eee6;
+}
+.more-menu-item.is-danger {
+    color: var(--danger);
+}
