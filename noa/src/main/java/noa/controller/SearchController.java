@@ -22,7 +22,8 @@ public class SearchController {
     @GetMapping("/search")
     public SearchResponse search(
             @RequestParam String keyword,
+            @RequestParam(defaultValue = "10") int limit,
             @AuthenticationPrincipal CustomUserDetails principal) {
-        return searchService.search(keyword, principal.getUser());
+        return searchService.search(keyword, limit, principal.getUser());
     }
 }

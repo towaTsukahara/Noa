@@ -9,6 +9,8 @@ export default function SearchPage() {
     const [keyword, setKeyword] = useState("");
     const [selectedTab, setSelectedTab] = useState("posts");
     const [posts, setPosts] = useState([]);
+    const [hasMorePosts, setHasMorePosts] = useState(false);
+    const [postLimit, setPostLimit] = useState(10);
     const [tags, setTags] = useState([]);
     const [followingTags, setFollowingTags] = useState([]);
     const [suggestions, setSuggestions] = useState([]);
@@ -59,10 +61,10 @@ export default function SearchPage() {
         };
     }, []);
 
-    const search = async (word) => {
+    const search = async (word, limit = 10) => {
         try {
             const response = await fetch(
-                `/api/v1/search?keyword=${encodeURIComponent(word)}`,
+                `/api/v1/search?keyword=${encodeURIComponent(word)}&limit=${limit}`,
                 { credentials: "include" }
             );
 
@@ -85,6 +87,27 @@ export default function SearchPage() {
 
             setPosts(data.posts);
             setTags(data.tags);
+            setHasMorePosts(data.hasMorePosts);
+
+        } catch (error) {
+            console.error(error);
+        }
+    };
+
+    const fetchRecentPosts = async (limit = 10) => {
+        try {
+            const response = await fetch(
+                `/api/v1/search/recent-posts?limit=${limit}`,
+                { credentials: "include" }
+            );
+
+            if (!response.ok) {
+                throw new Error("投稿取得失敗");
+            }
+
+            const data = await response.json();
+
+            setPosts(data);
 
         } catch (error) {
             console.error(error);
@@ -94,9 +117,18 @@ export default function SearchPage() {
     const handleSearch = async () => {
         setShowSuggestions(false);
 
-        setSearchParams({ keyword });
+        const word = keyword.trim();
 
-        await search(keyword);
+        setPostLimit(10);
+
+        if (!word) {
+            await fetchRecentPosts(10);
+            return;
+        }
+
+        setSearchParams({ keyword: word });
+
+        await search(word, 10);
     };
 
     const handleSuggestionClick = async (tag) => {
@@ -117,8 +149,24 @@ export default function SearchPage() {
         if (keywordFromUrl) {
             setKeyword(keywordFromUrl);
             search(keywordFromUrl);
+        } else {
+            fetchRecentPosts(10);
         }
     }, []);
+
+    const handleLoadMorePosts = async () => {
+        const nextLimit = postLimit + 10;
+
+        setPostLimit(nextLimit);
+
+        const word = keyword.trim();
+
+        if (!word) {
+            await fetchRecentPosts(nextLimit);
+        } else {
+            await search(word, nextLimit);
+        }
+    };
 
     const handleLikeToggle = async (post) => {
         try {
@@ -329,10 +377,20 @@ export default function SearchPage() {
                                     </span>
                                 </div>
                             </div>
-
                         </article>
                     ))
                     }
+
+                    {hasMorePosts && (
+                        <div style={{ textAlign: "center", marginTop: "20px" }}>
+                            <button
+                                className="btn"
+                                onClick={handleLoadMorePosts}
+                            >
+                                もっと見る
+                            </button>
+                        </div>
+                    )}
                 </div>
             ) : (
                 <div className="search-results">

@@ -2,12 +2,15 @@ package noa.service;
 
 import noa.dto.AdminCommentResponse;
 import noa.dto.AdminPostResponse;
+import noa.dto.AdminReportResponse;
 import noa.dto.AdminUserResponse;
 import noa.entity.Post;
+import noa.entity.Report;
 import noa.entity.User;
 import noa.repository.CommentRepository;
 import noa.repository.LikeRepository;
 import noa.repository.PostRepository;
+import noa.repository.ReportRepository;
 import noa.repository.UserRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
@@ -23,13 +26,15 @@ public class AdminService {
     private final PostRepository postRepository;
     private final LikeRepository likeRepository;
     private final CommentRepository commentRepository;
+    private final ReportRepository reportRepository;
 
     public AdminService(UserRepository userRepository, PostRepository postRepository,
-                        LikeRepository likeRepository, CommentRepository commentRepository) {
+                        LikeRepository likeRepository, CommentRepository commentRepository, ReportRepository reportRepository) {
         this.userRepository = userRepository;
         this.postRepository = postRepository;
         this.likeRepository = likeRepository;
         this.commentRepository = commentRepository;
+        this.reportRepository = reportRepository;
     }
     // 全ユーザー一覧（管理者用・秘匿しない）
     public List<AdminUserResponse> listUsers() {
@@ -80,6 +85,33 @@ public class AdminService {
                 .toList();
     }
 
+    // 通報一覧（管理者用）。status=null なら全件、指定なら絞り込み
+    public List<AdminReportResponse> listReports(String status) {
+        List<Report> reports = (status == null || status.isBlank())
+                ? reportRepository.findAllByOrderByIdDesc()
+                : reportRepository.findByStatusOrderByIdDesc(status);
+
+        return reports.stream().map(r -> {
+            // 通報者のhandle
+            String reporterHandle = userRepository.findById(r.getReporterId())
+                    .map(u -> u.getHandle()).orElse("(不明)");
+            // 対象の本文を、種別に応じて取得
+            String targetBody;
+            if ("POST".equals(r.getTargetType())) {
+                targetBody = postRepository.findById(r.getTargetId())
+                        .map(p -> p.isDeleted() ? "(削除済みの投稿)" : p.getBody())
+                        .orElse("(存在しない投稿)");
+                        } else {
+                targetBody = commentRepository.findById(r.getTargetId())
+                        .map(c -> c.getBody())
+                        .orElse("(削除済みのコメント)");
+            }
+            return new AdminReportResponse(
+                    r.getId(), reporterHandle, r.getTargetType(), r.getTargetId(),
+                    targetBody, r.getReason(), r.getStatus(), r.getCreatedAt());
+        }).toList();
+    }
+
     // ユーザーを停止する（status を SUSPENDED に）
     @org.springframework.transaction.annotation.Transactional
     public void suspendUser(Long userId, User admin) {
@@ -124,5 +156,15 @@ public class AdminService {
                 .orElseThrow(() -> new org.springframework.web.server.ResponseStatusException(
                         org.springframework.http.HttpStatus.NOT_FOUND, "コメントが見つかりません"));
         commentRepository.delete(comment);
+    }
+
+        // 通報を「対応済み」にする
+    @org.springframework.transaction.annotation.Transactional
+    public void resolveReport(Long reportId) {
+        Report report = reportRepository.findById(reportId)
+                .orElseThrow(() -> new org.springframework.web.server.ResponseStatusException(
+                        org.springframework.http.HttpStatus.NOT_FOUND, "通報が見つかりません"));
+        report.setStatus("RESOLVED");
+        reportRepository.save(report);
     }
 }

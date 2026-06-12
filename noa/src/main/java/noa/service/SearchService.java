@@ -31,13 +31,17 @@ public class SearchService {
         this.nicknameService = nicknameService;
     }
 
-    public SearchResponse search(String keyword, User viewer) {
+    public SearchResponse search(String keyword, int limit, User viewer) {
         // viewer が付けたニックネーム辞書（handle → nickname）を1回だけ取得
         Map<String, String> nickMap = nicknameService.nicknameMapOf(viewer);
 
-        List<PostResponse> posts = postRepository
-                .searchPosts(keyword)
+        List<Post> matchedPosts = postRepository.searchPosts(keyword);
+
+        boolean hasMore = matchedPosts.size() > limit;
+
+        List<PostResponse> posts = matchedPosts
                 .stream()
+                .limit(limit)
                 .map(post -> {
                     long likeCount = likeRepository.countByPostId(post.getId());
                     long replyCount = postRepository.countReplies(post.getId());
@@ -53,7 +57,7 @@ public class SearchService {
                 .map(this::toTagResponse)
                 .toList();
 
-        return new SearchResponse(posts, tags);
+        return new SearchResponse(posts, tags, hasMore);
     }
 
     private SearchPostResponse toPostResponse(Post post) {

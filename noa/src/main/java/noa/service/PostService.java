@@ -33,15 +33,17 @@ public class PostService {
         private final TagService tagService;
         private final CommentRepository commentRepository;
         private final NicknameService nicknameService;
+        private final ViewLogService viewLogService;
 
         public PostService(PostRepository postRepository, LikeRepository likeRepository,
                         TagService tagService, CommentRepository commentRepository,
-                        NicknameService nicknameService) {
+                        NicknameService nicknameService, ViewLogService viewLogService) {
                 this.postRepository = postRepository;
                 this.likeRepository = likeRepository;
                 this.tagService = tagService;
                 this.commentRepository = commentRepository;
                 this.nicknameService = nicknameService;
+                this.viewLogService = viewLogService;
         }
 
         // 通常投稿を作成する（タグも一緒に保存）
@@ -176,16 +178,37 @@ public class PostService {
                 return result;
         }
 
-        // === 投稿詳細を1件取得（いいね数・自分のいいね有無つき）===
         public PostResponse getPost(Long id, User viewer) {
                 Post post = postRepository.findById(id)
                                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "投稿が見つかりません"));
 
-                // TODO(F-120): 閲覧ログ(view_logs)に1件記録する（誰がいつ見たか）
+                // 閲覧を記録（F-120）。失敗しても表示は続行
+                viewLogService.record(viewer.getId(), id);
 
                 long likeCount = likeRepository.countByPostId(id);
                 boolean likedByMe = likeRepository.existsByUserIdAndPostId(viewer.getId(), id);
                 String nickname = nicknameService.nicknameMapOf(viewer).get(post.getAuthor().getHandle());
                 return PostResponse.from(post, likeCount, likedByMe, commentRepository.countByPostId(id), nickname);
+        }
+
+        // 検索画面用
+        public List<PostResponse> getRecentPosts(User viewer, int limit) {
+
+                Pageable pageable = PageRequest.of(0, limit);
+
+                List<Post> posts = postRepository.findRecentPosts(pageable);
+
+                Map<String, String> nickMap = nicknameService.nicknameMapOf(viewer);
+
+                return posts.stream()
+                                .map(p -> PostResponse.from(
+                                                p,
+                                                likeRepository.countByPostId(p.getId()),
+                                                likeRepository.existsByUserIdAndPostId(
+                                                                viewer.getId(),
+                                                                p.getId()),
+                                                commentRepository.countByPostId(p.getId()),
+                                                nickMap.get(p.getAuthor().getHandle())))
+                                .toList();
         }
 }
