@@ -4,6 +4,7 @@ import java.util.Map;
 import jakarta.validation.Valid;
 import noa.dto.PostCreateRequest;
 import noa.dto.PostResponse;
+import noa.dto.search.SearchResponse;
 import noa.entity.Post;
 import noa.security.CustomUserDetails;
 import noa.service.PostService;
@@ -54,5 +55,22 @@ public class PostController {
         if (principal == null)
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "ログインが必要です");
         return postService.getPost(id, principal.getUser());
+    }
+
+    //空検索時、最新10件表示用
+    @GetMapping("/search/recent-posts")
+    public SearchResponse recentPosts(
+            @RequestParam(defaultValue = "10") int limit,
+            @AuthenticationPrincipal CustomUserDetails principal) {
+
+        if (principal == null) {
+            throw new ResponseStatusException(
+                    HttpStatus.UNAUTHORIZED,
+                    "ログインが必要です");
+        }
+
+        return postService.getRecentPosts(
+                principal.getUser(),
+                limit);
     }
 }
