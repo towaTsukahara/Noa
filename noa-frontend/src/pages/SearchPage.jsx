@@ -323,9 +323,9 @@ export default function SearchPage() {
                                 </span>
 
                                 <button
-                                    className="btn"
+                                    className={`btn ${isFollowed ? "btn-ghost" : ""}`}
                                     onClick={() => toggleFollow(tag.name)}>
-                                    {isFollowed ? "フォローをやめる" : "フォローする"}
+                                    {isFollowed ? "フォロー中 ✓" : "フォローする"}
                                 </button>
 
                             </div>
