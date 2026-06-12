@@ -66,12 +66,22 @@
   padding: 16px 0;
 }
 
+.search-area {
+  position: relative;
+}
+
 .search-suggestions {
-  margin: 0 22px;
+  position: absolute;
+  top: 100%;
+  left: 22px;
+  right: 22px;
+
   background: var(--card);
   border: 1px solid var(--line);
   border-radius: var(--r-md);
   overflow: hidden;
+
+  z-index: 100;
 }
 
 .search-suggestion {
