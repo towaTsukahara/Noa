@@ -1,0 +1,18 @@
+.detail-panel {
+    border-left: 1px solid var(--line);
+    background: var(--panel);
+    height: 100vh;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+}
+.detail-panel-head {
+    padding: 14px 18px;
+    border-bottom: 1px solid var(--line2);
+    flex: none;
+}
+.detail-panel-body {
+    padding: 18px;
+    overflow-y: auto;
+    flex: 1;
+}

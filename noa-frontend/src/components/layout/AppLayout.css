@@ -1,11 +1,16 @@
-/* AppLayout — アプリ全体のシェル（左レール + メイン列）
-   構造: .layout > (.sidebar | .main > (.header + <Outlet/>)) */
+/* AppLayout — アプリ全体のシェル（左レール + メイン列 + 右詳細パネル）
+   構造: .layout > (.sidebar | .main > (.header + <Outlet/>) | .detail-panel?) */
 
 .layout {
   height: 100vh;
   display: grid;
   grid-template-columns: 242px 1fr;
   background: var(--bg);
+}
+
+/* ?post があるとき＝右に詳細パネル（3カラム） */
+.layout.has-detail {
+  grid-template-columns: 242px 1fr 380px;
 }
 
 .main {
@@ -18,5 +23,8 @@
 @media (max-width: 1000px) {
   .layout {
     grid-template-columns: 74px 1fr;
+  }
+  .layout.has-detail {
+    grid-template-columns: 74px 1fr 380px;
   }
 }
