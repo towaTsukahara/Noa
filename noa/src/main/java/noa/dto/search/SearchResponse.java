@@ -6,7 +6,8 @@ import noa.dto.PostResponse;
 
 public record SearchResponse(
     List<PostResponse> posts,
-    List<SearchTagResponse> tags
+    List<SearchTagResponse> tags,
+    boolean hasMorePosts
 ) {
     
 }
