@@ -55,6 +55,11 @@ export default function AdminDashboardPage() {
         <div className="admin page">
             <h2 className="page-title">管理ダッシュボード</h2>
             <div className="sub-note">管理者専用。ユーザーの状態確認・対応を行います。</div>
+            <div className="admin-nav">
+                <button className="btn-ghost" onClick={() => navigate("/admin/reports")}>
+                    通報管理へ →
+                </button>
+            </div>
 
             {loading && <p className="empty-note">読み込み中...</p>}
             {error && <p className="empty-note">{error}</p>}
