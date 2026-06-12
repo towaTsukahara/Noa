@@ -23,6 +23,7 @@ public class TagService {
         this.tagRepository = tagRepository;
         this.profileUserTagRepository = profileUserTagRepository;
     }
+
     public List<TagResponse> search(String q) {
         if (q == null || q.isBlank())
             return tagRepository.findAll()
@@ -67,8 +68,7 @@ public class TagService {
             if (profileUserTagRepository.existsByUserIdAndTagIdAndCategory(
                     request.getUserId(),
                     tag.getId(),
-                    request.getCategory()
-                )) {
+                    request.getCategory())) {
                 continue;
             }
 
@@ -87,8 +87,14 @@ public class TagService {
     }
 
     public Tag findById(Long id) {
-        return tagRepository.findById(id).orElseThrow(() ->
-            new RuntimeException("Tag not found"));
+        return tagRepository.findById(id).orElseThrow(() -> new RuntimeException("Tag not found"));
     }
 
+    //空検索用
+    public List<TagResponse> getRandomTags(int limit) {
+        return tagRepository.findRandomTags(limit)
+                .stream()
+                .map(TagResponse::from)
+                .toList();
+    }
 }

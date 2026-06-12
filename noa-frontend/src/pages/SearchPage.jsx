@@ -114,6 +114,28 @@ export default function SearchPage() {
         }
     };
 
+    const fetchRandomTags = async (limit = 10) => {
+        try {
+            const response = await fetch(
+                `/api/v1/tags/random?limit=${limit}`,
+                {
+                    credentials: "include",
+                }
+            );
+
+            if (!response.ok) {
+                throw new Error("タグ取得失敗");
+            }
+
+            const data = await response.json();
+
+            setTags(data);
+
+        } catch (error) {
+            console.error(error);
+        }
+    };
+
     const handleSearch = async () => {
         setShowSuggestions(false);
 
@@ -122,7 +144,13 @@ export default function SearchPage() {
         setPostLimit(10);
 
         if (!word) {
-            await fetchRecentPosts(10);
+
+            if (selectedTab === "posts") {
+                await fetchRecentPosts(10);
+            } else {
+                await fetchRandomTags(10);
+            }
+
             return;
         }
 
@@ -312,7 +340,12 @@ export default function SearchPage() {
                 </button>
                 <button
                     className={`tab ${selectedTab === "tags" ? "active" : ""}`}
-                    onClick={() => setSelectedTab("tags")}
+                    onClick={() => {
+                        setSelectedTab("tags");
+                        if (!keyword.trim()) {
+                            fetchRandomTags(10);
+                        }
+                    }}
                 >
                     タグ
                 </button>
