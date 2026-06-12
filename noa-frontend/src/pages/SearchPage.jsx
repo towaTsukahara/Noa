@@ -79,6 +79,9 @@ export default function SearchPage() {
 
             console.log("posts =", data.posts);
 
+            console.log("response", data);
+            console.log("hasMorePosts", data.hasMorePosts);
+
             data.posts.forEach((post) => {
                 console.log("post", post.id);
                 console.log("replyCount", post.replyCount);
@@ -107,7 +110,8 @@ export default function SearchPage() {
 
             const data = await response.json();
 
-            setPosts(data);
+            setPosts(data.posts);
+            setHasMorePosts(data.hasMorePosts);
 
         } catch (error) {
             console.error(error);
@@ -177,8 +181,6 @@ export default function SearchPage() {
         if (keywordFromUrl) {
             setKeyword(keywordFromUrl);
             search(keywordFromUrl);
-        } else {
-            fetchRecentPosts(10);
         }
     }, []);
 
