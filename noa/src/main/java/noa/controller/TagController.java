@@ -42,4 +42,11 @@ public class TagController {
         return Map.of("status", "ok");
     }
 
+    // 空検索時、ランダムで10件表示
+    @GetMapping("/tags/random")
+    public List<TagResponse> randomTags(
+            @RequestParam(defaultValue = "10") int limit) {
+
+        return tagService.getRandomTags(limit);
+    }
 }
