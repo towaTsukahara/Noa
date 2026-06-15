@@ -46,7 +46,7 @@ export default function AdminUserDetailPage() {
         try {
             await api(`/admin/posts/${postId}`, { method: "DELETE" });
             await loadPosts();
-        } catch (e) { alert("削除に失敗しました。"); }
+        } catch (e) { ErrorBanner("削除に失敗しました。"); }
     };
 
     const handleDeleteComment = async (commentId) => {
@@ -54,7 +54,7 @@ export default function AdminUserDetailPage() {
         try {
             await api(`/admin/comments/${commentId}`, { method: "DELETE" });
             await loadComments();
-        } catch (e) { alert("削除に失敗しました。"); }
+        } catch (e) { ErrorBanner("削除に失敗しました。"); }
     };
 
     return (
@@ -78,10 +78,15 @@ export default function AdminUserDetailPage() {
                 <>
                     {posts.length === 0 && <p className="empty-note">生きている投稿はありません。</p>}
                     {posts.map((p) => (
-                        <div key={p.id} className="mini-post">
+                        <div
+                            key={p.id}
+                            className="mini-post"
+                            onClick={() => navigate(`?post=${p.id}`)}
+                            style={{ cursor: "pointer" }}
+                        >
                             <div className="admin-post-head">
                                 <span className="user-handle">{p.authorHandle}</span>
-                                <button className="btn-danger admin-btn-sm" onClick={() => handleDeletePost(p.id)}>削除</button>
+                                <button className="btn-danger admin-btn-sm" onClick={(e) => { e.stopPropagation(); handleDeletePost(p.id); }}>削除</button>
                             </div>
                             <div className="mini-body">{p.body}</div>
                             <div className="mini-meta">
@@ -108,7 +113,7 @@ export default function AdminUserDetailPage() {
                             <div className="mini-meta">
                                 <span
                                     style={{ cursor: "pointer", color: "var(--accent)" }}
-                                    onClick={() => navigate(`/post/${c.postId}`)}
+                                    onClick={() => navigate(`?post=${c.postId}`)}
                                 >
                                     元の投稿を見る →
                                 </span>

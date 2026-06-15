@@ -53,7 +53,7 @@ export default function FollowPage() {
             await api(`/users/${handle}/follow`, { method: "DELETE" });
             setUsers((prev) => prev.filter((u) => u.handle !== handle));
         } catch (e) {
-            alert("解除に失敗しました。");
+            ErrorBanner("解除に失敗しました。");
         }
     };
 
@@ -64,7 +64,7 @@ export default function FollowPage() {
             await api(`/tags/${encodeURIComponent(name)}/follow`, { method: "DELETE" });
             setTags((prev) => prev.filter((t) => t.name !== name));
         } catch (e) {
-            alert("解除に失敗しました。");
+            ErrorBanner("解除に失敗しました。");
         }
     };
 

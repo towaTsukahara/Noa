@@ -146,7 +146,7 @@ export default function TagDetailPage() {
                     </div>
 
                     <Link
-                        to={`/post/${post.id}`}
+                        to={`?post=${post.id}`}
                         className="search-title"
                     >
                         詳細を見る
