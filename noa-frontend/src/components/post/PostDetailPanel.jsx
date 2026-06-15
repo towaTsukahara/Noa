@@ -69,7 +69,7 @@ export default function PostDetailPanel() {
             });
             await loadComments();
         } catch (error) {
-            alert("返信できませんでした。");
+            ErrorBanner("返信できませんでした。");
         }
     };
 
@@ -78,7 +78,7 @@ export default function PostDetailPanel() {
             await api(`/comments/${commentId}`, { method: "DELETE" });
             await loadComments();
         } catch (e) {
-            alert("削除できませんでした。");
+            ErrorBanner("削除できませんでした。");
         }
     };
 
@@ -108,7 +108,7 @@ export default function PostDetailPanel() {
 
                         <div className="detail-tags">
                             {post.tags?.map((tag) => (
-                                <span key={tag} className="tag">#{tag}</span>
+                                <span key={tag.id} className="tag">#{tag.name}</span>
                             ))}
                         </div>
 

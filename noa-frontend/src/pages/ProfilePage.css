@@ -178,3 +178,13 @@
 .profile-comment:hover {
   background: var(--accent-bg);
 }
+
+.mini-time {
+  font-size: 11px;
+  color: var(--faint);
+  margin-left: auto;
+}
+.mini-comment-label {
+  font-size: 11px;
+  color: var(--soft);
+}

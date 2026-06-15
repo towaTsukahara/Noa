@@ -383,7 +383,7 @@ export default function SearchPage() {
                             </p>
 
                             <Link
-                                to={`/post/${post.id}`}
+                                to={`?post=${post.id}`}
                                 className="post-detail-link"
                             >
                                 詳細...

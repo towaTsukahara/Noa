@@ -2,26 +2,23 @@ import { useState } from "react";
 import { api } from "../../api/client";
 import "./ReportModal.css";
 
-// 通報モーダル。targetType("POST"/"COMMENT")とtargetIdを受け取り、理由を入れて送信。
 export default function ReportModal({ targetType, targetId, onClose }) {
     const [reason, setReason] = useState("");
     const [submitting, setSubmitting] = useState(false);
     const [done, setDone] = useState(false);
+    const [error, setError] = useState(null); // エラーメッセージ
 
     const handleSubmit = async () => {
         setSubmitting(true);
+        setError(null); // 送信前にエラーをクリア
         try {
             await api("/reports", {
                 method: "POST",
                 body: JSON.stringify({ targetType, targetId, reason: reason.trim() || null }),
             });
-            setDone(true); // 送信完了表示
+            setDone(true);
         } catch (e) {
-            if (e?.status === 409) {
-                alert("すでに通報済みです。");
-            } else {
-                alert("通報に失敗しました。");
-            }
+            setError(e.message || "通報に失敗しました。");
         } finally {
             setSubmitting(false);
         }
@@ -49,6 +46,9 @@ export default function ReportModal({ targetType, targetId, onClose }) {
                             placeholder="例: 誹謗中傷、スパムなど"
                             maxLength={500}
                         />
+
+                        {error && <p className="report-error">{error}</p>}
+
                         <div className="report-actions">
                             <button className="btn-quiet" onClick={onClose}>やめる</button>
                             <button className="btn-danger" onClick={handleSubmit} disabled={submitting}>
