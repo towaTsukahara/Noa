@@ -9,6 +9,7 @@ function PostComposePage({ onClose, onPosted }) {
   const [submitting, setSubmitting] = useState(false);
   const [suggestions, setSuggestions] = useState([]);
   const [selectedTags, setSelectedTags] = useState([]);
+  const [activeIndex, setActiveIndex] = useState(-1);
 
   const handleSubmit = async () => {
     setError(null);
@@ -38,10 +39,92 @@ function PostComposePage({ onClose, onPosted }) {
         `/tags?q=${encodeURIComponent(keyword)}`
       );
 
-      setSuggestions(result);
+      setSuggestions(result.slice(0, 5));
     } catch (e) {
       console.error(e);
     }
+  };
+
+  const handleTagKeyDown = (e) => {
+    if (e.key === "ArrowDown") {
+      e.preventDefault();
+
+      setActiveIndex((prev) =>
+        Math.min(
+          prev + 1,
+          optionCount - 1
+        )
+      );
+      return;
+    }
+
+    if (e.key === "ArrowUp") {
+      e.preventDefault();
+
+      setActiveIndex((prev) => {
+        if (prev <= 0) {
+          return -1;
+        }
+        return prev - 1;
+      });
+      return;
+    }
+
+    if (e.key === "Enter") {
+      e.preventDefault();
+
+      // ↓選択中
+      if (
+        activeIndex >= 0 &&
+        activeIndex < suggestions.length
+      ) {
+        addTag(
+          suggestions[activeIndex].name
+        );
+        return;
+      }
+
+      // 候補1件目
+      if (suggestions.length > 0) {
+        addTag(suggestions[0].name);
+        return;
+      }
+
+      // 新規作成
+      if (showCreateTag &&
+        activeIndex === suggestions.length
+      ) {
+        addTag(tagsInput.trim());
+        return;
+      }
+    }
+  };
+
+  const showCreateTag =
+    tagsInput.trim().length > 0 &&
+    !suggestions.some(
+      (s) =>
+        s.name.toLowerCase() ===
+        tagsInput.trim().toLowerCase()
+    );
+    
+  const optionCount =
+    suggestions.length +
+    (showCreateTag ? 1 : 0);
+
+  const addTag = (tagName) => {
+    if (!tagName) return;
+
+    if (!selectedTags.includes(tagName)) {
+      setSelectedTags((prev) => [
+        ...prev,
+        tagName,
+      ]);
+    }
+
+    setTagsInput("");
+    setSuggestions([]);
+    setActiveIndex(-1);
   };
 
   return (
@@ -91,31 +174,37 @@ function PostComposePage({ onClose, onPosted }) {
               setTagsInput(value)
               searchTags(value);
             }}
+            onKeyDown={handleTagKeyDown}
             placeholder="タグ（カンマ区切り。例: React, 質問）"
           />
 
-          {suggestions.length > 0 && (
+          {(suggestions.length > 0 || showCreateTag) && (
             <ul className="tag-suggestions">
-              {suggestions.map((tag) => (
+              {suggestions.map((tag, index) => (
                 <li
+                  className={
+                    index === activeIndex ? "active" : ""
+                  }
                   key={tag.id}
-                  onClick={() => {
-                    if (
-                      !selectedTags.includes(tag.name)
-                    ) {
-                      setSelectedTags([
-                        ...selectedTags,
-                        tag.name,
-                      ]);
-                    }
-
-                    setTagsInput("");
-                    setSuggestions([]);
-                  }}
+                  onClick={() => addTag(tag.name)}
                 >
                   {tag.name}
                 </li>
               ))}
+              {showCreateTag && (
+                <li
+                  className={
+                    activeIndex === suggestions.length
+                      ? "create-tag active"
+                      : "create-tag"
+                  }
+                  onClick={() =>
+                    addTag(tagsInput.trim())
+                  }
+                >
+                  ＋ "{tagsInput}" を新規作成
+                </li>
+              )}
             </ul>
           )}
         </div>
