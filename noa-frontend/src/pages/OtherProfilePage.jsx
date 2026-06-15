@@ -66,7 +66,7 @@ export default function OtherProfilePage() {
       setEditingNick(false);
       await load(); // 表示を更新（nicknameが反映される）
     } catch (e) {
-      ErrorBanner("ニックネームの保存に失敗しました。");
+      setError("ニックネームの保存に失敗しました。");
     }
   };
 

@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react";
-import { useSearchParams } from "react-router-dom";
+import { useSearchParams, useNavigate } from "react-router-dom";
 import { api } from "../../api/client";
 import { useAuth } from "../../context/AuthContext";
 import "./PostDetailPanel.css";
@@ -21,6 +21,7 @@ export default function PostDetailPanel() {
     const [reportTarget, setReportTarget] = useState(null);
 
     const commentRef = useRef(null);
+    const navigate = useNavigate();
 
     // パネルを閉じる＝?post を消す
     const close = () => {
@@ -69,7 +70,7 @@ export default function PostDetailPanel() {
             });
             await loadComments();
         } catch (error) {
-            ErrorBanner("返信できませんでした。");
+            setError("返信できませんでした。");
         }
     };
 
@@ -78,7 +79,7 @@ export default function PostDetailPanel() {
             await api(`/comments/${commentId}`, { method: "DELETE" });
             await loadComments();
         } catch (e) {
-            ErrorBanner("削除できませんでした。");
+            setError("削除できませんでした。");
         }
     };
 
@@ -108,7 +109,14 @@ export default function PostDetailPanel() {
 
                         <div className="detail-tags">
                             {post.tags?.map((tag) => (
-                                <span key={tag.id} className="tag">#{tag.name}</span>
+                                <span
+                                    key={tag.id}
+                                    className="tag"
+                                    style={{ cursor: "pointer" }}
+                                    onClick={() => navigate(`/tag/${tag.id}`)}
+                                >
+                                    #{tag.name}
+                                </span>
                             ))}
                         </div>
 

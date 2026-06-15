@@ -4,6 +4,7 @@ import { api } from "../api/client";
 import { useAuth } from "../context/AuthContext";
 import { relativeTime } from "../utils/relativeTime";
 import "./ProfilePage.css";
+import ExpandableText from "../components/common/ExpandableText";
 import heart_filled from '/icons/heart_filled.svg';
 import heart from '/icons/heart.svg';
 import reply from '/icons/reply.svg';
@@ -29,6 +30,8 @@ function ProfilePage() {
 
     // ===== プロフィール表示部（F-104・別担当のためモックのまま） =====
     const [profile, setProfile] = useState(null);
+
+    const [error, setError] = useState(null);
 
     // 自分の投稿をAPIから取得
     const loadPosts = async () => {
@@ -85,7 +88,7 @@ function ProfilePage() {
             loadPosts(); // 削除後に一覧を再読込
             loadProfile(); //削除後にプロフィール情報再取得
         } catch (e) {
-            ErrorBanner("削除できませんでした。");
+            setError("削除できませんでした。");
         }
     };
 
@@ -121,7 +124,7 @@ function ProfilePage() {
                 )
             );
         } catch (e) {
-            ErrorBanner("いいねできませんでした。");
+            setError("いいねできませんでした。");
         }
     };
 
@@ -148,7 +151,7 @@ function ProfilePage() {
                 )
             );
         } catch (e) {
-            ErrorBanner("いいねできませんでした。");
+            setError("いいねできませんでした。");
         }
     };
 
@@ -178,17 +181,16 @@ function ProfilePage() {
             onClick={() => navigate(`?post=${post.id}`)}
             style={{ cursor: "pointer" }}
         >
-            <div className="mini-body">{post.body}</div>
+            <div className="mini-body">
+                <ExpandableText text={post.body} clampLines={5} />
+            </div>
             <div className="mini-meta">
+                <span className="mini-time">{relativeTime(post.createdAt)}</span>
                 <button
                     className={`mini-like ${post.likedByMe ? "liked" : ""}`}
                     onClick={(e) => { e.stopPropagation(); onLike(post); }}
                 >
-                    <img
-                        src={post.likedByMe ? heart_filled : heart}
-                        alt="いいね"
-                        className="icon-like"
-                    />
+                    <img src={post.likedByMe ? heart_filled : heart} alt="いいね" className="icon-like" />
                     <span>{post.likeCount}</span>
                 </button>
                 <span className="mini-reply">
@@ -203,11 +205,21 @@ function ProfilePage() {
                         <img src={trashcan} alt="削除" className="icon-delete" />
                     </button>
                 )}
-                <span className="mini-time">{relativeTime(post.createdAt)}</span>
             </div>
         </div>
     );
 
+    // 自分のコメントを削除（DELETE /comments/{id}）
+    const handleDeleteComment = async (commentId) => {
+        const isConfirmed = window.confirm("このコメントを削除しますか？");
+        if (!isConfirmed) return;
+        try {
+            await api(`/comments/${commentId}`, { method: "DELETE" });
+            loadMyComments(); // 削除後にコメント一覧を再読込
+        } catch (e) {
+            setError("削除できませんでした。");
+        }
+    };
 
     return (
         <div className="profile page">
@@ -314,10 +326,17 @@ function ProfilePage() {
                             onClick={() => navigate(`?post=${c.postId}`)}
                             style={{ cursor: "pointer" }}
                         >
-                            <div className="mini-body">{c.commentBody}</div>
+                            <div className="mini-body">
+                                <ExpandableText text={c.commentBody} clampLines={5} />
+                            </div>
                             <div className="mini-meta">
-                                <span className="mini-comment-label">コメント</span>
-                                <span className="mini-time">{relativeTime(c.createdAt)}</span>
+                                <span className="mini-time">{relativeTime(c.commentedAt)}</span>
+                                <button
+                                    className="mini-delete"
+                                    onClick={(e) => { e.stopPropagation(); handleDeleteComment(c.commentId); }}
+                                >
+                                    <img src={trashcan} alt="削除" className="icon-delete" />
+                                </button>
                             </div>
                         </div>
                     ))}

@@ -3,8 +3,9 @@ import "./TimelinePage.css";
 import "../components/post/LikeButton.css"; // インラインの .like-button 用
 import { api } from "../api/client";
 import UserHandle from "../components/user/UserHandle";
+import ExpandableText from "../components/common/ExpandableText";
 import { relativeTime } from "../utils/relativeTime";
-import { Link, useOutletContext, useSearchParams } from "react-router-dom";
+import { Link, useOutletContext, useSearchParams, useNavigate } from "react-router-dom";
 import heart_filled from '/icons/heart_filled.svg';
 import heart from '/icons/heart.svg';
 import reply from '/icons/reply.svg';
@@ -21,6 +22,7 @@ function TimelinePage() {
   const { lastPostedAt } = useOutletContext();
   const [searchParams, setSearchParams] = useSearchParams();
   const selectedId = searchParams.get("post"); // 今開いている投稿id（文字列）
+  const navigate = useNavigate();
 
   // 投稿を右パネルで開く（?post=123 を付ける）
   const openDetail = (postId) => {
@@ -53,7 +55,7 @@ function TimelinePage() {
       setPosts((prev) => [...prev, ...data.items]); // 既存の下に継ぎ足す
       setNextCursor(data.nextCursor);
     } catch (e) {
-      ErrorBanner("読み込みに失敗しました。");
+      setError("読み込みに失敗しました。");
     } finally {
       setLoadingMore(false);
     }
@@ -77,7 +79,7 @@ function TimelinePage() {
         )
       );
     } catch (e) {
-      ErrorBanner("いいねできませんでした。");
+      setError("いいねできませんでした。");
     }
   };
 
@@ -114,11 +116,18 @@ function TimelinePage() {
             </div>
           </div>
 
-          <p className="content">{post.body}</p>
+          <div className="content">
+            <ExpandableText text={post.body} clampLines={3} />
+          </div>
 
           <div className="tags">
             {post.tags.map((tag) => (
-              <span key={tag.id}>#{tag.name}</span>
+              <span
+                key={tag.id}
+                onClick={(e) => { e.stopPropagation(); navigate(`/tag/${tag.id}`); }}
+              >
+                #{tag.name}
+              </span>
             ))}
           </div>
 
