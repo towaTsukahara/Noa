@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { api } from "../api/client";
 import UserHandle from "../components/user/UserHandle";
+import ErrorBanner from "../components/common/ErrorBanner";
 import "./FollowPage.css";
 
 export default function FollowPage() {
@@ -13,6 +14,7 @@ export default function FollowPage() {
     const [users, setUsers] = useState([]);   // フォロー中ユーザー（UserSummary）
     const [tags, setTags] = useState([]);      // フォロー中タグ（{id, name}）
     const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
 
     // フォロー中のユーザーとタグを取得
     const load = async () => {
@@ -53,7 +55,7 @@ export default function FollowPage() {
             await api(`/users/${handle}/follow`, { method: "DELETE" });
             setUsers((prev) => prev.filter((u) => u.handle !== handle));
         } catch (e) {
-            ErrorBanner("解除に失敗しました。");
+            setError("解除に失敗しました。");
         }
     };
 
@@ -64,7 +66,7 @@ export default function FollowPage() {
             await api(`/tags/${encodeURIComponent(name)}/follow`, { method: "DELETE" });
             setTags((prev) => prev.filter((t) => t.name !== name));
         } catch (e) {
-            ErrorBanner("解除に失敗しました。");
+            setError("解除に失敗しました。");
         }
     };
 
@@ -72,6 +74,8 @@ export default function FollowPage() {
 
     return (
         <div className="follow page">
+            <ErrorBanner message={error} onClose={() => setError(null)} />
+
             <div className="follow-search">
                 <input
                     className="field"
@@ -107,6 +111,7 @@ export default function FollowPage() {
                             {/* 名前クリックで相手プロフィールへ */}
                             <span
                                 className="follow-name"
+                                style={{ cursor: "pointer" }}
                                 onClick={() => navigate(`/users/${u.handle}`)}
                             >
                                 <UserHandle user={u} />
@@ -125,7 +130,13 @@ export default function FollowPage() {
                     {filteredTags.length === 0 && <p>フォロー中のタグはありません。</p>}
                     {filteredTags.map((t) => (
                         <div key={t.id} className="row-between">
-                            <span className="follow-tag">#{t.name}</span>
+                            <span
+                                className="follow-tag"
+                                style={{ cursor: "pointer" }}
+                                onClick={() => navigate(`/tag/${t.id}`)}
+                            >
+                                #{t.name}
+                            </span>
                             <button className="btn btn-quiet" onClick={() => handleUnfollowTag(t.name)}>
                                 フォローをやめる
                             </button>

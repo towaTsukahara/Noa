@@ -1,11 +1,13 @@
 //名前変更予定
 import { useEffect, useState } from "react";
-import { useParams, Link } from "react-router-dom";
+import { Link, useParams, useNavigate } from "react-router-dom";
 import { relativeTime } from "../utils/relativeTime";
 
 import "./TagDetailPage.css";
 
 export default function TagDetailPage() {
+
+    const navigate = useNavigate();
 
     const [tag, setTag] = useState(null);
     const [loading, setLoading] = useState(true);
@@ -154,12 +156,15 @@ export default function TagDetailPage() {
 
                     <div className="tags">
                         {post.tags?.map((tag) => (
-                            <span key={tag.id}>
+                            <span
+                                key={tag.id}
+                                style={{ cursor: "pointer" }}
+                                onClick={() => navigate(`/tag/${tag.id}`)}
+                            >
                                 #{tag.name}
                             </span>
                         ))}
                     </div>
-
                     <div className="actions">
                         <button
                             onClick={() => handleLikeToggle(post)}

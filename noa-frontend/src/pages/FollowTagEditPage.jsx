@@ -51,7 +51,7 @@ const FollowTagEditPage = () => {
                 else next.delete(name);
                 return next;
             });
-            ErrorBanner("操作に失敗しました。");
+            setError("操作に失敗しました。");
         }
     };
 

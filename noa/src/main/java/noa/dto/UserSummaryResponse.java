@@ -17,12 +17,10 @@ public record UserSummaryResponse(
     public static UserSummaryResponse from(
             User u, Map<String, List<String>> tags,
             boolean isFollowing, String nickname) {
-        // TODO(F-104): 興味タグ(user_tags)が未実装のため現状は空。
-        // プロフィール実装後に user_tags から tech/hobby/cert を詰める。
-        //Map<String, List<String>> tags = Map.of(
-        //       "tech", List.of(),
-        //       "hobby", List.of(),
-        //       "cert", List.of());
-        return new UserSummaryResponse(u.getHandle(), u.getBio(), tags, isFollowing, nickname);
+        Map<String, List<String>> tagMap = Map.of(
+                "tech", List.of(),
+                "hobby", List.of(),
+                "cert", List.of());
+        return new UserSummaryResponse(u.getHandle(), u.getBio(), tagMap, isFollowing, nickname);
     }
 }
