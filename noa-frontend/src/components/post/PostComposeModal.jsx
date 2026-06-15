@@ -7,20 +7,16 @@ function PostComposePage({ onClose, onPosted }) {
   const [tagsInput, setTagsInput] = useState("");
   const [error, setError] = useState(null);
   const [submitting, setSubmitting] = useState(false);
+  const [suggestions, setSuggestions] = useState([]);
+  const [selectedTags, setSelectedTags] = useState([]);
 
   const handleSubmit = async () => {
     setError(null);
     setSubmitting(true);
     try {
-      // "React, 質問" のような入力を ["React","質問"] に変換（空白・重複を除く）
-      const tags = tagsInput
-        .split(/[,、\s]+/)
-        .map((t) => t.trim())
-        .filter((t) => t.length > 0);
-
       const created = await api("/posts", {
         method: "POST",
-        body: JSON.stringify({ body, tags }),
+        body: JSON.stringify({ body, tags: selectedTags }),
       });
       if (onPosted) onPosted(created);
       if (onClose) onClose();
@@ -28,6 +24,23 @@ function PostComposePage({ onClose, onPosted }) {
       setError("投稿できませんでした。本文を確認してください（1〜1000文字）。");
     } finally {
       setSubmitting(false);
+    }
+  };
+
+  const searchTags = async (keyword) => {
+    if (!keyword.trim()) {
+      setSuggestions([]);
+      return;
+    }
+
+    try {
+      const result = await api(
+        `/tags?q=${encodeURIComponent(keyword)}`
+      );
+
+      setSuggestions(result);
+    } catch (e) {
+      console.error(e);
     }
   };
 
@@ -47,13 +60,65 @@ function PostComposePage({ onClose, onPosted }) {
           maxLength={1000}
         />
 
-        <input
-          type="text"
-          className="modal-tags"
-          value={tagsInput}
-          onChange={(e) => setTagsInput(e.target.value)}
-          placeholder="タグ（カンマ区切り。例: React, 質問）"
-        />
+        <div className="selected-tags">
+          {selectedTags.map((tag) => (
+            <span key={tag} className="tag-chip">
+              #{tag}
+
+              <button
+                type="button"
+                onClick={() =>
+                  setSelectedTags(
+                    selectedTags.filter(
+                      (t) => t !== tag
+                    )
+                  )
+                }
+              >
+                ×
+              </button>
+            </span>
+          ))}
+        </div>
+
+        <div className="tag-area">
+          <input
+            type="text"
+            className="modal-tags"
+            value={tagsInput}
+            onChange={(e) => {
+              const value = e.target.value;
+              setTagsInput(value)
+              searchTags(value);
+            }}
+            placeholder="タグ（カンマ区切り。例: React, 質問）"
+          />
+
+          {suggestions.length > 0 && (
+            <ul className="tag-suggestions">
+              {suggestions.map((tag) => (
+                <li
+                  key={tag.id}
+                  onClick={() => {
+                    if (
+                      !selectedTags.includes(tag.name)
+                    ) {
+                      setSelectedTags([
+                        ...selectedTags,
+                        tag.name,
+                      ]);
+                    }
+
+                    setTagsInput("");
+                    setSuggestions([]);
+                  }}
+                >
+                  {tag.name}
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
 
         <div className="modal-counter">{body.length}/1000</div>
 
