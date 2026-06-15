@@ -47,7 +47,7 @@ export default function AdminReportsPage() {
             await api(`/admin/reports/${r.id}/resolve`, { method: "POST" });
             await loadReports();
         } catch (e) {
-            alert("削除に失敗しました。");
+            ErrorBanner("削除に失敗しました。");
         }
     };
 
@@ -58,7 +58,7 @@ export default function AdminReportsPage() {
             await api(`/admin/reports/${reportId}/resolve`, { method: "POST" });
             await loadReports();
         } catch (e) {
-            alert("操作に失敗しました。");
+            ErrorBanner("操作に失敗しました。");
         }
     };
 
@@ -85,40 +85,40 @@ export default function AdminReportsPage() {
             )}
 
             {reports.map((r) => (
-                <div key={r.id} className="report-item">
-                    <div className="report-item-head">
-                        <span className={`report-type ${r.targetType === "POST" ? "is-post" : "is-comment"}`}>
-                            {r.targetType === "POST" ? "投稿" : "コメント"}
-                        </span>
-                        <span className={`admin-status ${r.status === "PENDING" ? "is-suspended" : "is-active"}`}>
-                            {r.status === "PENDING" ? "未対応" : "対応済み"}
-                        </span>
-                        <span className="report-time">{relativeTime(r.createdAt)}</span>
-                    </div>
-
-                    <div className="report-target-body">{r.targetBody}</div>
-
-                    <div className="report-meta">
-                        <span>通報者: {r.reporterHandle}</span>
-                        {r.reason && <span>理由: {r.reason}</span>}
-                    </div>
-
-                    {r.status === "PENDING" && (
-                        <div className="report-item-actions">
-                            <button className="btn-danger admin-btn-sm" onClick={() => handleDeleteTarget(r)}>
-                                対象を削除
-                            </button>
-                            <button className="btn-quiet admin-btn-sm" onClick={() => handleResolve(r.id)}>
-                                対応済みにする
-                            </button>
-                            {r.targetType === "POST" && (
-                                <button className="btn-ghost admin-btn-sm" onClick={() => navigate(`/post/${r.targetId}`)}>
-                                    投稿を見る
-                                </button>
-                            )}
-                        </div>
-                    )}
+                <div
+                key={r.id}
+                className="report-item"
+                onClick={() => r.postId && navigate(`?post=${r.postId}`)}
+                style={{ cursor: "pointer" }}
+            >
+                <div className="report-item-head">
+                    <span className={`report-type ${r.targetType === "POST" ? "is-post" : "is-comment"}`}>
+                        {r.targetType === "POST" ? "投稿" : "コメント"}
+                    </span>
+                    <span className={`admin-status ${r.status === "PENDING" ? "is-suspended" : "is-active"}`}>
+                        {r.status === "PENDING" ? "未対応" : "対応済み"}
+                    </span>
+                    <span className="report-time">{relativeTime(r.createdAt)}</span>
                 </div>
+
+                <div className="report-target-body">{r.targetBody}</div>
+
+                <div className="report-meta">
+                    <span>通報者: {r.reporterHandle}</span>
+                    {r.reason && <span>理由: {r.reason}</span>}
+                </div>
+
+                {r.status === "PENDING" && (
+                    <div className="report-item-actions">
+                        <button className="btn-danger admin-btn-sm" onClick={(e) => { e.stopPropagation(); handleDeleteTarget(r); }}>
+                            対象を削除
+                        </button>
+                        <button className="btn-quiet admin-btn-sm" onClick={(e) => { e.stopPropagation(); handleResolve(r.id); }}>
+                            対応済みにする
+                        </button>
+                    </div>
+                )}
+            </div>
             ))}
         </div>
     );

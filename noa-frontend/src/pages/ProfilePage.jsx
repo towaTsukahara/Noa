@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { api } from "../api/client";
 import { useAuth } from "../context/AuthContext";
+import { relativeTime } from "../utils/relativeTime";
 import "./ProfilePage.css";
 import heart_filled from '/icons/heart_filled.svg';
 import heart from '/icons/heart.svg';
@@ -84,7 +85,7 @@ function ProfilePage() {
             loadPosts(); // 削除後に一覧を再読込
             loadProfile(); //削除後にプロフィール情報再取得
         } catch (e) {
-            alert("削除できませんでした。");
+            ErrorBanner("削除できませんでした。");
         }
     };
 
@@ -120,7 +121,7 @@ function ProfilePage() {
                 )
             );
         } catch (e) {
-            alert("いいねできませんでした。");
+            ErrorBanner("いいねできませんでした。");
         }
     };
 
@@ -147,7 +148,7 @@ function ProfilePage() {
                 )
             );
         } catch (e) {
-            alert("いいねできませんでした。");
+            ErrorBanner("いいねできませんでした。");
         }
     };
 
@@ -171,12 +172,17 @@ function ProfilePage() {
         ));
 
     const renderPostCard = (post, onLike) => (
-        <div key={post.id} className="mini-post">
+        <div
+            key={post.id}
+            className="mini-post"
+            onClick={() => navigate(`?post=${post.id}`)}
+            style={{ cursor: "pointer" }}
+        >
             <div className="mini-body">{post.body}</div>
             <div className="mini-meta">
                 <button
                     className={`mini-like ${post.likedByMe ? "liked" : ""}`}
-                    onClick={() => onLike(post)}
+                    onClick={(e) => { e.stopPropagation(); onLike(post); }}
                 >
                     <img
                         src={post.likedByMe ? heart_filled : heart}
@@ -186,22 +192,18 @@ function ProfilePage() {
                     <span>{post.likeCount}</span>
                 </button>
                 <span className="mini-reply">
-                    <img
-                        src={reply}
-                        alt="返信"
-                        className="icon-reply"
-                    />
+                    <img src={reply} alt="返信" className="icon-reply" />
                     <span>{post.replyCount}</span>
                 </span>
                 {onLike === handleLikeToggle && (
-                    <button className="mini-delete" onClick={() => handleDelete(post.id)}>
-                        <img
-                            src={trashcan}
-                            alt="削除"
-                            className="icon-delete"
-                        />
+                    <button
+                        className="mini-delete"
+                        onClick={(e) => { e.stopPropagation(); handleDelete(post.id); }}
+                    >
+                        <img src={trashcan} alt="削除" className="icon-delete" />
                     </button>
                 )}
+                <span className="mini-time">{relativeTime(post.createdAt)}</span>
             </div>
         </div>
     );
@@ -309,9 +311,14 @@ function ProfilePage() {
                         <div
                             key={c.commentId}
                             className="mini-post profile-comment"
-                            onClick={() => navigate(`/post/${c.postId}`)}
+                            onClick={() => navigate(`?post=${c.postId}`)}
+                            style={{ cursor: "pointer" }}
                         >
                             <div className="mini-body">{c.commentBody}</div>
+                            <div className="mini-meta">
+                                <span className="mini-comment-label">コメント</span>
+                                <span className="mini-time">{relativeTime(c.createdAt)}</span>
+                            </div>
                         </div>
                     ))}
                 </>

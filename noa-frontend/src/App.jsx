@@ -9,7 +9,6 @@ import FollowTagEditPage from './pages/FollowTagEditPage';
 import ProfileEditPage from './pages/ProfileEditPage';
 import TagEditPage from './pages/TagEditPage';
 import OtherProfilePage from './pages/OtherProfilePage';
-import PostDetailPage from './pages/PostDetailPage';
 import AppLayout from './components/layout/AppLayout';
 import SearchPage from './pages/SearchPage';
 import TagDetailPage from './pages/TagDetailPage';

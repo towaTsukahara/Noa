@@ -39,7 +39,7 @@ const NotificationPage = () => {
                 <div
                     key={n.id}
                     className={`notif ${n.isRead ? "" : "unread"}`}
-                    onClick={() => navigate(`/post/${n.postId}`)}
+                    onClick={() => navigate(`?post=${n.postId}`)}
                     style={{ cursor: "pointer" }}
                 >
                     <div className={`notif-icon ${n.type === "LIKE" ? "is-like" : "is-reply"}`}>
