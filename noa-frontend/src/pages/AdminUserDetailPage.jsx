@@ -46,7 +46,7 @@ export default function AdminUserDetailPage() {
         try {
             await api(`/admin/posts/${postId}`, { method: "DELETE" });
             await loadPosts();
-        } catch (e) { ErrorBanner("削除に失敗しました。"); }
+        } catch (e) { setError("削除に失敗しました。"); }
     };
 
     const handleDeleteComment = async (commentId) => {
@@ -54,7 +54,7 @@ export default function AdminUserDetailPage() {
         try {
             await api(`/admin/comments/${commentId}`, { method: "DELETE" });
             await loadComments();
-        } catch (e) { ErrorBanner("削除に失敗しました。"); }
+        } catch (e) { setError("削除に失敗しました。"); }
     };
 
     return (

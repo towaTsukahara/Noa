@@ -88,85 +88,78 @@
   margin-top: 18px;
 }
 
-/* 投稿リスト内の削除ボタン */
-.mini-post .mini-delete {
+/* 投稿カードのメタ行（いいね・返信・削除・日時を1行に揃える） */
+.mini-meta {
+  display: flex;
+  align-items: center;
+  gap: 18px;
   margin-top: 10px;
-  border: 1px solid #e7d4d1;
-  background: #fff;
-  color: var(--danger);
-  font-family: inherit;
-  font-size: 12px;
-  font-weight: 500;
-  padding: 5px 12px;
-  border-radius: var(--r-sm);
-  cursor: pointer;
-  transition: background 0.12s, border-color 0.12s;
 }
 
-.mini-post .mini-delete:hover {
-  background: #f7ece9;
-  border-color: var(--danger);
-}
-
-/* 投稿タブのいいねボタン（インライン） */
-.mini-post .mini-like {
+/* いいね・返信：アイコン＋数字を同じ見た目に揃える */
+.mini-like,
+.mini-reply {
   display: inline-flex;
   align-items: center;
-  gap: 5px;
+  gap: 6px;
   border: none;
   background: none;
-  cursor: pointer;
+  padding: 0;
   font-family: inherit;
   font-size: 12.5px;
   color: var(--soft);
-  padding: 0;
   font-variant-numeric: tabular-nums;
 }
-
-.mini-post .mini-like:hover {
+.mini-like {
+  cursor: pointer;
+}
+.mini-like:hover {
   color: var(--like);
 }
-
-.mini-post .mini-like.liked {
+.mini-like.liked {
   color: var(--like);
   font-weight: 600;
 }
 
-/* アイコンサイズ */
-.icon-like,
-.icon-reply,
-.icon-delete {
-  width: 17px;
-  height: 17px;
-  display: block;
-}
-
-.mini-like,
-.mini-reply {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-}
-
+/* 削除：アイコンだけのボタン。いいね・返信と同じ高さに揃える */
 .mini-delete {
-  display: flex;
+  display: inline-flex;
   align-items: center;
   justify-content: center;
   border: none;
   background: transparent;
   cursor: pointer;
   padding: 4px;
+  border-radius: var(--r-sm);
   margin-left: auto;
 }
-
-/* hoverで赤くする（超おすすめ） */
+.mini-delete:hover {
+  background: rgba(176, 106, 90, 0.1);
+}
 .mini-delete:hover .icon-delete {
-  filter: invert(24%) sepia(93%) saturate(7425%) hue-rotate(355deg);
+  filter: invert(48%) sepia(18%) saturate(900%) hue-rotate(320deg);
 }
 
-/* hover全体 */
-.mini-delete:hover {
-  background: rgba(255, 0, 0, 0.08);
+/* 日時：右端に寄せる（唯一の margin-left: auto） */
+.mini-time {
+  font-size: 11px;
+  color: var(--faint);
+  font-variant-numeric: tabular-nums;
+}
+
+/* アイコンサイズ（いいね・返信・削除で統一） */
+.icon-like,
+.icon-reply,
+.icon-delete {
+  width: 16px;
+  height: 16px;
+  display: block;
+}
+
+/* コメントタブ用ラベル */
+.mini-comment-label {
+  font-size: 11px;
+  color: var(--soft);
 }
 
 /* コメントタブのカード（クリックで元投稿へ） */
@@ -174,17 +167,6 @@
   cursor: pointer;
   transition: background 0.12s;
 }
-
 .profile-comment:hover {
   background: var(--accent-bg);
-}
-
-.mini-time {
-  font-size: 11px;
-  color: var(--faint);
-  margin-left: auto;
-}
-.mini-comment-label {
-  font-size: 11px;
-  color: var(--soft);
 }

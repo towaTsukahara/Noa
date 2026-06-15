@@ -47,7 +47,7 @@ export default function AdminReportsPage() {
             await api(`/admin/reports/${r.id}/resolve`, { method: "POST" });
             await loadReports();
         } catch (e) {
-            ErrorBanner("削除に失敗しました。");
+            setError("削除に失敗しました。");
         }
     };
 
@@ -58,7 +58,7 @@ export default function AdminReportsPage() {
             await api(`/admin/reports/${reportId}/resolve`, { method: "POST" });
             await loadReports();
         } catch (e) {
-            ErrorBanner("操作に失敗しました。");
+            setError("操作に失敗しました。");
         }
     };
 

@@ -72,22 +72,13 @@
   text-align: right;
 }
 
-/* 本文。アバター(42)+gap(11)=53px ぶんインデント */
 .content {
   font-size: 14.5px;
   line-height: 1.76;
   color: #2b3038;
   padding-left: 53px;
-  white-space: pre-wrap;
-  overflow-wrap: anywhere;
-  /* 一覧では3行で省略 */
-  display: -webkit-box;
-  -webkit-line-clamp: 3;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
 }
 
-/* 「詳細...」への導線 */
 .post-detail-link {
   display: inline-block;
   margin: 6px 0 0 53px;
