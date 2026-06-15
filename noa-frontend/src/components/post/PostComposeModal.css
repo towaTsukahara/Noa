@@ -37,11 +37,13 @@
   border-bottom: 1px solid var(--line);
   margin: 0;
 }
+
 .modal-head h2 {
   font-size: 15px;
   font-weight: 600;
   color: var(--ink);
 }
+
 .modal-close {
   border: none;
   background: none;
@@ -51,6 +53,7 @@
   cursor: pointer;
   transition: color 0.12s;
 }
+
 .modal-close:hover {
   color: var(--ink);
 }
@@ -70,13 +73,19 @@
   padding: 18px 20px 6px;
   border-radius: 0;
 }
+
 .modal-textarea::placeholder {
   color: var(--faint);
 }
 
-.modal-tags {
-  width: calc(100% - 40px);
+.tag-area {
+  position: relative;
   margin: 4px 20px 0;
+}
+
+.modal-tags {
+  width: 100%;
+  margin: 0;
   font-family: var(--mono-font);
   font-size: 13px;
   color: var(--ink);
@@ -86,9 +95,72 @@
   padding: 9px 13px;
   outline: none;
 }
+
+.tag-suggestions {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  right: 0;
+
+  list-style: none;
+  margin: 0;
+  padding: 6px 0;
+
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: var(--r-md);
+
+  box-shadow: 0 8px 20px rgba(0, 0, 0, .08);
+
+  max-height: 180px;
+  overflow-y: auto;
+
+  z-index: 100;
+}
+
+.tag-suggestions li {
+  padding: 10px 14px;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.tag-suggestions li:hover {
+  background: var(--accent-bg);
+}
+
+.selected-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 12px 20px 8px;
+}
+
+.tag-chip {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+
+  padding: 4px 10px;
+
+  background: var(--accent-bg);
+  color: var(--accent);
+
+  border-radius: 999px;
+  font-size: 13px;
+}
+
+.tag-chip button {
+  border: none;
+  background: none;
+  cursor: pointer;
+  color: inherit;
+  padding: 0;
+}
+
 .modal-tags::placeholder {
   color: var(--faint);
 }
+
 .modal-tags:focus {
   border-color: var(--accent);
   box-shadow: 0 0 0 3px var(--accent-bg);
@@ -117,6 +189,7 @@
   border-top: 1px solid var(--line);
   background: #f6f3ec;
 }
+
 .modal-submit {
   padding: 10px 26px;
   border: none;
@@ -129,9 +202,11 @@
   cursor: pointer;
   transition: background 0.14s, opacity 0.14s;
 }
+
 .modal-submit:hover {
   background: var(--accent-d);
 }
+
 .modal-submit:disabled {
   opacity: 0.4;
   cursor: not-allowed;

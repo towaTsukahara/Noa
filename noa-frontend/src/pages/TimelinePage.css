@@ -186,3 +186,23 @@
   align-items: center;
   gap: 6px;
 }
+
+/* カード全体クリックで詳細を開く */
+.post-card {
+  cursor: pointer;
+  position: relative;
+}
+
+/* 選択中（右パネルで開いている）投稿 */
+.post-card.is-selected {
+  background: var(--accent-bg);
+}
+.post-card.is-selected::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 3px;
+  background: var(--accent);
+}

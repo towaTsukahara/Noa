@@ -9,7 +9,6 @@ import FollowTagEditPage from './pages/FollowTagEditPage';
 import ProfileEditPage from './pages/ProfileEditPage';
 import TagEditPage from './pages/TagEditPage';
 import OtherProfilePage from './pages/OtherProfilePage';
-import PostDetailPage from './pages/PostDetailPage';
 import AppLayout from './components/layout/AppLayout';
 import SearchPage from './pages/SearchPage';
 import TagDetailPage from './pages/TagDetailPage';
@@ -37,11 +36,9 @@ function App() {
           <Route path="/tags/skilledit" element={<TagEditPage type="skill" />} />
           <Route path="/tags/hobbyedit" element={<TagEditPage type="hobby" />} />
           <Route path="/tags/certedit" element={<TagEditPage type="cert" />} />
-          <Route path="/post/:id" element={<PostDetailPage />} />
           <Route path="/users/:handle" element={<OtherProfilePage />} />
           <Route path="/follow/tags" element={<FollowTagEditPage />} />
           <Route path="/search" element={<SearchPage />} />
-          <Route path="/posts/:id" element={<PostDetailPage />} />
           <Route path="/tag/:tagId" element={<TagDetailPage />} />
           <Route path="/notifications" element={<NotificationPage />} />
           <Route path="/admin" element={<AdminDashboardPage />} />

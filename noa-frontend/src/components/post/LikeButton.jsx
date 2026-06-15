@@ -23,7 +23,7 @@ function LikeButton({ postId, initialCount = 0, initialLiked = false }) {
       // 失敗したら元に戻す
       setLiked(!nextLiked);
       setCount((c) => (nextLiked ? c - 1 : c + 1));
-      alert("いいねできませんでした。");
+      ErrorBanner("いいねできませんでした。");
     } finally {
       setBusy(false);
     }
