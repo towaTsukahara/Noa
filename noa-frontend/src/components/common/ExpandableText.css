@@ -1,0 +1,23 @@
+.expandable-text {
+    font-size: inherit;
+    line-height: inherit;
+    color: inherit;
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+    margin: 0;
+}
+/* 折りたたみ時：指定行数で省略（行数は inline style の WebkitLineClamp で指定） */
+.expandable-text:not(.is-expanded) {
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+.expandable-toggle {
+    border: none;
+    background: none;
+    color: var(--accent);
+    cursor: pointer;
+    font-size: 12.5px;
+    padding: 4px 0 0;
+    font-weight: 600;
+}

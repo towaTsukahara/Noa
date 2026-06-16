@@ -1,6 +1,6 @@
 //名前変更予定
 import { useEffect, useState } from "react";
-import { useParams, useSearchParams, Link } from "react-router-dom";
+import { useParams, useSearchParams, useNavigate, Link } from "react-router-dom";
 import { relativeTime } from "../utils/relativeTime";
 import heart_filled from '/icons/heart_filled.svg';
 import heart from '/icons/heart.svg';
@@ -9,6 +9,8 @@ import reply from '/icons/reply.svg';
 import "./TagDetailPage.css";
 
 export default function TagDetailPage() {
+
+    const navigate = useNavigate();
 
     const [tag, setTag] = useState(null);
     const [searchParams, setSearchParams] = useSearchParams();
@@ -156,12 +158,15 @@ export default function TagDetailPage() {
 
                     <div className="tags">
                         {post.tags?.map((tag) => (
-                            <span key={tag.id}>
+                            <span
+                                key={tag.id}
+                                style={{ cursor: "pointer" }}
+                                onClick={() => navigate(`/tag/${tag.id}`)}
+                            >
                                 #{tag.name}
                             </span>
                         ))}
                     </div>
-
                     <div className="actions">
                         <button
                             className={`like-button ${post.likedByMe ? "liked" : ""}`}

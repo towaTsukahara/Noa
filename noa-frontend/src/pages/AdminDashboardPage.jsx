@@ -47,7 +47,7 @@ export default function AdminDashboardPage() {
             });
             await loadUsers(); // 一覧を再読込して状態を反映
         } catch (e) {
-            ErrorBanner(`${action}に失敗しました。`);
+            setError(`${action}に失敗しました。`);
         }
     };
 

@@ -28,7 +28,7 @@ function FollowButton({ handle, initialFollowing, onChanged }) {
       setFollowing(next);
       if (onChanged) onChanged(next);
     } catch (e) {
-      ErrorBanner("操作に失敗しました。");
+      setError("操作に失敗しました。");
     } finally {
       setBusy(false);
     }
