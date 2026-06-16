@@ -16,9 +16,17 @@ export default function SearchPage() {
     const [suggestions, setSuggestions] = useState([]);
     const [showSuggestions, setShowSuggestions] = useState(false);
     const [searchParams, setSearchParams] = useSearchParams();
+    const selectedId = searchParams.get("post"); // 今開いている投稿id（文字列）
 
     const navigate = useNavigate();
     const searchRef = useRef(null);
+
+    // 投稿を右パネルで開く（?post=123 を付ける）
+    const openDetail = (postId) => {
+        const next = new URLSearchParams(searchParams);
+        next.set("post", postId);
+        setSearchParams(next);
+    };
 
     const fetchSuggestions = async (value) => {
 
@@ -356,7 +364,11 @@ export default function SearchPage() {
             {selectedTab === "posts" ? (
                 <div className="search-results">
                     {posts.map((post) => (
-                        <article key={post.id} className="mini-post">
+                        <article
+                            key={post.id}
+                            className={`mini-post ${String(selectedId) === String(post.id) ? "is-selected" : ""}`}
+                            onClick={() => openDetail(post.id)}
+                        >
 
                             <div className="post-header">
                                 <div className="avatar"></div>
@@ -381,13 +393,6 @@ export default function SearchPage() {
                             <p className="search-snippet">
                                 {post.body}
                             </p>
-
-                            <Link
-                                to={`?post=${post.id}`}
-                                className="post-detail-link"
-                            >
-                                詳細...
-                            </Link>
 
                             <div className="tags">
                                 {post.tags.map((tag) => {
