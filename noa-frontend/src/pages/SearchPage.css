@@ -123,12 +123,35 @@
 .mini-post {
   padding: 16px 22px;
   border-bottom: 1px solid var(--line2);
+  cursor: pointer;
+  position: relative;
+}
+
+.mini-post:hover {
+  background: #f6f3ec;
+}
+
+/* 選択中（右パネルで開いている）投稿 */
+.mini-post.is-selected {
+  background: var(--accent-bg);
+}
+
+.mini-post.is-selected::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 3px;
+  background: var(--accent);
 }
 
 .row-between {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  cursor: pointer;
+  position: relative;
 }
 
 .tag-result {
@@ -162,15 +185,4 @@
   background: none;
   cursor: pointer;
   font-size: 13px;
-}
-
-.post-detail-link {
-  display: inline-block;
-  margin-top: 8px;
-  color: var(--accent);
-  text-decoration: none;
-}
-
-.post-detail-link:hover {
-  text-decoration: underline;
 }
