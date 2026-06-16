@@ -3,6 +3,9 @@ import { useState, useEffect, useRef } from "react";
 import { useNavigate, Link, useSearchParams } from "react-router-dom";
 import { relativeTime } from "../utils/relativeTime";
 import UserHandle from "../components/user/UserHandle";
+import heart_filled from '/icons/heart_filled.svg';
+import heart from '/icons/heart.svg';
+import reply from '/icons/reply.svg';
 import "./SearchPage.css";
 
 export default function SearchPage() {
@@ -396,7 +399,6 @@ export default function SearchPage() {
 
                             <div className="tags">
                                 {post.tags.map((tag) => {
-                                    console.log("rendering tag", tag);
 
                                     return (
                                         <span key={tag.id}>
@@ -407,15 +409,21 @@ export default function SearchPage() {
                             </div>
 
                             <div className="actions">
-                                <div style={{ marginTop: "20px" }}>
-                                    <button onClick={() => handleLikeToggle(post)}>
-                                        {post.likedByMe ? "♥" : "♡"} {post.likeCount}
-                                    </button>
-
-                                    <span style={{ marginLeft: "12px" }}>
-                                        💬 {post.replyCount}
-                                    </span>
-                                </div>
+                                <button
+                                    className={`like-button ${post.likedByMe ? "liked" : ""}`}
+                                    onClick={(e) => { e.stopPropagation(); handleLikeToggle(post); }}
+                                >
+                                    <img
+                                        src={post.likedByMe ? heart_filled : heart}
+                                        alt="いいね"
+                                        className="icon-like"
+                                    />
+                                    <span>{post.likeCount}</span>
+                                </button>
+                                <span className="reply">
+                                    <img src={reply} alt="返信" className="icon-reply" />
+                                    <span>{post.replyCount}</span>
+                                </span>
                             </div>
                         </article>
                     ))
