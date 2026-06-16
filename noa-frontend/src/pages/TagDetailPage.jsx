@@ -1,7 +1,10 @@
 //名前変更予定
 import { useEffect, useState } from "react";
-import { Link, useParams, useNavigate } from "react-router-dom";
+import { useParams, useSearchParams, useNavigate, Link } from "react-router-dom";
 import { relativeTime } from "../utils/relativeTime";
+import heart_filled from '/icons/heart_filled.svg';
+import heart from '/icons/heart.svg';
+import reply from '/icons/reply.svg';
 
 import "./TagDetailPage.css";
 
@@ -10,9 +13,18 @@ export default function TagDetailPage() {
     const navigate = useNavigate();
 
     const [tag, setTag] = useState(null);
+    const [searchParams, setSearchParams] = useSearchParams();
     const [loading, setLoading] = useState(true);
 
     const { tagId } = useParams();
+    const selectedId = searchParams.get("post"); // 今開いている投稿id（文字列）
+
+    // 投稿を右パネルで開く（?post=123 を付ける）
+    const openDetail = (postId) => {
+        const next = new URLSearchParams(searchParams);
+        next.set("post", postId);
+        setSearchParams(next);
+    };
 
     const fetchTag = async () => {
 
@@ -124,10 +136,6 @@ export default function TagDetailPage() {
 
             </div>
 
-            <div className="section-title">
-                投稿
-            </div>
-
             {tag.posts?.length === 0 && (
                 <p className="empty-note">
                     このタグの投稿はまだありません。
@@ -137,7 +145,8 @@ export default function TagDetailPage() {
             {tag.posts?.map((post) => (
                 <article
                     key={post.id}
-                    className="mini-post"
+                    className={`mini-post ${String(selectedId) === String(post.id) ? "is-selected" : ""}`}
+                    onClick={() => openDetail(post.id)}
                 >
                     <div className="search-date">
                         {relativeTime(post.createdAt)}
@@ -146,13 +155,6 @@ export default function TagDetailPage() {
                     <div className="search-snippet">
                         {post.body}
                     </div>
-
-                    <Link
-                        to={`?post=${post.id}`}
-                        className="search-title"
-                    >
-                        詳細を見る
-                    </Link>
 
                     <div className="tags">
                         {post.tags?.map((tag) => (
@@ -167,14 +169,19 @@ export default function TagDetailPage() {
                     </div>
                     <div className="actions">
                         <button
-                            onClick={() => handleLikeToggle(post)}
+                            className={`like-button ${post.likedByMe ? "liked" : ""}`}
+                            onClick={(e) => { e.stopPropagation(); handleLikeToggle(post); }}
                         >
-                            {post.likedByMe ? "♥" : "♡"}{" "}
-                            {post.likeCount}
+                            <img
+                                src={post.likedByMe ? heart_filled : heart}
+                                alt="いいね"
+                                className="icon-like"
+                            />
+                            <span>{post.likeCount}</span>
                         </button>
-
-                        <span>
-                            💬 {post.replyCount}
+                        <span className="reply">
+                            <img src={reply} alt="返信" className="icon-reply" />
+                            <span>{post.replyCount}</span>
                         </span>
                     </div>
                 </article>
