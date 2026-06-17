@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useSearchParams, useNavigate } from "react-router-dom";
 import { relativeTime } from "../utils/relativeTime";
 import MiniPostCard from "../components/post/MiniPostCard";
 import "./TagDetailPage.css";
