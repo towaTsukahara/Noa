@@ -11,6 +11,8 @@ const FollowTagEditPage = () => {
     const [allTags, setAllTags] = useState([]);          // 候補（GET /tags）
     const [followingNames, setFollowingNames] = useState(new Set()); // フォロー中タグ名
     const [loading, setLoading] = useState(true);
+    const [creating, setCreating] = useState(false);
+    const [activeIndex, setActiveIndex] = useState(-1);
 
     // 候補タグと、現在フォロー中のタグを取得
     const load = async () => {
@@ -60,6 +62,61 @@ const FollowTagEditPage = () => {
         return allTags.filter((t) => t.name.toLowerCase().includes(kw));
     }, [allTags, searchKeyword]);
 
+    const exactMatch = allTags.some(
+        (t) =>
+            t.name.toLowerCase() ===
+            searchKeyword.trim().toLowerCase()
+    );
+
+    const showCreateTag =
+        searchKeyword.trim().length > 0 &&
+        !exactMatch;
+
+    const createAndFollowTag = async () => {
+        const tagName = searchKeyword.trim();
+
+        if (!tagName) return;
+
+        const normalized = tagName.toLowerCase();
+
+        try {
+            await api(
+                `/tags/${encodeURIComponent(tagName)}/follow`,
+                {
+                    method: "POST",
+                }
+            );
+
+            // 即時反映
+            setAllTags((prev) => {
+                const exists = prev.some(
+                    (t) =>
+                        t.name.toLowerCase() === normalized
+                );
+
+                if (exists) return prev;
+
+                return [
+                    ...prev,
+                    {
+                        id: Date.now(),
+                        name: normalized,
+                    },
+                ];
+            });
+
+            setFollowingNames((prev) => {
+                const next = new Set(prev);
+                next.add(normalized);
+                return next;
+            });
+
+            setSearchKeyword("");
+        } catch (e) {
+            console.error(e);
+        }
+    };
+
     if (loading) return <div className="follow-tag-edit page"><p className="empty-note">読み込み中...</p></div>;
 
     return (
@@ -70,10 +127,52 @@ const FollowTagEditPage = () => {
                 <input
                     className="field"
                     type="text"
-                    placeholder="タグを検索"
+                    placeholder="タグを検索・新規作成"
                     value={searchKeyword}
-                    onChange={(e) => setSearchKeyword(e.target.value)}
+                    onChange={(e) => {
+                        setSearchKeyword(e.target.value);
+                        setActiveIndex(-1);
+                    }}
+                    onKeyDown={(e) => {
+                        if (!showCreateTag) return;
+
+                        if (e.key === "ArrowDown") {
+                            e.preventDefault();
+                            setActiveIndex(0);
+                            return;
+                        }
+
+                        if (e.key === "ArrowUp") {
+                            e.preventDefault();
+                            setActiveIndex(-1);
+                            return;
+                        }
+
+                        if (e.key === "Enter") {
+                            if (activeIndex === 0) {
+                                e.preventDefault();
+                                createAndFollowTag();
+                            }
+                        }
+                    }}
                 />
+
+                {showCreateTag && (
+                    <div className="create-tag-box">
+                        <button
+                            type="button"
+                            className={
+                                activeIndex === 0
+                                    ? "create-tag-btn active"
+                                    : "create-tag-btn"
+                            }
+                            onClick={createAndFollowTag}
+                            disabled={creating}
+                        >
+                            ＋ "{searchKeyword}" を新規作成
+                        </button>
+                    </div>
+                )}
             </div>
 
             <div className="tag-cloud">
