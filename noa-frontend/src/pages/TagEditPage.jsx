@@ -15,10 +15,9 @@ const TagEditPage = ({ type }) => {
 
     const [selected, setSelected] = useState(form[type] || []); // このカテゴリの選択中タグ
     const [q, setQ] = useState("");                          // 検索キーワード
+    const [createSelected, setCreateSelected] = useState(false);
     const [allTags, setAllTags] = useState([]);     // DBの全タグ
     const [candidates, setCandidates] = useState([]);          // DBから取得した候補
-    const [newTag, setNewTag] = useState("");
-    const [error, setError] = useState("");
 
     const removeSelected = (name) => {
         setSelected(selected.filter(t => t !== name));
@@ -57,12 +56,54 @@ const TagEditPage = ({ type }) => {
             : [...selected, name]);
     };
 
-    // 候補に無いタグを新規追加（DBへの作成は保存時＝PUT /me/profile の find-or-create）
     const addNew = () => {
-        const name = newTag.trim().toLowerCase();
-        if (name && !selected.includes(name)) setSelected([...selected, name]);
-        setNewTag("");
+        const name = q.trim().toLowerCase();
+
+        if (!name) return;
+
+        if (!selected.includes(name)) {
+            setSelected(prev => [...prev, name]);
+        }
+
+        setQ("");
     };
+
+    const handleKeyDown = (e) => {
+        if (!showCreateTag) return;
+
+        if (e.key === "ArrowDown") {
+            e.preventDefault();
+            setCreateSelected(true);
+            return;
+        }
+
+        if (e.key === "ArrowUp") {
+            e.preventDefault();
+            setCreateSelected(false);
+            return;
+        }
+
+        if (e.key === "Enter") {
+            e.preventDefault();
+
+            if (createSelected) {
+                addNew();
+            }
+        }
+    };
+
+    const showCreateTag =
+        q.trim().length > 0 &&
+        !candidates.some(
+            tag =>
+                tag.name.toLowerCase() ===
+                q.trim().toLowerCase()
+        ) &&
+        !selected.some(
+            tag =>
+                tag.toLowerCase() ===
+                q.trim().toLowerCase()
+        );
 
     //  DB保存
     const handleSave = async () => {
@@ -151,6 +192,37 @@ const TagEditPage = ({ type }) => {
                 <button className="btn" onClick={handleSave}>
                     保存（{selected.length}つ選択中）
                 </button>
+            </div>
+
+            {/* 検索 */}
+            <div className="edit-block">
+                <h3>検索・新規作成</h3>
+                <input
+                    className="field"
+                    value={q}
+                    onChange={(e) => {
+                        setQ(e.target.value);
+                        setCreateSelected(false);
+                    }}
+                    onKeyDown={handleKeyDown}
+                    placeholder="タグを検索・新規作成"
+                />
+
+                {showCreateTag && (
+                    <div className="create-tag-box">
+                        <button
+                            type="button"
+                            className={
+                                createSelected
+                                    ? "create-tag-btn active"
+                                    : "create-tag-btn"
+                            }
+                            onClick={addNew}
+                        >
+                            ＋ "{q}" を新規作成
+                        </button>
+                    </div>
+                )}
             </div>
 
             {/* タグ候補 */}

@@ -69,7 +69,7 @@ function ProfileEditPage() {
                         <span key={tag} className="tag">#{tag}</span>
                     ))}
                 </div>
-                <button onClick={() => editTags("skill")}>さらに表示</button>
+                <button onClick={() => editTags("skill")}>編集</button>
             </div >
 
             <div className="edit-block">
@@ -79,7 +79,7 @@ function ProfileEditPage() {
                         <span key={tag} className="tag">#{tag}</span>
                     ))}
                 </div>
-                <button onClick={() => editTags("hobby")}>さらに表示</button>
+                <button onClick={() => editTags("hobby")}>編集</button>
             </div >
 
             <div className="edit-block">
@@ -89,7 +89,7 @@ function ProfileEditPage() {
                         <span key={tag} className="tag">#{tag}</span>
                     ))}
                 </div>
-                <button onClick={() => editTags("cert")}>さらに表示</button>
+                <button onClick={() => editTags("cert")}>編集</button>
             </div >
 
             <div className="edit-actions">
