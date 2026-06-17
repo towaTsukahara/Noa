@@ -5,7 +5,7 @@ import { useAuth } from "../../context/AuthContext";
 import "./PostDetailPanel.css";
 
 import LikeButton from "./LikeButton";
-import CommentList from "./CommentList";
+import CommentNode from "./CommentNode";
 import CommentForm from "./CommentForm";
 import MoreMenu from "../common/MoreMenu";
 import ReportModal from "../report/ReportModal";
@@ -13,15 +13,16 @@ import ReportModal from "../report/ReportModal";
 export default function PostDetailPanel() {
     const [searchParams, setSearchParams] = useSearchParams();
     const postId = searchParams.get("post"); // ?post=123
+    const navigate = useNavigate();
     const { user } = useAuth();
 
     const [post, setPost] = useState(null);
     const [loading, setLoading] = useState(true);
     const [comments, setComments] = useState([]);
     const [reportTarget, setReportTarget] = useState(null);
+    const [replyingTo, setReplyingTo] = useState(null); // 返信中のコメントid
 
     const commentRef = useRef(null);
-    const navigate = useNavigate();
 
     // パネルを閉じる＝?post を消す
     const close = () => {
@@ -38,6 +39,7 @@ export default function PostDetailPanel() {
                 authorHandle: c.authorName,
                 authorNickname: c.authorNickname,
                 body: c.body,
+                parentCommentId: c.parentCommentId, // 親コメントid（ツリー用）
                 mine: user && c.authorName === user.handle,
             }))
         );
@@ -47,6 +49,7 @@ export default function PostDetailPanel() {
     useEffect(() => {
         if (!postId) return;
         setLoading(true);
+        setReplyingTo(null); // 投稿を切り替えたら返信状態をリセット
         const fetchAll = async () => {
             try {
                 const data = await api(`/posts/${postId}`);
@@ -62,6 +65,7 @@ export default function PostDetailPanel() {
         fetchAll();
     }, [postId]);
 
+    // トップレベルのコメント投稿
     const handleAddComment = async (text) => {
         try {
             await api(`/comments`, {
@@ -70,7 +74,25 @@ export default function PostDetailPanel() {
             });
             await loadComments();
         } catch (error) {
-            setError("返信できませんでした。");
+            alert("返信できませんでした。");
+        }
+    };
+
+    // 返信を送信（parentCommentId 付き）
+    const handleAddReply = async (parentCommentId, text) => {
+        try {
+            await api(`/comments`, {
+                method: "POST",
+                body: JSON.stringify({
+                    postId: Number(postId),
+                    body: text,
+                    parentCommentId: parentCommentId,
+                }),
+            });
+            setReplyingTo(null); // フォームを閉じる
+            await loadComments(); // 再読込してツリー更新
+        } catch (error) {
+            alert("返信できませんでした。");
         }
     };
 
@@ -79,12 +101,20 @@ export default function PostDetailPanel() {
             await api(`/comments/${commentId}`, { method: "DELETE" });
             await loadComments();
         } catch (e) {
-            setError("削除できませんでした。");
+            alert("削除できませんでした。");
         }
     };
 
     // ?post が無ければパネルごと非表示
     if (!postId) return null;
+
+    // コメントを親子のツリーに組み立てる（parentCommentId で分類）
+    const childrenMap = {};
+    for (const c of comments) {
+        const pid = c.parentCommentId ?? "root";
+        (childrenMap[pid] ||= []).push(c);
+    }
+    const topLevel = childrenMap["root"] || [];
 
     return (
         <aside className="detail-panel">
@@ -128,11 +158,23 @@ export default function PostDetailPanel() {
                             />
                         </div>
 
-                        <CommentList
-                            comments={comments}
-                            onDeleteComment={handleDeleteComment}
-                            onReportComment={(commentId) => setReportTarget({ type: "COMMENT", id: commentId })}
-                        />
+                        <div className="comments">
+                            <h3>コメント</h3>
+                            {topLevel.map((c) => (
+                                <CommentNode
+                                    key={c.id}
+                                    comment={c}
+                                    childrenMap={childrenMap}
+                                    depth={0}
+                                    onDeleteComment={handleDeleteComment}
+                                    onReportComment={(commentId) => setReportTarget({ type: "COMMENT", id: commentId })}
+                                    replyingTo={replyingTo}
+                                    setReplyingTo={setReplyingTo}
+                                    onAddReply={handleAddReply}
+                                />
+                            ))}
+                        </div>
+
                         <CommentForm ref={commentRef} onAddComment={handleAddComment} />
                     </>
                 )}

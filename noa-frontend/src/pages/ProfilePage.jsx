@@ -5,9 +5,8 @@ import { useAuth } from "../context/AuthContext";
 import { relativeTime } from "../utils/relativeTime";
 import "./ProfilePage.css";
 import ExpandableText from "../components/common/ExpandableText";
-import heart_filled from '/icons/heart_filled.svg';
-import heart from '/icons/heart.svg';
-import reply from '/icons/reply.svg';
+import ConfirmModal from "../components/common/ConfirmModal";
+import MiniPostCard from "../components/post/MiniPostCard";
 import trashcan from '/icons/trashcan.svg';
 
 function ProfilePage() {
@@ -15,27 +14,24 @@ function ProfilePage() {
     const { user } = useAuth();
     const [activeTab, setActiveTab] = useState("posts");
 
-    // ===== 自分の投稿（APIから取得） =====
     const [posts, setPosts] = useState([]);
     const [postsLoading, setPostsLoading] = useState(true);
     const [postsError, setPostsError] = useState(null);
 
-    // ===== 自分がいいねした投稿（F-111） =====
     const [likedPosts, setLikedPosts] = useState([]);
     const [likesLoading, setLikesLoading] = useState(false);
 
-    // ===== 自分のコメント（/comments/me） =====
     const [myComments, setMyComments] = useState([]);
     const [commentsLoading, setCommentsLoading] = useState(false);
 
-    // ===== プロフィール表示部（F-104・別担当のためモックのまま） =====
     const [profile, setProfile] = useState(null);
-
     const [error, setError] = useState(null);
 
-    // 自分の投稿をAPIから取得
+    // 確認モーダル（message と、OKしたら実行する関数を持つ）
+    const [confirm, setConfirm] = useState(null);
+
     const loadPosts = async () => {
-        if (!user) return; // ログイン情報の復元前は何もしない
+        if (!user) return;
         setPostsLoading(true);
         setPostsError(null);
         try {
@@ -52,7 +48,6 @@ function ProfilePage() {
         loadPosts();
     }, [user]);
 
-    // 自分がいいねした投稿を取得（F-111: GET /me/likes）
     const loadLikes = async () => {
         setLikesLoading(true);
         try {
@@ -65,11 +60,10 @@ function ProfilePage() {
         }
     };
 
-    // 自分のコメント一覧を取得（クリックで元投稿へ飛ぶ）
     const loadMyComments = async () => {
         setCommentsLoading(true);
         try {
-            const data = await api("/comments/me"); // MyCommentResponse[]
+            const data = await api("/comments/me");
             setMyComments(data);
         } catch (e) {
             // 失敗時は空のまま
@@ -78,21 +72,32 @@ function ProfilePage() {
         }
     };
 
-    // 投稿削除（F-108: 論理削除API。本人のみ204 / 他人は403）
-    const handleDelete = async (postId) => {
-        const isConfirmed = window.confirm("この投稿を削除しますか？");
-        if (!isConfirmed) return;
+    // 投稿削除：確認モーダルを開く
+    const handleDelete = (postId) => {
+        setConfirm({
+            message: "この投稿を削除しますか？この操作は取り消せません。",
+            onConfirm: async () => {
+                try {
+                    await api(`/posts/${postId}`, { method: "DELETE" });
+                    loadPosts();
+                    loadProfile();
+                } catch (e) {
+                    setError("削除できませんでした。");
+                }
+            },
+        });
+    };
 
+    // プロフィールのタグ（文字列）から、そのタグの投稿一覧へ
+    const goToTag = async (tagName) => {
         try {
-            await api(`/posts/${postId}`, { method: "DELETE" });
-            loadPosts(); // 削除後に一覧を再読込
-            loadProfile(); //削除後にプロフィール情報再取得
+            const data = await api(`/tags/by-name/${encodeURIComponent(tagName)}`);
+            navigate(`/tag/${data.id}`);
         } catch (e) {
-            setError("削除できませんでした。");
+            setError("タグを開けませんでした。");
         }
     };
 
-    //投稿・削除時、プロフィール情報再取得
     const loadProfile = async () => {
         try {
             const me = await api("/me");
@@ -106,7 +111,6 @@ function ProfilePage() {
         loadProfile();
     }, []);
 
-    // いいねのトグル（投稿タブ用。likedByMe で POST/DELETE を出し分け）
     const handleLikeToggle = async (post) => {
         try {
             await api(`/posts/${post.id}/like`, {
@@ -130,10 +134,9 @@ function ProfilePage() {
 
     const handleCommentsClick = () => {
         setActiveTab("comments");
-        loadMyComments(); // タブを開いたタイミングで取得
+        loadMyComments();
     };
 
-    // いいねタブの♥トグル（その場では一覧から消さず、押し直しできるようにする）
     const handleLikedTabToggle = async (post) => {
         try {
             await api(`/posts/${post.id}/like`, {
@@ -155,7 +158,6 @@ function ProfilePage() {
         }
     };
 
-    // ===== 画面遷移・タブ切替 =====
     const handleFollowClick = () => {
         navigate("/follow");
     };
@@ -166,64 +168,38 @@ function ProfilePage() {
 
     const handleLikesClick = () => {
         setActiveTab("likes");
-        loadLikes(); // タブを開いたタイミングで取得
+        loadLikes();
     };
 
     const renderTags = (arr) =>
         (arr || []).map((t) => (
-            <span key={t} className="tag">#{t}</span>
+            <span
+                key={t}
+                className="tag"
+                style={{ cursor: "pointer" }}
+                onClick={() => goToTag(t)}
+            >
+                #{t}
+            </span>
         ));
 
-    const renderPostCard = (post, onLike) => (
-        <div
-            key={post.id}
-            className="mini-post"
-            onClick={() => navigate(`?post=${post.id}`)}
-            style={{ cursor: "pointer" }}
-        >
-            <div className="mini-body">
-                <ExpandableText text={post.body} clampLines={5} />
-            </div>
-            <div className="mini-meta">
-                <span className="mini-time">{relativeTime(post.createdAt)}</span>
-                <button
-                    className={`mini-like ${post.likedByMe ? "liked" : ""}`}
-                    onClick={(e) => { e.stopPropagation(); onLike(post); }}
-                >
-                    <img src={post.likedByMe ? heart_filled : heart} alt="いいね" className="icon-like" />
-                    <span>{post.likeCount}</span>
-                </button>
-                <span className="mini-reply">
-                    <img src={reply} alt="返信" className="icon-reply" />
-                    <span>{post.replyCount}</span>
-                </span>
-                {onLike === handleLikeToggle && (
-                    <button
-                        className="mini-delete"
-                        onClick={(e) => { e.stopPropagation(); handleDelete(post.id); }}
-                    >
-                        <img src={trashcan} alt="削除" className="icon-delete" />
-                    </button>
-                )}
-            </div>
-        </div>
-    );
-
-    // 自分のコメントを削除（DELETE /comments/{id}）
-    const handleDeleteComment = async (commentId) => {
-        const isConfirmed = window.confirm("このコメントを削除しますか？");
-        if (!isConfirmed) return;
-        try {
-            await api(`/comments/${commentId}`, { method: "DELETE" });
-            loadMyComments(); // 削除後にコメント一覧を再読込
-        } catch (e) {
-            setError("削除できませんでした。");
-        }
+    // コメント削除：確認モーダルを開く
+    const handleDeleteComment = (commentId) => {
+        setConfirm({
+            message: "このコメントを削除しますか？",
+            onConfirm: async () => {
+                try {
+                    await api(`/comments/${commentId}`, { method: "DELETE" });
+                    loadMyComments();
+                } catch (e) {
+                    setError("削除できませんでした。");
+                }
+            },
+        });
     };
 
     return (
         <div className="profile page">
-            {/* ===== プロフィール表示部（F-104・モックのまま） ===== */}
             <div className="profile-hero">
                 <div className="profile-hero-top">
                     <div className="avatar is-lg"></div>
@@ -267,7 +243,6 @@ function ProfilePage() {
                 </div>
             </div>
 
-            {/* ===== タブ ===== */}
             <div className="tabs">
                 <button
                     className={`tab ${activeTab === "posts" ? "active" : ""}`}
@@ -289,7 +264,6 @@ function ProfilePage() {
                 </button>
             </div>
 
-            {/* ===== 投稿タブ ===== */}
             {activeTab === "posts" && (
                 <>
                     {postsLoading && <p className="empty-note">読み込み中...</p>}
@@ -297,22 +271,35 @@ function ProfilePage() {
                     {!postsLoading && !postsError && posts.length === 0 && (
                         <p className="empty-note">まだ投稿がありません。</p>
                     )}
-                    {posts.map((post) => renderPostCard(post, handleLikeToggle))}
+                    {posts.map((post) => (
+                        <MiniPostCard
+                            key={post.id}
+                            post={post}
+                            onLike={handleLikeToggle}
+                            onDelete={(p) => handleDelete(p.id)}
+                            showAuthor={false}
+                        />
+                    ))}
                 </>
             )}
 
-            {/* ===== いいねタブ（F-111: /me/likes） ===== */}
             {activeTab === "likes" && (
                 <>
                     {likesLoading && <p className="empty-note">読み込み中...</p>}
                     {!likesLoading && likedPosts.length === 0 && (
                         <p className="empty-note">いいねした投稿はありません。</p>
                     )}
-                    {likedPosts.map((post) => renderPostCard(post, handleLikedTabToggle))}
+                    {likedPosts.map((post) => (
+                        <MiniPostCard
+                            key={post.id}
+                            post={post}
+                            onLike={handleLikedTabToggle}
+                            showAuthor={false}
+                        />
+                    ))}
                 </>
             )}
 
-            {/* ===== コメントタブ（/comments/me。クリックで元投稿へ） ===== */}
             {activeTab === "comments" && (
                 <>
                     {commentsLoading && <p className="empty-note">読み込み中...</p>}
@@ -342,6 +329,15 @@ function ProfilePage() {
                     ))}
                 </>
             )}
+
+            <ConfirmModal
+                open={confirm !== null}
+                title="確認"
+                message={confirm?.message}
+                confirmLabel="削除する"
+                onConfirm={() => { confirm.onConfirm(); setConfirm(null); }}
+                onCancel={() => setConfirm(null)}
+            />
         </div>
     );
 }

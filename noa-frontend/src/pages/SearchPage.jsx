@@ -3,6 +3,7 @@ import { useState, useEffect, useRef } from "react";
 import { useNavigate, Link, useSearchParams } from "react-router-dom";
 import { relativeTime } from "../utils/relativeTime";
 import UserHandle from "../components/user/UserHandle";
+import MiniPostCard from "../components/post/MiniPostCard";
 import "./SearchPage.css";
 
 export default function SearchPage() {
@@ -356,72 +357,15 @@ export default function SearchPage() {
             {selectedTab === "posts" ? (
                 <div className="search-results">
                     {posts.map((post) => (
-                        <article key={post.id} className="mini-post">
-
-                            <div className="post-header">
-                                <div className="avatar"></div>
-
-                                <div>
-                                    <div className="nickname">
-                                        <Link
-                                            to={`/users/${post.author?.handle}`}
-                                        >
-                                            <UserHandle
-                                                user={post.author ?? { handle: "Unknown" }}
-                                            />
-                                        </Link>
-                                    </div>
-
-                                    <div className="search-date">
-                                        {relativeTime(post.createdAt)}
-                                    </div>
-                                </div>
-                            </div>
-
-                            <p className="search-snippet">
-                                {post.body}
-                            </p>
-
-                            <Link
-                                to={`?post=${post.id}`}
-                                className="post-detail-link"
-                            >
-                                詳細...
-                            </Link>
-
-                            <div className="tags">
-                                {post.tags.map((tag) => {
-                                    console.log("rendering tag", tag);
-
-                                    return (
-                                        <span key={tag.id}>
-                                            #{tag.name}
-                                        </span>
-                                    );
-                                })}
-                            </div>
-
-                            <div className="actions">
-                                <div style={{ marginTop: "20px" }}>
-                                    <button onClick={() => handleLikeToggle(post)}>
-                                        {post.likedByMe ? "♥" : "♡"} {post.likeCount}
-                                    </button>
-
-                                    <span style={{ marginLeft: "12px" }}>
-                                        💬 {post.replyCount}
-                                    </span>
-                                </div>
-                            </div>
-                        </article>
-                    ))
-                    }
-
+                        <MiniPostCard
+                            key={post.id}
+                            post={post}
+                            onLike={handleLikeToggle}
+                        />
+                    ))}
                     {hasMorePosts && (
                         <div style={{ textAlign: "center", marginTop: "20px" }}>
-                            <button
-                                className="btn"
-                                onClick={handleLoadMorePosts}
-                            >
+                            <button className="btn" onClick={handleLoadMorePosts}>
                                 もっと見る
                             </button>
                         </div>

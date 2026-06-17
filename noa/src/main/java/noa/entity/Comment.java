@@ -27,6 +27,11 @@ public class Comment {
     @Column(name = "created_at", nullable = false, insertable = false, updatable = false)
     private OffsetDateTime createdAt;
 
+    // 親コメント（返信先）。null ならトップレベルのコメント
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "parent_comment_id")
+    private Comment parentComment;
+
     // getter / setter
 
     public Long getId() {
@@ -59,5 +64,13 @@ public class Comment {
 
     public OffsetDateTime getCreatedAt() {
         return createdAt;
+    }
+
+    public Comment getParentComment() {
+        return parentComment;
+    }
+
+    public void setParentComment(Comment parentComment) {
+        this.parentComment = parentComment;
     }
 }

@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { api } from "../api/client";
 import UserHandle from "../components/user/UserHandle";
 import ErrorBanner from "../components/common/ErrorBanner";
+import ConfirmModal from "../components/common/ConfirmModal";
 import "./FollowPage.css";
 
 export default function FollowPage() {
@@ -11,18 +12,18 @@ export default function FollowPage() {
     const [activeTab, setActiveTab] = useState("user");
     const [searchKeyword, setSearchKeyword] = useState("");
 
-    const [users, setUsers] = useState([]);   // フォロー中ユーザー（UserSummary）
-    const [tags, setTags] = useState([]);      // フォロー中タグ（{id, name}）
+    const [users, setUsers] = useState([]);
+    const [tags, setTags] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+    const [confirm, setConfirm] = useState(null);
 
-    // フォロー中のユーザーとタグを取得
     const load = async () => {
         setLoading(true);
         try {
-            const u = await api("/me/following");        // { items, nextCursor }
+            const u = await api("/me/following");
             setUsers(u.items);
-            const t = await api("/me/following/tags");   // [{ id, name }]
+            const t = await api("/me/following/tags");
             setTags(t);
         } catch (e) {
             // 失敗時は空のまま
@@ -35,7 +36,6 @@ export default function FollowPage() {
         load();
     }, []);
 
-    // 検索（取得済みデータをフロントで絞り込む）
     const filteredUsers = useMemo(() => {
         const kw = searchKeyword.toLowerCase();
         return users.filter((u) =>
@@ -48,26 +48,34 @@ export default function FollowPage() {
         return tags.filter((t) => t.name.toLowerCase().includes(kw));
     }, [searchKeyword, tags]);
 
-    // ユーザーのフォロー解除
-    const handleUnfollowUser = async (handle) => {
-        if (!window.confirm("フォローを解除しますか？")) return;
-        try {
-            await api(`/users/${handle}/follow`, { method: "DELETE" });
-            setUsers((prev) => prev.filter((u) => u.handle !== handle));
-        } catch (e) {
-            setError("解除に失敗しました。");
-        }
+    // ユーザーのフォロー解除：確認モーダルを開く
+    const handleUnfollowUser = (handle) => {
+        setConfirm({
+            message: "フォローを解除しますか？",
+            onConfirm: async () => {
+                try {
+                    await api(`/users/${handle}/follow`, { method: "DELETE" });
+                    setUsers((prev) => prev.filter((u) => u.handle !== handle));
+                } catch (e) {
+                    setError("解除に失敗しました。");
+                }
+            },
+        });
     };
 
-    // タグのフォロー解除
-    const handleUnfollowTag = async (name) => {
-        if (!window.confirm(`#${name} のフォローを解除しますか？`)) return;
-        try {
-            await api(`/tags/${encodeURIComponent(name)}/follow`, { method: "DELETE" });
-            setTags((prev) => prev.filter((t) => t.name !== name));
-        } catch (e) {
-            setError("解除に失敗しました。");
-        }
+    // タグのフォロー解除：確認モーダルを開く
+    const handleUnfollowTag = (name) => {
+        setConfirm({
+            message: `#${name} のフォローを解除しますか？`,
+            onConfirm: async () => {
+                try {
+                    await api(`/tags/${encodeURIComponent(name)}/follow`, { method: "DELETE" });
+                    setTags((prev) => prev.filter((t) => t.name !== name));
+                } catch (e) {
+                    setError("解除に失敗しました。");
+                }
+            },
+        });
     };
 
     if (loading) return <div className="follow page"><p className="empty-note">読み込み中...</p></div>;
@@ -86,7 +94,6 @@ export default function FollowPage() {
                 />
             </div>
 
-            {/* タブ切替（件数は取得した配列の長さ） */}
             <div className="tabs">
                 <button
                     className={`tab ${activeTab === "user" ? "active" : ""}`}
@@ -108,7 +115,6 @@ export default function FollowPage() {
                     {filteredUsers.length === 0 && <p>フォロー中のユーザーはいません。</p>}
                     {filteredUsers.map((u) => (
                         <div key={u.handle} className="row-between">
-                            {/* 名前クリックで相手プロフィールへ */}
                             <span
                                 className="follow-name"
                                 style={{ cursor: "pointer" }}
@@ -151,6 +157,15 @@ export default function FollowPage() {
             <div className="edit-actions" style={{ justifyContent: "flex-start" }}>
                 <button className="btn btn-quiet" onClick={() => navigate("/profile")}>戻る</button>
             </div>
+
+            <ConfirmModal
+                open={confirm !== null}
+                title="確認"
+                message={confirm?.message}
+                confirmLabel="解除する"
+                onConfirm={() => { confirm.onConfirm(); setConfirm(null); }}
+                onCancel={() => setConfirm(null)}
+            />
         </div>
     );
 }
