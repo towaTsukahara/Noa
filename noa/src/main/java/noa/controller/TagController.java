@@ -47,6 +47,14 @@ public class TagController {
         return tagDetailService.getTag(principal.getUser(), id);
     }
 
+    // タグ名で詳細を引く（プロフィールの文字列タグから飛ぶ用）
+    @GetMapping("/tags/by-name/{name}")
+    public TagDetailResponse getTagByName(
+            @PathVariable String name,
+            @AuthenticationPrincipal CustomUserDetails principal) {
+        return tagDetailService.getTagByName(principal.getUser(), name);
+    }
+
     @PostMapping("/tags/save")
     public Map<String, String> save(@Valid @RequestBody SaveTagRequest req) {
 

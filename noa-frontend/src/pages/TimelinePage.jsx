@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import "./TimelinePage.css";
+import MiniPostCard from "../components/post/MiniPostCard";
 import "../components/post/LikeButton.css"; // インラインの .like-button 用
 import { api } from "../api/client";
 import UserHandle from "../components/user/UserHandle";
@@ -95,60 +96,12 @@ function TimelinePage() {
       {!loading && !error && posts.length === 0 && <p>まだ投稿がありません。</p>}
 
       {posts.map((post) => (
-        <article
+        <MiniPostCard
           key={post.id}
-          className={`post-card ${String(selectedId) === String(post.id) ? "is-selected" : ""}`}
-          onClick={() => openDetail(post.id)}
-        >
-          <div className="post-header">
-            <div className="avatar"></div>
-            <div>
-              <div className="nickname">
-                <Link
-                  to={`/users/${post.author.handle}`}
-                  className="author-link"
-                  onClick={(e) => e.stopPropagation()}
-                >
-                  <UserHandle user={post.author} />
-                </Link>
-              </div>
-              <div className="date">{relativeTime(post.createdAt)}</div>
-            </div>
-          </div>
-
-          <div className="content">
-            <ExpandableText text={post.body} clampLines={3} />
-          </div>
-
-          <div className="tags">
-            {post.tags.map((tag) => (
-              <span
-                key={tag.id}
-                onClick={(e) => { e.stopPropagation(); navigate(`/tag/${tag.id}`); }}
-              >
-                #{tag.name}
-              </span>
-            ))}
-          </div>
-
-          <div className="actions">
-            <button
-              className={`like-button ${post.likedByMe ? "liked" : ""}`}
-              onClick={(e) => { e.stopPropagation(); handleLikeToggle(post); }}
-            >
-              <img
-                src={post.likedByMe ? heart_filled : heart}
-                alt="いいね"
-                className="icon-like"
-              />
-              <span>{post.likeCount}</span>
-            </button>
-            <span className="reply">
-              <img src={reply} alt="返信" className="icon-reply" />
-              <span>{post.replyCount}</span>
-            </span>
-          </div>
-        </article>
+          post={post}
+          onLike={handleLikeToggle}
+          isSelected={String(selectedId) === String(post.id)}
+        />
       ))}
 
       {nextCursor && !loading && (

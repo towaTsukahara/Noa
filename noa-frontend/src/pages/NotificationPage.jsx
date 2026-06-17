@@ -25,6 +25,20 @@ const NotificationPage = () => {
         load();
     }, []);
 
+    // 通知の種類ごとの文言
+    const notifText = (type) => {
+        switch (type) {
+            case "LIKE":
+                return "あなたの投稿にいいねがありました";
+            case "REPLY":
+                return "あなたの投稿に返信がありました";
+            case "REPLY_TO_COMMENT":
+                return "あなたのコメントに返信がありました";
+            default:
+                return "新しい通知があります";
+        }
+    };
+
     return (
         <div className="notifications page">
             <h2 className="page-title">通知</h2>
@@ -46,9 +60,7 @@ const NotificationPage = () => {
                         {n.type === "LIKE" ? "♥" : "@"}
                     </div>
                     <div className="notif-main">
-                        <div className="notif-text">
-                            あなたの投稿に{n.type === "LIKE" ? "いいねがありました" : "返信がありました"}
-                        </div>
+                        <div className="notif-text">{notifText(n.type)}</div>
                         <div className="notif-snippet">{n.postBody}</div>
                         <div className="notif-time">{relativeTime(n.createdAt)}</div>
                     </div>
