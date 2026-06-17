@@ -7,6 +7,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.server.ResponseStatusException;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 
 import java.time.OffsetDateTime;
 
@@ -27,6 +28,27 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(ex.getStatusCode()).body(body);
     }
 
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity<ErrorResponse> handleValidation(
+            MethodArgumentNotValidException ex,
+            HttpServletRequest req) {
+
+        String message = ex.getBindingResult()
+                .getFieldErrors()
+                .stream()
+                .findFirst()
+                .map(error -> error.getDefaultMessage())
+                .orElse("入力値が不正です");
+
+        ErrorResponse body = new ErrorResponse(
+                400,
+                message,
+                req.getRequestURI(),
+                OffsetDateTime.now());
+
+        return ResponseEntity.badRequest().body(body);
+    }
+
     // 想定外の例外（バグ等）。詳細はサーバーログにだけ出し、クライアントには汎用メッセージ
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorResponse> handleUnexpected(
@@ -35,7 +57,7 @@ public class GlobalExceptionHandler {
         ex.printStackTrace();
         ErrorResponse body = new ErrorResponse(
                 500,
-                "サーバーでエラーが発生しました",   // クライアントには内部情報を見せない
+                "サーバーでエラーが発生しました", // クライアントには内部情報を見せない
                 req.getRequestURI(),
                 OffsetDateTime.now());
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(body);

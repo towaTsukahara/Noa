@@ -12,22 +12,32 @@
   padding: 16px 22px;
   border-bottom: 1px solid var(--line2);
 }
+
 .tag-edit .edit-block h3 {
   font-size: 12.5px;
   font-weight: 600;
   color: var(--soft);
   margin-bottom: 10px;
 }
+
 .tag-edit .new-tag-row {
   display: flex;
   gap: 10px;
 }
+
 .tag-edit .new-tag-row input {
   flex: 1;
 }
+
 .tag-edit .tag-cloud {
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
   padding: 16px 22px;
+}
+
+.error-message {
+  color: red;
+  margin: 12px 0;
+  font-size: 14px;
 }

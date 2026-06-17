@@ -17,6 +17,7 @@ const TagEditPage = ({ type }) => {
     const [allTags, setAllTags] = useState([]);     // DBの全タグ
     const [candidates, setCandidates] = useState([]);          // DBから取得した候補
     const [newTag, setNewTag] = useState("");
+    const [error, setError] = useState("");
 
     const removeSelected = (name) => {
         setSelected(selected.filter(t => t !== name));
@@ -86,6 +87,7 @@ const TagEditPage = ({ type }) => {
 
         } catch (err) {
             console.error(err);
+            setError(err.message || "保存に失敗しました")
         }
     };
 
@@ -134,6 +136,11 @@ const TagEditPage = ({ type }) => {
                 </div>
             </div>
 
+            {error && (
+                <p className="error-message">
+                    {error}
+                </p>
+            )}
             <div className="edit-actions">
                 <button className="btn btn-quiet" onClick={() => navigate("/profile/edit", { state: { form } })}>
                     キャンセル

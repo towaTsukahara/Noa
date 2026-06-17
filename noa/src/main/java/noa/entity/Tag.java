@@ -12,7 +12,7 @@ public class Tag {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false, unique = true, length = 100)
+    @Column(nullable = false, unique = true, length = 30)
     private String name;
 
     @Column(name = "created_at", nullable = false, insertable = false, updatable = false)
