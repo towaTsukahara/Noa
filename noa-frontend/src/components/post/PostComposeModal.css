@@ -216,3 +216,8 @@
   opacity: 0.4;
   cursor: not-allowed;
 }
+
+.tag-count {
+    text-align: right;
+    margin-top: 4px;
+}

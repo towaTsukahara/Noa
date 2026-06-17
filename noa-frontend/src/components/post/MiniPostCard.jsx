@@ -35,7 +35,14 @@ export default function MiniPostCard({
         >
             {showAuthor && (
                 <div className="post-header">
-                    <div className="avatar"></div>
+                    <div
+                        className="avatar"
+                        style= {{cursor: "pointer"}}
+                        onClick={(e) => {
+                            e.stopPropagation();
+                            navigate(`/users/${post.author.handle}`);
+                        }}
+                        ></div>
                     <div>
                         <div className="nickname">
                             <Link

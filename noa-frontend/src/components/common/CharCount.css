@@ -1,0 +1,12 @@
+.char-count {
+    font-size: 11.5px;
+    color: var(--faint);
+    font-variant-numeric: tabular-nums;
+}
+.char-count.is-near {
+    color: var(--like);
+}
+.char-count.is-over {
+    color: var(--danger);
+    font-weight: 600;
+}

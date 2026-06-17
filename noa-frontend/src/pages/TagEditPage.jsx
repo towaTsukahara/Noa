@@ -1,6 +1,7 @@
 import { useNavigate, useLocation } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { api } from "../api/client";
+import CharCount from "../components/common/CharCount";
 import "./TagEditPage.css";
 
 const LABEL = { skill: "技術スタックタグ", hobby: "興味タグ", cert: "趣味タグ" };
@@ -131,9 +132,11 @@ const TagEditPage = ({ type }) => {
                         value={newTag}
                         onChange={(e) => setNewTag(e.target.value)}
                         placeholder="新しいタグ名"
+                        maxLength={30}
                     />
                     <button className="btn btn-ghost" onClick={addNew}>新規追加</button>
                 </div>
+                <CharCount current={newTag.length} max={30} />
             </div>
 
             {error && (
