@@ -128,6 +128,7 @@ const TagEditPage = ({ type }) => {
 
         } catch (err) {
             console.error(err);
+            setError(err.message || "保存に失敗しました")
         }
     };
 

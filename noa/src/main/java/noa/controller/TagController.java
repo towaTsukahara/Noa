@@ -1,18 +1,30 @@
 package noa.controller;
 
-import java.util.*;
-import org.springframework.web.bind.annotation.*;
+import java.util.List;
+import java.util.Map;
+
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import noa.dto.TagResponse;
-import noa.dto.TagDetailResponse;
-import noa.security.CustomUserDetails;
-import noa.service.TagService;
-import noa.service.TagDetailService;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
+import jakarta.validation.Valid;
+
 import noa.dto.SaveTagRequest;
+import noa.dto.TagDetailResponse;
+import noa.dto.TagResponse;
+import noa.security.CustomUserDetails;
+import noa.service.TagDetailService;
+import noa.service.TagService;
 
 @RestController
 @RequestMapping("/api/v1")
 public class TagController {
+
     private final TagService tagService;
     private final TagDetailService tagDetailService;
 
@@ -44,13 +56,13 @@ public class TagController {
     }
 
     @PostMapping("/tags/save")
-    public Map<String, String> save(@RequestBody SaveTagRequest req) {
+    public Map<String, String> save(@Valid @RequestBody SaveTagRequest req) {
+
         tagService.saveTags(req);
 
         return Map.of("status", "ok");
     }
 
-    // 空検索時、ランダムで10件表示
     @GetMapping("/tags/random")
     public List<TagResponse> randomTags(
             @RequestParam(defaultValue = "10") int limit) {
