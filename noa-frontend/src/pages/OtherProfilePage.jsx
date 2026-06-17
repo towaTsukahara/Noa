@@ -3,8 +3,12 @@ import { useParams, useNavigate } from "react-router-dom";
 import { api } from "../api/client";
 import { useAuth } from "../context/AuthContext";
 import FollowButton from "../components/user/FollowButton";
+import MiniPostCard from "../components/post/MiniPostCard";
 import { relativeTime } from "../utils/relativeTime";
 import "./OtherProfilePage.css";
+import heart_filled from '/icons/heart_filled.svg';
+import heart from '/icons/heart.svg';
+import reply from '/icons/reply.svg';
 
 export default function OtherProfilePage() {
   const { handle } = useParams(); // URLの /users/:handle から取得
@@ -18,7 +22,6 @@ export default function OtherProfilePage() {
 
   const [editingNick, setEditingNick] = useState(false); // ニックネーム編集モードか
   const [nickInput, setNickInput] = useState("");        // 入力中のニックネーム
-
 
   // 自分自身のhandleなら自分のプロフィールへ
   useEffect(() => {
@@ -55,7 +58,6 @@ export default function OtherProfilePage() {
     try {
       const trimmed = nickInput.trim();
       if (trimmed === "") {
-        // 空で保存＝削除
         await api(`/users/${handle}/nickname`, { method: "DELETE" });
       } else {
         await api(`/users/${handle}/nickname`, {
@@ -64,7 +66,7 @@ export default function OtherProfilePage() {
         });
       }
       setEditingNick(false);
-      await load(); // 表示を更新（nicknameが反映される）
+      await load();
     } catch (e) {
       setError("ニックネームの保存に失敗しました。");
     }
@@ -75,6 +77,77 @@ export default function OtherProfilePage() {
     setNickInput(profile.nickname || "");
     setEditingNick(true);
   };
+
+  // プロフィールのタグ（文字列）から、そのタグの投稿一覧へ
+  const goToTag = async (tagName) => {
+    try {
+      const data = await api(`/tags/by-name/${encodeURIComponent(tagName)}`);
+      navigate(`/tag/${data.id}`);
+    } catch (e) {
+      setError("タグを開けませんでした。");
+    }
+  };
+
+  // いいねのトグル（他人の投稿にいいね／取消）
+  const handleLikeToggle = async (post) => {
+    try {
+      await api(`/posts/${post.id}/like`, {
+        method: post.likedByMe ? "DELETE" : "POST",
+      });
+      setPosts((prev) =>
+        prev.map((p) =>
+          p.id === post.id
+            ? {
+                ...p,
+                likedByMe: !p.likedByMe,
+                likeCount: p.likedByMe ? p.likeCount - 1 : p.likeCount + 1,
+              }
+            : p
+        )
+      );
+    } catch (e) {
+      setError("いいねできませんでした。");
+    }
+  };
+
+  // 文字列タグの配列を、クリックできる形で並べる
+  const renderTags = (arr) =>
+    (arr || []).map((t) => (
+      <span
+        key={t}
+        className="tag"
+        style={{ cursor: "pointer" }}
+        onClick={() => goToTag(t)}
+      >
+        #{t}
+      </span>
+    ));
+
+  // 投稿カード（ProfilePage と同じ表記順。ただし削除ボタンは無し）
+  const renderPostCard = (post) => (
+    <div
+      key={post.id}
+      className="mini-post"
+      onClick={() => navigate(`?post=${post.id}`)}
+      style={{ cursor: "pointer" }}
+    >
+      <div className="mini-body">{post.body}</div>
+      <div className="mini-meta">
+        <span className="mini-time">{relativeTime(post.createdAt)}</span>
+        <button
+          className={`mini-like ${post.likedByMe ? "liked" : ""}`}
+          onClick={(e) => { e.stopPropagation(); handleLikeToggle(post); }}
+        >
+          <img src={post.likedByMe ? heart_filled : heart} alt="いいね" className="icon-like" />
+          <span>{post.likeCount}</span>
+        </button>
+        <span className="mini-reply">
+          <img src={reply} alt="返信" className="icon-reply" />
+          <span>{post.replyCount}</span>
+        </span>
+      </div>
+    </div>
+  );
 
   return (
     <div className="other-profile page">
@@ -123,22 +196,30 @@ export default function OtherProfilePage() {
 
       <section className="op-section">
         <h3>タグ</h3>
-        <p>技術: {profile.tags.tech.join("、") || "—"}</p>
-        <p>趣味: {profile.tags.hobby.join("、") || "—"}</p>
-        <p>資格: {profile.tags.cert.join("、") || "—"}</p>
+        <div className="profile-tagset">
+          <div className="tag-group">
+            <div className="tag-group-label">技術スタック</div>
+            <div className="tag-row">{renderTags(profile.tags?.tech)}</div>
+          </div>
+          <div className="tag-group">
+            <div className="tag-group-label">興味</div>
+            <div className="tag-row">{renderTags(profile.tags?.hobby)}</div>
+          </div>
+          <div className="tag-group">
+            <div className="tag-group-label">趣味</div>
+            <div className="tag-row">{renderTags(profile.tags?.cert)}</div>
+          </div>
+        </div>
       </section>
 
       <div className="section-title">投稿</div>
       {posts.length === 0 && <p className="empty-note">まだ投稿がありません。</p>}
       {posts.map((post) => (
-        <div key={post.id} className="mini-post">
-          <div className="mini-body">{post.body}</div>
-          <div className="mini-meta">
-            <span>♡ {post.likeCount}</span>
-            <span>💬 {post.replyCount}</span>
-            <span>{relativeTime(post.createdAt)}</span>
-          </div>
-        </div>
+        <MiniPostCard
+          key={post.id}
+          post={post}
+          onLike={handleLikeToggle}
+        />
       ))}
     </div>
   );

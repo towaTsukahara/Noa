@@ -6,6 +6,8 @@ public class CommentCreateRequest {
 
     private String body;
 
+    private Long parentCommentId; // 任意。null ならトップレベル、値があれば返信
+
     public Long getPostId() {
         return postId;
     }
@@ -20,5 +22,13 @@ public class CommentCreateRequest {
 
     public void setBody(String body) {
         this.body = body;
+    }
+
+    public Long getParentCommentId() {
+        return parentCommentId;
+    }
+
+    public void setParentCommentId(Long parentCommentId) {
+        this.parentCommentId = parentCommentId;
     }
 }
