@@ -44,10 +44,27 @@ public class CommentService {
         comment.setAuthor(author);
         comment.setPost(post);
         comment.setBody(req.getBody());
+
+        // 返信の場合：親コメントをセット
+        Comment parent = null;
+        if (req.getParentCommentId() != null) {
+            parent = commentRepository.findById(req.getParentCommentId())
+                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "返信先コメントが見つかりません"));
+            // 親コメントが同じ投稿に属するか確認（不正な返信を防ぐ）
+            if (!parent.getPost().getId().equals(post.getId())) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "返信先が不正です");
+            }
+            comment.setParentComment(parent);
+        }
+
         Comment saved = commentRepository.save(comment);
 
-        // 投稿者へ通知（自分の投稿への自分のコメントは NotificationService 側で弾かれる）
-        notificationService.create(post.getAuthor().getId(), author.getId(), post.getId(), "REPLY");
+        // 通知：トップレベル→投稿主へ／返信→親コメント主へ
+        if (parent == null) {
+            notificationService.create(post.getAuthor().getId(), author.getId(), post.getId(), "REPLY");
+        } else {
+            notificationService.create(parent.getAuthor().getId(), author.getId(), post.getId(), "REPLY_TO_COMMENT");
+        }
 
         return saved;
     }
@@ -65,9 +82,11 @@ public class CommentService {
                     response.setId(comment.getId());
                     response.setAuthorId(comment.getAuthor().getId());
                     response.setAuthorName(handle);
-                    response.setAuthorNickname(nickMap.get(handle)); // 呼び名（なければ null）
+                    response.setAuthorNickname(nickMap.get(handle));
                     response.setBody(comment.getBody());
                     response.setCreatedAt(comment.getCreatedAt());
+                    response.setParentCommentId(
+                            comment.getParentComment() != null ? comment.getParentComment().getId() : null);
 
                     return response;
                 })

@@ -3,9 +3,7 @@ import { useState, useEffect, useRef } from "react";
 import { useNavigate, Link, useSearchParams } from "react-router-dom";
 import { relativeTime } from "../utils/relativeTime";
 import UserHandle from "../components/user/UserHandle";
-import heart_filled from '/icons/heart_filled.svg';
-import heart from '/icons/heart.svg';
-import reply from '/icons/reply.svg';
+import MiniPostCard from "../components/post/MiniPostCard";
 import "./SearchPage.css";
 
 export default function SearchPage() {
@@ -367,74 +365,15 @@ export default function SearchPage() {
             {selectedTab === "posts" ? (
                 <div className="search-results">
                     {posts.map((post) => (
-                        <article
+                        <MiniPostCard
                             key={post.id}
-                            className={`mini-post ${String(selectedId) === String(post.id) ? "is-selected" : ""}`}
-                            onClick={() => openDetail(post.id)}
-                        >
-
-                            <div className="post-header">
-                                <div className="avatar"></div>
-
-                                <div>
-                                    <div className="nickname">
-                                        <Link
-                                            to={`/users/${post.author?.handle}`}
-                                        >
-                                            <UserHandle
-                                                user={post.author ?? { handle: "Unknown" }}
-                                            />
-                                        </Link>
-                                    </div>
-
-                                    <div className="search-date">
-                                        {relativeTime(post.createdAt)}
-                                    </div>
-                                </div>
-                            </div>
-
-                            <p className="search-snippet">
-                                {post.body}
-                            </p>
-
-                            <div className="tags">
-                                {post.tags.map((tag) => {
-
-                                    return (
-                                        <span key={tag.id}>
-                                            #{tag.name}
-                                        </span>
-                                    );
-                                })}
-                            </div>
-
-                            <div className="actions">
-                                <button
-                                    className={`like-button ${post.likedByMe ? "liked" : ""}`}
-                                    onClick={(e) => { e.stopPropagation(); handleLikeToggle(post); }}
-                                >
-                                    <img
-                                        src={post.likedByMe ? heart_filled : heart}
-                                        alt="いいね"
-                                        className="icon-like"
-                                    />
-                                    <span>{post.likeCount}</span>
-                                </button>
-                                <span className="reply">
-                                    <img src={reply} alt="返信" className="icon-reply" />
-                                    <span>{post.replyCount}</span>
-                                </span>
-                            </div>
-                        </article>
-                    ))
-                    }
-
+                            post={post}
+                            onLike={handleLikeToggle}
+                        />
+                    ))}
                     {hasMorePosts && (
                         <div style={{ textAlign: "center", marginTop: "20px" }}>
-                            <button
-                                className="btn"
-                                onClick={handleLoadMorePosts}
-                            >
+                            <button className="btn" onClick={handleLoadMorePosts}>
                                 もっと見る
                             </button>
                         </div>
@@ -456,7 +395,7 @@ export default function SearchPage() {
                                     className="search-tagname"
                                     onClick={() => navigate(`/tag/${tag.id}`)}
                                 >
-                                    {tag.name}
+                                    #{tag.name}
                                 </span>
 
                                 <button

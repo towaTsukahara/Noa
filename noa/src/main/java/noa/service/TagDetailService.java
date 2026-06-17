@@ -72,4 +72,10 @@ public class TagDetailService {
                 followed,
                 posts);
     }
+
+    // タグ名で詳細を引く（プロフィールの文字列タグから飛ぶ用）
+    public TagDetailResponse getTagByName(User user, String name) {
+        Tag tag = tagService.findByName(name);
+        return getTag(user, tag.getId());
+    }
 }

@@ -90,6 +90,13 @@ public class TagService {
         return tagRepository.findById(id).orElseThrow(() -> new RuntimeException("Tag not found"));
     }
 
+    // タグ名で引く（プロフィールの文字列タグから飛ぶ用）。DBは小文字正規化されているので合わせる
+    public Tag findByName(String name) {
+        String normalized = name.trim().toLowerCase();
+        return tagRepository.findByName(normalized)
+                .orElseThrow(() -> new RuntimeException("Tag not found"));
+    }
+
     //空検索用
     public List<TagResponse> getRandomTags(int limit) {
         return tagRepository.findRandomTags(limit)

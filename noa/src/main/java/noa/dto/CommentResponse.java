@@ -16,6 +16,8 @@ public class CommentResponse {
 
     private OffsetDateTime createdAt;
 
+    private Long parentCommentId;
+
     public Long getId() {
         return id;
     }
@@ -62,5 +64,13 @@ public class CommentResponse {
 
     public void setCreatedAt(OffsetDateTime createdAt) {
         this.createdAt = createdAt;
+    }
+
+    public Long getParentCommentId() {
+        return parentCommentId;
+    }
+
+    public void setParentCommentId(Long parentCommentId) {
+        this.parentCommentId = parentCommentId;
     }
 }
