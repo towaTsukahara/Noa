@@ -23,13 +23,14 @@ function PostDetailPage() {
     const { user } = useAuth();
 
     const loadComments = async () => {
-        const data = await api(`/comments?postId=${id}`);
+        const data = await api(`/comments?postId=${postId}`);
         setComments(
             data.map((c) => ({
                 id: c.id,
                 authorHandle: c.authorName,
                 authorNickname: c.authorNickname,
                 body: c.body,
+                parentCommentId: c.parentCommentId, // 親コメントid（ツリー用）
                 mine: user && c.authorName === user.handle,
             }))
         );

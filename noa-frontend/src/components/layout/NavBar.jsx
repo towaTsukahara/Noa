@@ -14,9 +14,6 @@ function NavBar() {
 
   return (
     <nav className="header">
-      {/* TODO(F-116): 検索は未実装。入力欄は仮置き */}
-      <input type="text" placeholder="検索..." />
-
       {loading ? null : user ? (
         <>
           <span>{user.handle}</span>

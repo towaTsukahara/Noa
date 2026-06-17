@@ -17,10 +17,6 @@ public record UserSummaryResponse(
     public static UserSummaryResponse from(
             User u, Map<String, List<String>> tags,
             boolean isFollowing, String nickname) {
-        Map<String, List<String>> tagMap = Map.of(
-                "tech", List.of(),
-                "hobby", List.of(),
-                "cert", List.of());
-        return new UserSummaryResponse(u.getHandle(), u.getBio(), tagMap, isFollowing, nickname);
+        return new UserSummaryResponse(u.getHandle(), u.getBio(), tags, isFollowing, nickname);
     }
 }

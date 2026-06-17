@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { api } from "../api/client";
 import { useAuth } from "../context/AuthContext";
+import ConfirmModal from "../components/common/ConfirmModal";
 import "./AdminDashboardPage.css";
 
 export default function AdminDashboardPage() {
@@ -11,8 +12,8 @@ export default function AdminDashboardPage() {
     const [users, setUsers] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+    const [confirm, setConfirm] = useState(null);
 
-    // 管理者以外がURL直打ちで来たら追い返す（フロント側のガード）
     useEffect(() => {
         if (user && user.role !== "ADMIN") {
             navigate("/", { replace: true });
@@ -23,7 +24,7 @@ export default function AdminDashboardPage() {
         setLoading(true);
         setError(null);
         try {
-            const data = await api("/admin/users"); // AdminUserResponse[]
+            const data = await api("/admin/users");
             setUsers(data);
         } catch (e) {
             setError("ユーザー一覧の取得に失敗しました。");
@@ -36,19 +37,23 @@ export default function AdminDashboardPage() {
         loadUsers();
     }, []);
 
-    // 停止/解除のトグル
-    const handleToggleStatus = async (u) => {
+    // 停止/解除のトグル：確認モーダルを開く
+    const handleToggleStatus = (u) => {
         const willSuspend = u.status === "ACTIVE";
         const action = willSuspend ? "停止" : "解除";
-        if (!window.confirm(`${u.handle} を${action}しますか？`)) return;
-        try {
-            await api(`/admin/users/${u.id}/${willSuspend ? "suspend" : "activate"}`, {
-                method: "POST",
-            });
-            await loadUsers(); // 一覧を再読込して状態を反映
-        } catch (e) {
-            setError(`${action}に失敗しました。`);
-        }
+        setConfirm({
+            message: `${u.handle} を${action}しますか？`,
+            onConfirm: async () => {
+                try {
+                    await api(`/admin/users/${u.id}/${willSuspend ? "suspend" : "activate"}`, {
+                        method: "POST",
+                    });
+                    await loadUsers();
+                } catch (e) {
+                    setError(`${action}に失敗しました。`);
+                }
+            },
+        });
     };
 
     return (
@@ -73,7 +78,6 @@ export default function AdminDashboardPage() {
                                 <th>社員番号</th>
                                 <th>メール</th>
                                 <th>権限</th>
-                                <th>状態</th>
                                 <th>状態</th>
                                 <th>操作</th>
                             </tr>
@@ -115,6 +119,15 @@ export default function AdminDashboardPage() {
                     </table>
                 </div>
             )}
+
+            <ConfirmModal
+                open={confirm !== null}
+                title="確認"
+                message={confirm?.message}
+                confirmLabel="実行する"
+                onConfirm={() => { confirm.onConfirm(); setConfirm(null); }}
+                onCancel={() => setConfirm(null)}
+            />
         </div>
     );
 }
