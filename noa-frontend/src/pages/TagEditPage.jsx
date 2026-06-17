@@ -18,6 +18,7 @@ const TagEditPage = ({ type }) => {
     const [createSelected, setCreateSelected] = useState(false);
     const [allTags, setAllTags] = useState([]);     // DBの全タグ
     const [candidates, setCandidates] = useState([]);          // DBから取得した候補
+    const [error, setError] = useState("");
 
     const removeSelected = (name) => {
         setSelected(selected.filter(t => t !== name));
@@ -153,33 +154,6 @@ const TagEditPage = ({ type }) => {
                 </div>
             </div>
 
-            {/* 検索 */}
-            <div className="edit-block">
-                <h3>検索</h3>
-                <input
-                    className="field"
-                    value={q}
-                    onChange={(e) => setQ(e.target.value)}
-                    placeholder="タグを検索"
-                />
-            </div>
-
-            {/* 新規作成（候補に無い名前を打って追加） */}
-            <div className="edit-block">
-                <h3>新規作成</h3>
-                <div className="new-tag-row">
-                    <input
-                        className="field"
-                        value={newTag}
-                        onChange={(e) => setNewTag(e.target.value)}
-                        placeholder="新しいタグ名"
-                        maxLength={30}
-                    />
-                    <button className="btn btn-ghost" onClick={addNew}>新規追加</button>
-                </div>
-                <CharCount current={newTag.length} max={30} />
-            </div>
-
             {error && (
                 <p className="error-message">
                     {error}
@@ -206,6 +180,7 @@ const TagEditPage = ({ type }) => {
                     }}
                     onKeyDown={handleKeyDown}
                     placeholder="タグを検索・新規作成"
+                    maxLength={30}
                 />
 
                 {showCreateTag && (
@@ -223,6 +198,7 @@ const TagEditPage = ({ type }) => {
                         </button>
                     </div>
                 )}
+                <CharCount current={q.length} max={30} />
             </div>
 
             {/* タグ候補 */}
