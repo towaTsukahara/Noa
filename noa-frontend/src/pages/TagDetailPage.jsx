@@ -9,9 +9,18 @@ export default function TagDetailPage() {
     const navigate = useNavigate();
 
     const [tag, setTag] = useState(null);
+    const [searchParams, setSearchParams] = useSearchParams();
     const [loading, setLoading] = useState(true);
 
     const { tagId } = useParams();
+    const selectedId = searchParams.get("post"); // 今開いている投稿id（文字列）
+
+    // 投稿を右パネルで開く（?post=123 を付ける）
+    const openDetail = (postId) => {
+        const next = new URLSearchParams(searchParams);
+        next.set("post", postId);
+        setSearchParams(next);
+    };
 
     const fetchTag = async () => {
         setLoading(true);
@@ -100,10 +109,6 @@ export default function TagDetailPage() {
                 >
                     {tag.followed ? "フォロー中 ✓" : "フォローする"}
                 </button>
-            </div>
-
-            <div className="section-title">
-                投稿
             </div>
 
             {tag.posts?.length === 0 && (

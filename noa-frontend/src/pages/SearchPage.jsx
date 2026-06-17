@@ -17,9 +17,17 @@ export default function SearchPage() {
     const [suggestions, setSuggestions] = useState([]);
     const [showSuggestions, setShowSuggestions] = useState(false);
     const [searchParams, setSearchParams] = useSearchParams();
+    const selectedId = searchParams.get("post"); // 今開いている投稿id（文字列）
 
     const navigate = useNavigate();
     const searchRef = useRef(null);
+
+    // 投稿を右パネルで開く（?post=123 を付ける）
+    const openDetail = (postId) => {
+        const next = new URLSearchParams(searchParams);
+        next.set("post", postId);
+        setSearchParams(next);
+    };
 
     const fetchSuggestions = async (value) => {
 
