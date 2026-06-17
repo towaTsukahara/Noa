@@ -36,8 +36,39 @@
   padding: 16px 22px;
 }
 
-.error-message {
-  color: red;
-  margin: 12px 0;
+.create-tag-box {
+  margin-top: 8px;
+
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: var(--r-md);
+
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+  overflow: hidden;
+}
+
+.create-tag-btn {
+  width: 100%;
+
+  border: none;
+  background: transparent;
+
+  padding: 10px 14px;
+
+  text-align: left;
   font-size: 14px;
+  font-family: inherit;
+  color: var(--accent);
+  font-weight: 500;
+
+  cursor: pointer;
+  transition: background 0.12s;
+}
+
+.create-tag-btn:hover {
+  background: var(--accent-bg);
+}
+
+.create-tag-btn.active {
+  background: var(--accent-bg);
 }
