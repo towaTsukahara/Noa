@@ -2,9 +2,10 @@ import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { api } from "../api/client";
 import { useAuth } from "../context/AuthContext";
+import { relativeTime } from "../utils/relativeTime";
 import FollowButton from "../components/user/FollowButton";
 import MiniPostCard from "../components/post/MiniPostCard";
-import { relativeTime } from "../utils/relativeTime";
+import CharCount from "../components/common/CharCount";
 import "./OtherProfilePage.css";
 import heart_filled from '/icons/heart_filled.svg';
 import heart from '/icons/heart.svg';
@@ -98,10 +99,10 @@ export default function OtherProfilePage() {
         prev.map((p) =>
           p.id === post.id
             ? {
-                ...p,
-                likedByMe: !p.likedByMe,
-                likeCount: p.likedByMe ? p.likeCount - 1 : p.likeCount + 1,
-              }
+              ...p,
+              likedByMe: !p.likedByMe,
+              likeCount: p.likedByMe ? p.likeCount - 1 : p.likeCount + 1,
+            }
             : p
         )
       );
@@ -172,6 +173,7 @@ export default function OtherProfilePage() {
                   placeholder="呼び名（自分だけに表示）"
                   maxLength={30}
                 />
+                <CharCount current={nickInput.length} max={30} />
                 <div className="op-nick-actions">
                   <button className="btn" onClick={handleSaveNickname}>保存</button>
                   <button className="btn btn-quiet" onClick={() => setEditingNick(false)}>やめる</button>

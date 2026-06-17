@@ -1,6 +1,7 @@
 import { useNavigate, useLocation } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { api } from "../api/client";
+import CharCount from "../components/common/CharCount";
 import "./TagEditPage.css";
 
 const LABEL = { skill: "技術スタックタグ", hobby: "興味タグ", cert: "趣味タグ" };
@@ -152,6 +153,38 @@ const TagEditPage = ({ type }) => {
                 </div>
             </div>
 
+            {/* 検索 */}
+            <div className="edit-block">
+                <h3>検索</h3>
+                <input
+                    className="field"
+                    value={q}
+                    onChange={(e) => setQ(e.target.value)}
+                    placeholder="タグを検索"
+                />
+            </div>
+
+            {/* 新規作成（候補に無い名前を打って追加） */}
+            <div className="edit-block">
+                <h3>新規作成</h3>
+                <div className="new-tag-row">
+                    <input
+                        className="field"
+                        value={newTag}
+                        onChange={(e) => setNewTag(e.target.value)}
+                        placeholder="新しいタグ名"
+                        maxLength={30}
+                    />
+                    <button className="btn btn-ghost" onClick={addNew}>新規追加</button>
+                </div>
+                <CharCount current={newTag.length} max={30} />
+            </div>
+
+            {error && (
+                <p className="error-message">
+                    {error}
+                </p>
+            )}
             <div className="edit-actions">
                 <button className="btn btn-quiet" onClick={() => navigate("/profile/edit", { state: { form } })}>
                     キャンセル

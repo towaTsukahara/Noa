@@ -215,7 +215,7 @@ function ProfilePage() {
                             プロフィールを編集
                         </button>
                         <button className="btn btn-ghost" onClick={handleFollowClick}>
-                            フォロー
+                            フォローー覧
                         </button>
                     </div>
                 </div>
