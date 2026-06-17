@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { api } from "../../api/client";
+import CharCount from "../common/CharCount";
 import "./PostComposeModal.css";
 
 function PostComposePage({ onClose, onPosted }) {
@@ -107,7 +108,7 @@ function PostComposePage({ onClose, onPosted }) {
         s.name.toLowerCase() ===
         tagsInput.trim().toLowerCase()
     );
-    
+
   const optionCount =
     suggestions.length +
     (showCreateTag ? 1 : 0);
@@ -176,6 +177,7 @@ function PostComposePage({ onClose, onPosted }) {
             }}
             onKeyDown={handleTagKeyDown}
             placeholder="タグ（カンマ区切り。例: React, 質問）"
+            maxLength={30}
           />
 
           {(suggestions.length > 0 || showCreateTag) && (
@@ -207,9 +209,15 @@ function PostComposePage({ onClose, onPosted }) {
               )}
             </ul>
           )}
+
+          <div className="tag-count">
+            <CharCount current={tagsInput.length} max={30} />
+          </div>
         </div>
 
-        <div className="modal-counter">{body.length}/1000</div>
+        <div className="modal-counter">
+          <CharCount current={body.length} max={1000} />
+        </div>
 
         {error && <p className="modal-error">{error}</p>}
 

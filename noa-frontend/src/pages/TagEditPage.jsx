@@ -1,6 +1,7 @@
 import { useNavigate, useLocation } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { api } from "../api/client";
+import CharCount from "../components/common/CharCount";
 import "./TagEditPage.css";
 
 const LABEL = { skill: "技術スタックタグ", hobby: "興味タグ", cert: "趣味タグ" };
@@ -17,6 +18,7 @@ const TagEditPage = ({ type }) => {
     const [allTags, setAllTags] = useState([]);     // DBの全タグ
     const [candidates, setCandidates] = useState([]);          // DBから取得した候補
     const [newTag, setNewTag] = useState("");
+    const [error, setError] = useState("");
 
     const removeSelected = (name) => {
         setSelected(selected.filter(t => t !== name));
@@ -86,6 +88,7 @@ const TagEditPage = ({ type }) => {
 
         } catch (err) {
             console.error(err);
+            setError(err.message || "保存に失敗しました")
         }
     };
 
@@ -129,11 +132,18 @@ const TagEditPage = ({ type }) => {
                         value={newTag}
                         onChange={(e) => setNewTag(e.target.value)}
                         placeholder="新しいタグ名"
+                        maxLength={30}
                     />
                     <button className="btn btn-ghost" onClick={addNew}>新規追加</button>
                 </div>
+                <CharCount current={newTag.length} max={30} />
             </div>
 
+            {error && (
+                <p className="error-message">
+                    {error}
+                </p>
+            )}
             <div className="edit-actions">
                 <button className="btn btn-quiet" onClick={() => navigate("/profile/edit", { state: { form } })}>
                     キャンセル

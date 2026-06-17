@@ -1,6 +1,7 @@
 import { useNavigate, useLocation } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { api } from "../api/client";
+import CharCount from "../components/common/CharCount";
 import "./ProfileEditPage.css";
 
 function ProfileEditPage() {
@@ -56,7 +57,9 @@ function ProfileEditPage() {
                     className="field"
                     value={form.bio}
                     onChange={(e) => setForm({ ...form, bio: e.target.value })}
+                    maxLength={300}
                 />
+                <CharCount current={form.bio.length} max={300} />
             </div>
 
             <div className="edit-block">

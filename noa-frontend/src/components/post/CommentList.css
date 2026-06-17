@@ -115,3 +115,10 @@
 .comment-more:hover {
   text-decoration: underline;
 }
+
+.comment-form-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 6px;
+}
