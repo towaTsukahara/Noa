@@ -1,6 +1,7 @@
 import { Link, useNavigate } from "react-router-dom";
 import UserHandle from "../user/UserHandle";
 import ExpandableText from "../common/ExpandableText";
+import { useAuth } from "../../context/AuthContext";
 import { relativeTime } from "../../utils/relativeTime";
 import "./MiniPostCard.css";
 import "./LikeButton.css"; // .like-button のスタイル
@@ -24,9 +25,13 @@ export default function MiniPostCard({
     showAuthor = true,
 }) {
     const navigate = useNavigate();
+    const { user } = useAuth();
 
     // カードクリックで右パネルを開く
     const openDetail = () => navigate(`?post=${post.id}`);
+
+    // 自分の投稿か
+    const isMine = user && post.author && user.handle === post.author.handle;
 
     return (
         <article
@@ -37,21 +42,25 @@ export default function MiniPostCard({
                 <div className="post-header">
                     <div
                         className="avatar"
-                        style= {{cursor: "pointer"}}
+                        style={{ cursor: "pointer" }}
                         onClick={(e) => {
                             e.stopPropagation();
                             navigate(`/users/${post.author.handle}`);
                         }}
-                        ></div>
+                    ></div>
                     <div>
                         <div className="nickname">
-                            <Link
-                                to={`/users/${post.author.handle}`}
-                                className="author-link"
-                                onClick={(e) => e.stopPropagation()}
-                            >
-                                <UserHandle user={post.author} />
-                            </Link>
+                            {isMine ? (
+                                <span className="author-link">あなた</span>
+                            ) : (
+                                <Link
+                                    to={`/users/${post.author.handle}`}
+                                    className="author-link"
+                                    onClick={(e) => e.stopPropagation()}
+                                >
+                                    <UserHandle user={post.author} />
+                                </Link>
+                            )}
                         </div>
                         <div className="date">{relativeTime(post.createdAt)}</div>
                     </div>

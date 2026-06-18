@@ -1,4 +1,4 @@
-import { useState, forwardRef } from "react";
+import { useState, forwardRef, useRef, useEffect } from "react";
 import CharCount from "../common/CharCount";
 
 // コメント・返信の入力フォーム。
@@ -12,6 +12,12 @@ const CommentForm = forwardRef(function CommentForm(
 ) {
     const [text, setText] = useState("");
     const [submitting, setSubmitting] = useState(false);
+    const innerRef = useRef(null);
+
+    // マウント時（フォームが開いたとき）に自動でフォーカス
+    useEffect(() => {
+        innerRef.current?.focus();
+    }, []);
 
     const handleSubmit = async () => {
         if (!text.trim()) return;
@@ -27,7 +33,11 @@ const CommentForm = forwardRef(function CommentForm(
     return (
         <div className="comment-form">
             <textarea
-                ref={ref}
+                ref={(el) => {
+                    innerRef.current = el;
+                    if (typeof ref === "function") ref(el);
+                    else if (ref) ref.current = el;
+                }}
                 placeholder={placeholder}
                 value={text}
                 onChange={(e) => setText(e.target.value)}
