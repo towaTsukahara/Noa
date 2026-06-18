@@ -2,6 +2,7 @@ import { useState } from "react";
 import CommentDeleteButton from "./CommentDeleteButton";
 import MoreMenu from "../common/MoreMenu";
 import CommentForm from "./CommentForm";
+import ExpandableText from "../common/ExpandableText";
 import "./CommentList.css";
 
 // ハンドルから決定論的にアバターのトーン(1-7)を選ぶ（顔写真を使わない原則）
@@ -41,7 +42,9 @@ export default function CommentNode({
                         )}
                     </div>
 
-                    <p className="comment-body">{comment.body}</p>
+                    <div className="comment-body">
+                        <ExpandableText text={comment.body} clampLines={3} />
+                    </div>
 
                     {/* 操作：返信する / 返信を読む（展開トグル）を flex+gap でまとめる */}
                     <div className="comment-actions">

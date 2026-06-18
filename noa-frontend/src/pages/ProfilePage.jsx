@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { api } from "../api/client";
 import { useAuth } from "../context/AuthContext";
 import { relativeTime } from "../utils/relativeTime";
@@ -7,10 +7,12 @@ import "./ProfilePage.css";
 import ExpandableText from "../components/common/ExpandableText";
 import ConfirmModal from "../components/common/ConfirmModal";
 import MiniPostCard from "../components/post/MiniPostCard";
+import Toast from "../components/common/Toast";
 import trashcan from '/icons/trashcan.svg';
 
 function ProfilePage() {
     const navigate = useNavigate();
+    const location = useLocation();
     const { user } = useAuth();
     const [activeTab, setActiveTab] = useState("posts");
 
@@ -29,6 +31,16 @@ function ProfilePage() {
 
     // 確認モーダル（message と、OKしたら実行する関数を持つ）
     const [confirm, setConfirm] = useState(null);
+
+    // 保存後などのトースト（遷移時に state で渡される）
+    const [toast, setToast] = useState(location.state?.toast || null);
+
+    useEffect(() => {
+        if (location.state?.toast) {
+            window.history.replaceState({}, "");
+        }
+    }, []);
+
 
     const loadPosts = async () => {
         if (!user) return;
@@ -339,6 +351,8 @@ function ProfilePage() {
                 onConfirm={() => { confirm.onConfirm(); setConfirm(null); }}
                 onCancel={() => setConfirm(null)}
             />
+
+            <Toast message={toast} onClose={() => setToast(null)} />
         </div>
     );
 }

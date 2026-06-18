@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import { api } from "../../api/client";
 import CharCount from "../common/CharCount";
 import "./PostComposeModal.css";
@@ -11,6 +11,12 @@ function PostComposePage({ onClose, onPosted }) {
   const [suggestions, setSuggestions] = useState([]);
   const [selectedTags, setSelectedTags] = useState([]);
   const [activeIndex, setActiveIndex] = useState(-1);
+  const bodyRef = useRef(null);
+
+  // モーダルが開いたら本文にフォーカス
+  useEffect(() => {
+    bodyRef.current?.focus();
+  }, []);
 
   const handleSubmit = async () => {
     setError(null);
@@ -137,6 +143,7 @@ function PostComposePage({ onClose, onPosted }) {
         </div>
 
         <textarea
+          ref={bodyRef}
           className="modal-textarea"
           value={body}
           onChange={(e) => setBody(e.target.value)}
