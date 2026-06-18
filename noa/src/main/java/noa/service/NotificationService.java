@@ -40,9 +40,11 @@ public class NotificationService {
     public List<NotificationResponse> getMyNotifications(User viewer) {
         List<NotificationResponse> result = new ArrayList<>();
         for (Notification n : notificationRepository.findByRecipientIdOrderByIdDesc(viewer.getId())) {
-            // 対象投稿の本文（冒頭表示用）。削除済みでも通知は残す
+            // 対象投稿の本文（冒頭表示用）。通知自体は残すが、削除済み投稿の本文は見せない。
             String postBody = postRepository.findById(n.getPostId())
-                    .map(Post::getBody).orElse("(削除された投稿)");
+                    .filter(p -> !p.isDeleted())   // 論理削除された投稿は除外
+                    .map(Post::getBody)
+                    .orElse("(削除された投稿)");
             result.add(new NotificationResponse(
                     n.getId(),
                     n.getType(),
