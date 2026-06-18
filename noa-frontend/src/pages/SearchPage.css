@@ -7,6 +7,13 @@
        > .search-results
            本文: .mini-post(> h3.search-title + .search-snippet + .search-date)
            タグ: .row-between(> span.search-tagname + button) */
+.timeline {
+  max-width: 646px;
+  margin: 0 auto;
+  min-height: calc(100vh - 60px);
+  border-left: 1px solid var(--line2);
+  border-right: 1px solid var(--line2);
+}
 
 .search-bar {
   display: flex;
@@ -120,32 +127,6 @@
   color: var(--accent);
 }
 
-.mini-post {
-  padding: 16px 22px;
-  border-bottom: 1px solid var(--line2);
-  cursor: pointer;
-  position: relative;
-}
-
-.mini-post:hover {
-  background: #f6f3ec;
-}
-
-/* 選択中（右パネルで開いている）投稿 */
-.mini-post.is-selected {
-  background: var(--accent-bg);
-}
-
-.mini-post.is-selected::before {
-  content: "";
-  position: absolute;
-  left: 0;
-  top: 0;
-  bottom: 0;
-  width: 3px;
-  background: var(--accent);
-}
-
 .row-between {
   display: flex;
   align-items: center;
@@ -163,51 +144,39 @@
   border-bottom: none;
 }
 
-.tags {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  margin-top: 10px;
+/* 投稿カード: MiniPostCard 内の navigate を迂回し /search?post= を維持 */
+.search-post-card-wrap {
+  cursor: pointer;
 }
 
-.tags span {
-  font-family: var(--mono-font);
-  font-size: 11.5px;
-  color: var(--accent);
-  border: 1px solid var(--line);
-  background: #fff;
-  padding: 2px 10px;
-  border-radius: var(--r-pill);
+.search-post-card-wrap > .post-card {
+  pointer-events: none;
 }
 
-/* アクション行（いいね・返信数） */
-.actions {
-  display: flex;
-  align-items: center;
-  gap: 24px;
-  margin-top: 12px;
-  padding-left: 53px;
-  font-size: 12.5px;
-  color: var(--soft);
+.search-post-card-wrap .post-header .avatar,
+.search-post-card-wrap .post-header a,
+.search-post-card-wrap .tags span,
+.search-post-card-wrap .actions,
+.search-post-card-wrap .actions * {
+  pointer-events: auto;
 }
 
-.actions>span {
-  font-variant-numeric: tabular-nums;
-  color: var(--soft);
-  white-space: nowrap;
+/* pointer-events: none により .post-card:hover が効かないためラッパーで再現 */
+.search-post-card-wrap:hover > .post-card:not(.is-selected) {
+  background: #f6f3ec;
 }
 
-.actions button,
-.actions .reply {
-  display: flex;
-  align-items: center;
-  gap: 6px;
+/* 選択中（TimelinePage / MiniPostCard と同じ） */
+.search-post-card-wrap > .post-card.is-selected {
+  background: var(--accent-bg);
 }
 
-/* いいね、コメントのアイコン */
-.icon-like,
-.icon-reply {
-  width: 17px;
-  height: 17px;
-  object-fit: contain;
+.search-post-card-wrap > .post-card.is-selected::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 3px;
+  background: var(--accent);
 }

@@ -4,6 +4,8 @@ import { relativeTime } from "../utils/relativeTime";
 import MiniPostCard from "../components/post/MiniPostCard";
 import "./TagDetailPage.css";
 
+console.log("TAG DETAIL PAGE LOADED");
+
 export default function TagDetailPage() {
 
     const navigate = useNavigate();
@@ -94,8 +96,15 @@ export default function TagDetailPage() {
         }
     };
 
+    console.log(
+        tag.posts?.map((p) => ({
+            id: p.id,
+            selected: String(selectedId) === String(p.id),
+        }))
+    );
+
     return (
-        <div className="tag-detail page">
+        <div className="search tag-detail page">
             <div className="tag-hero">
                 <div className="tag-hero-name">
                     #{tag.name}
@@ -111,19 +120,32 @@ export default function TagDetailPage() {
                 </button>
             </div>
 
-            {tag.posts?.length === 0 && (
-                <p className="empty-note">
-                    このタグの投稿はまだありません。
-                </p>
-            )}
+            <div className="timeline tag-results">
+                {tag.posts?.length === 0 && (
+                    <p className="empty-note">
+                        このタグの投稿はまだありません。
+                    </p>
+                )}
 
-            {tag.posts?.map((post) => (
-                <MiniPostCard
-                    key={post.id}
-                    post={post}
-                    onLike={handleLikeToggle}
-                />
-            ))}
+                {tag.posts?.map((post) => {
+                    const selected = String(selectedId) === String(post.id);
+
+                    console.log({
+                        selectedId,
+                        postId: post.id,
+                        selected,
+                    });
+
+                    return (
+                        <MiniPostCard
+                            key={post.id}
+                            post={post}
+                            onLike={handleLikeToggle}
+                            isSelected={selected}
+                        />
+                    );
+                })}
+            </div>
         </div>
     );
 }

@@ -363,13 +363,19 @@ export default function SearchPage() {
             </div>
 
             {selectedTab === "posts" ? (
-                <div className="search-results">
+                <div className="timeline search-results">
                     {posts.map((post) => (
-                        <MiniPostCard
+                        <div
                             key={post.id}
-                            post={post}
-                            onLike={handleLikeToggle}
-                        />
+                            className="search-post-card-wrap"
+                            onClick={() => openDetail(post.id)}
+                        >
+                            <MiniPostCard
+                                post={post}
+                                onLike={handleLikeToggle}
+                                isSelected={String(selectedId) === String(post.id)}
+                            />
+                        </div>
                     ))}
                     {hasMorePosts && (
                         <div style={{ textAlign: "center", marginTop: "20px" }}>
