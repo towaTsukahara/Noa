@@ -5,6 +5,14 @@
        > .section-title「投稿」
        > .mini-post(> .search-title + .search-snippet) */
 
+.timeline {
+  max-width: 646px;
+  margin: 0 auto;
+  min-height: calc(100vh - 60px);
+  border-left: 1px solid var(--line2);
+  border-right: 1px solid var(--line2);
+}
+
 .tag-hero {
   padding: 24px 22px 20px;
   border-bottom: 1px solid var(--line2);
@@ -33,23 +41,31 @@
   font-weight: 600;
 }
 
-.mini-post {
-  padding: 16px 22px;
-  border-bottom: 1px solid var(--line2);
+.tag-post-card-wrap {
   cursor: pointer;
-  position: relative;
 }
 
-.mini-post:hover {
+.tag-post-card-wrap>.post-card {
+  pointer-events: none;
+}
+
+.tag-post-card-wrap .post-header .avatar,
+.tag-post-card-wrap .post-header a,
+.tag-post-card-wrap .tags span,
+.tag-post-card-wrap .actions,
+.tag-post-card-wrap .actions * {
+  pointer-events: auto;
+}
+
+.tag-post-card-wrap:hover>.post-card:not(.is-selected) {
   background: #f6f3ec;
 }
 
-/* 選択中（右パネルで開いている）投稿 */
-.mini-post.is-selected {
+.tag-post-card-wrap>.post-card.is-selected {
   background: var(--accent-bg);
 }
 
-.mini-post.is-selected::before {
+.tag-post-card-wrap>.post-card.is-selected::before {
   content: "";
   position: absolute;
   left: 0;
@@ -59,7 +75,11 @@
   background: var(--accent);
 }
 
-.search-title {
+.tag-results {
+  padding-top: 4px;
+}
+
+.tag-title {
   display: inline-block;
   margin-top: 8px;
   font-size: 14px;
@@ -68,65 +88,21 @@
   text-decoration: none;
 }
 
-.search-title:hover {
+.tag-title:hover {
   text-decoration: underline;
 }
 
-.search-snippet {
+.tag-snippet {
   font-size: 13.5px;
   line-height: 1.65;
   color: #3a4047;
   margin-top: 6px;
 }
 
-.search-date {
+.tag-date {
   font-family: var(--mono-font);
   font-size: 11px;
   color: var(--faint);
-}
-
-.tags {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  margin-top: 10px;
-}
-
-.tags span {
-  font-family: var(--mono-font);
-  font-size: 12px;
-  color: var(--accent);
-}
-
-.actions {
-  display: flex;
-  align-items: center;
-  gap: 24px;
-  margin-top: 12px;
-  padding-left: 53px;
-  font-size: 12.5px;
-  color: var(--soft);
-}
-
-.actions>span {
-  font-variant-numeric: tabular-nums;
-  color: var(--soft);
-  white-space: nowrap;
-}
-
-/* いいね、コメントのアイコン */
-.icon-like,
-.icon-reply {
-  width: 17px;
-  height: 17px;
-  object-fit: contain;
-}
-
-.actions button,
-.actions .reply {
-  display: flex;
-  align-items: center;
-  gap: 6px;
 }
 
 .empty-note {
