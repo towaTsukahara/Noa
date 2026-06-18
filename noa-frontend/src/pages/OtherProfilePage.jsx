@@ -187,7 +187,13 @@ export default function OtherProfilePage() {
           </div>
         )}
         <div className="op-follow">
-          <FollowButton handle={profile.handle} initialFollowing={profile.isFollowing} />
+          <FollowButton
+            handle={profile.handle}
+            initialFollowing={profile.isFollowing}
+            onChanged={(following) =>
+              setProfile((prev) => ({ ...prev, isFollowing: following }))
+            }
+          />
         </div>
       </div>
 

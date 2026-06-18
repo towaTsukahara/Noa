@@ -395,7 +395,7 @@ export default function SearchPage() {
                                     className="search-tagname"
                                     onClick={() => navigate(`/tag/${tag.id}`)}
                                 >
-                                    {tag.name}
+                                    #{tag.name}
                                 </span>
 
                                 <button

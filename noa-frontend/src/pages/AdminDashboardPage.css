@@ -1,7 +1,7 @@
 /* AdminDashboardPage — 管理ダッシュボード（管理者専用） */
 
 .admin-table-wrap {
-  padding: 8px 22px 22px;
+  padding: 8px 20px 20px;
   overflow-x: auto;
 }
 
@@ -44,8 +44,16 @@
 }
 
 .admin-btn-sm {
-  font-size: 11.5px;
-  padding: 4px 12px;
+  font-size: 12px;
+  padding: 5px 12px;
+  line-height: 1.1;
+  border-radius: var(--r-sm);
+}
+/* 行内の操作ボタン群（margin-left のインライン指定をやめ flex+gap で組む） */
+.admin-actions {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
 }
 .admin-muted {
   color: var(--faint);
@@ -60,7 +68,7 @@
 
 /* 通報一覧 */
 .admin-filter {
-    padding: 8px 22px;
+    padding: 8px 20px;
     font-size: 13px;
     color: var(--soft);
 }
@@ -72,7 +80,7 @@
 }
 
 .report-item {
-    padding: 14px 22px;
+    padding: 14px 20px;
     border-bottom: 1px solid var(--line2);
 }
 .report-item-head {
@@ -126,5 +134,5 @@
     flex-wrap: wrap;
 }
 .admin-nav {
-    padding: 8px 22px 0;
+    padding: 8px 20px 0;
 }

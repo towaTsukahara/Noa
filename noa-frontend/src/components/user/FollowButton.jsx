@@ -20,15 +20,18 @@ function FollowButton({ handle, initialFollowing, onChanged }) {
 
   const toggle = async () => {
     setBusy(true);
+    const next = !following;
+    // 先に画面を更新（楽観的更新）
+    setFollowing(next);
+    if (onChanged) onChanged(next);
     try {
       await api(`/users/${handle}/follow`, {
-        method: following ? "DELETE" : "POST",
+        method: next ? "POST" : "DELETE",
       });
-      const next = !following;
-      setFollowing(next);
-      if (onChanged) onChanged(next);
     } catch (e) {
-      setError("操作に失敗しました。");
+      // 失敗したら元に戻す
+      setFollowing(!next);
+      if (onChanged) onChanged(!next);
     } finally {
       setBusy(false);
     }

@@ -7,12 +7,47 @@
     flex-direction: column;
 }
 .detail-panel-head {
-    padding: 14px 18px;
+    padding: 13px 20px;
     border-bottom: 1px solid var(--line2);
     flex: none;
 }
+/* 閉じるボタン（「戻る」用の .backbtn 流用をやめ、本文と競合しない控えめな専用スタイル） */
+.panel-close {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--soft);
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-family: inherit;
+    padding: 5px 6px;
+    border-radius: var(--r-sm);
+    transition: color 0.13s, background 0.13s;
+}
+.panel-close .panel-close-x {
+    display: grid;
+    place-items: center;
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    border: 1px solid var(--line);
+    color: var(--soft);
+    font-size: 12px;
+    line-height: 1;
+}
+.panel-close:hover {
+    color: var(--accent);
+    background: var(--accent-bg);
+}
+.panel-close:hover .panel-close-x {
+    border-color: var(--accent);
+    color: var(--accent);
+}
 .detail-panel-body {
-    padding: 18px;
+    padding: 20px;
     overflow-y: auto;
     flex: 1;
 }
@@ -52,7 +87,11 @@
     cursor: pointer;
     font-size: 12.5px;
     font-weight: 600;
-    padding: 4px 0;
+    padding: 0;
+    font-family: inherit;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
 }
 .comment-more:hover {
     text-decoration: underline;
@@ -62,10 +101,61 @@
     background: none;
     color: var(--soft);
     cursor: pointer;
-    font-size: 12px;
-    padding: 4px 0;
-    margin-right: 8px;
+    font-size: 12.5px;
+    font-weight: 600;
+    padding: 0;
+    font-family: inherit;
 }
 .comment-reply-btn:hover {
     color: var(--accent);
+}
+
+/* コメント入力エリア（投稿本文の直下） */
+.comment-compose {
+    padding: 14px 0;
+    border-bottom: 1px solid var(--line2);
+}
+
+/* 「コメントする」ボタン（入力欄を開く） */
+.comment-compose-open {
+    width: 100%;
+    text-align: left;
+    background: #fff;
+    border: 1px solid var(--line);
+    border-radius: var(--r-md);
+    padding: 11px 14px;
+    color: var(--faint);
+    font-family: inherit;
+    font-size: 14px;
+    cursor: pointer;
+    transition: border-color 0.13s;
+}
+.comment-compose-open:hover {
+    border-color: var(--accent);
+}
+
+/* コメントフォームのフッター（文字数カウント＋ボタン） */
+.comment-form-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 8px;
+}
+.comment-form-actions {
+    display: flex;
+    gap: 8px;
+}
+
+.detail-comment-count {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+    color: var(--soft);
+    font-variant-numeric: tabular-nums;
+}
+.detail-comment-count .icon-reply {
+    width: 16px;
+    height: 16px;
+    display: block;
 }

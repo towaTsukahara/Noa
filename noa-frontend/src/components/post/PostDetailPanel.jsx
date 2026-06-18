@@ -2,13 +2,16 @@ import { useState, useEffect, useRef } from "react";
 import { useSearchParams, useNavigate } from "react-router-dom";
 import { api } from "../../api/client";
 import { useAuth } from "../../context/AuthContext";
-import "./PostDetailPanel.css";
 
 import LikeButton from "./LikeButton";
 import CommentNode from "./CommentNode";
 import CommentForm from "./CommentForm";
 import MoreMenu from "../common/MoreMenu";
 import ReportModal from "../report/ReportModal";
+
+import reply from '/icons/reply.svg';
+
+import "./PostDetailPanel.css";
 
 export default function PostDetailPanel() {
     const [searchParams, setSearchParams] = useSearchParams();
@@ -21,6 +24,7 @@ export default function PostDetailPanel() {
     const [comments, setComments] = useState([]);
     const [reportTarget, setReportTarget] = useState(null);
     const [replyingTo, setReplyingTo] = useState(null); // 返信中のコメントid
+    const [composing, setComposing] = useState(false);  // コメント入力欄を開いているか
 
     const commentRef = useRef(null);
 
@@ -50,6 +54,7 @@ export default function PostDetailPanel() {
         if (!postId) return;
         setLoading(true);
         setReplyingTo(null); // 投稿を切り替えたら返信状態をリセット
+        setComposing(false); // コメント入力欄も閉じる
         const fetchAll = async () => {
             try {
                 const data = await api(`/posts/${postId}`);
@@ -72,9 +77,10 @@ export default function PostDetailPanel() {
                 method: "POST",
                 body: JSON.stringify({ postId: Number(postId), body: text }),
             });
+            setComposing(false); // 投稿したら入力欄を閉じる
             await loadComments();
         } catch (error) {
-            alert("返信できませんでした。");
+            alert("コメントできませんでした。");
         }
     };
 
@@ -119,7 +125,9 @@ export default function PostDetailPanel() {
     return (
         <aside className="detail-panel">
             <div className="detail-panel-head">
-                <button className="backbtn" onClick={close}>✕ 閉じる</button>
+                <button className="panel-close" onClick={close} aria-label="閉じる">
+                    <span className="panel-close-x">✕</span>閉じる
+                </button>
             </div>
 
             <div className="detail-panel-body">
@@ -156,6 +164,27 @@ export default function PostDetailPanel() {
                                 initialCount={post.likeCount}
                                 initialLiked={post.likedByMe}
                             />
+                            <span className="detail-comment-count">
+                                <img src={reply} alt="返信" className="icon-reply" />
+                                <span>{comments.length}</span>
+                            </span>
+                        </div>
+
+                        {/* コメント入力（投稿本文の直下） */}
+                        <div className="comment-compose">
+                            {composing ? (
+                                <CommentForm
+                                    ref={commentRef}
+                                    onAddComment={handleAddComment}
+                                    onCancel={() => setComposing(false)}
+                                    placeholder="コメントを書く"
+                                    submitLabel="コメントする"
+                                />
+                            ) : (
+                                <button className="comment-compose-open" onClick={() => setComposing(true)}>
+                                    コメントする
+                                </button>
+                            )}
                         </div>
 
                         <div className="comments">
@@ -174,8 +203,6 @@ export default function PostDetailPanel() {
                                 />
                             ))}
                         </div>
-
-                        <CommentForm ref={commentRef} onAddComment={handleAddComment} />
                     </>
                 )}
             </div>
