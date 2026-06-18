@@ -62,7 +62,7 @@ export default function AdminDashboardPage() {
             <div className="sub-note">管理者専用。ユーザーの状態確認・対応を行います。</div>
             <div className="admin-nav">
                 <button className="btn-ghost" onClick={() => navigate("/admin/reports")}>
-                    通報管理へ →
+                    通報管理へ
                 </button>
             </div>
 
@@ -91,27 +91,28 @@ export default function AdminDashboardPage() {
                                     <td>{u.role}</td>
                                     <td>
                                         <span className={`admin-status ${u.status === "ACTIVE" ? "is-active" : "is-suspended"}`}>
-                                            {u.status}
+                                            {u.status === "ACTIVE" ? "稼働中" : "停止中"}
                                         </span>
                                     </td>
                                     <td>
-                                        <button
-                                            className="btn-ghost admin-btn-sm"
-                                            onClick={() => navigate(`/admin/users/${u.id}`)}
-                                        >
-                                            投稿
-                                        </button>
-                                        {u.role === "ADMIN" ? (
-                                            <span className="admin-muted" style={{ marginLeft: 8 }}>—</span>
-                                        ) : (
+                                        <div className="admin-actions">
                                             <button
-                                                className={u.status === "ACTIVE" ? "btn-danger admin-btn-sm" : "btn-ghost admin-btn-sm"}
-                                                onClick={() => handleToggleStatus(u)}
-                                                style={{ marginLeft: 8 }}
+                                                className="btn-ghost admin-btn-sm"
+                                                onClick={() => navigate(`/admin/users/${u.id}`)}
                                             >
-                                                {u.status === "ACTIVE" ? "停止" : "解除"}
+                                                投稿
                                             </button>
-                                        )}
+                                            {u.role === "ADMIN" ? (
+                                                <span className="admin-muted">—</span>
+                                            ) : (
+                                                <button
+                                                    className={u.status === "ACTIVE" ? "btn-danger admin-btn-sm" : "btn-ghost admin-btn-sm"}
+                                                    onClick={() => handleToggleStatus(u)}
+                                                >
+                                                    {u.status === "ACTIVE" ? "停止" : "解除"}
+                                                </button>
+                                            )}
+                                        </div>
                                     </td>
                                 </tr>
                             ))}

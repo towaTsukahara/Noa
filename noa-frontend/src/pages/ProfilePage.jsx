@@ -207,17 +207,18 @@ function ProfilePage() {
                         <div className="user-handle">{profile?.handle}</div>
                         <div className="profile-name">あなた</div>
                         <div className="profile-sub">
-                            社員番号: {profile?.employeeNo} ・ {profile?.email}
+                            社員番号: {profile?.employeeNo}<br />
+                            メールアドレス: {profile?.email}
                         </div>
                     </div>
-                    <div className="profile-actions">
-                        <button className="btn btn-ghost" onClick={() => navigate("/profile/edit")}>
-                            プロフィールを編集
-                        </button>
-                        <button className="btn btn-ghost" onClick={handleFollowClick}>
-                            フォローー覧
-                        </button>
-                    </div>
+                </div>
+                <div className="profile-actions">
+                    <button className="btn btn-ghost" onClick={() => navigate("/profile/edit")}>
+                        プロフィールを編集
+                    </button>
+                    <button className="btn btn-ghost" onClick={handleFollowClick}>
+                        フォロー一覧
+                    </button>
                 </div>
 
                 <div className="profile-stats">

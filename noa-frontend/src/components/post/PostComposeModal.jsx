@@ -132,7 +132,7 @@ function PostComposePage({ onClose, onPosted }) {
     <div className="modal-overlay" onClick={onClose}>
       <div className="modal-card" onClick={(e) => e.stopPropagation()}>
         <div className="modal-head">
-          <h2>呼称ほしい</h2>
+          <h2>投稿する</h2>
           <button className="modal-close" onClick={onClose}>×</button>
         </div>
 
@@ -143,6 +143,10 @@ function PostComposePage({ onClose, onPosted }) {
           placeholder="いまどうしてる？"
           maxLength={1000}
         />
+
+        <div className="modal-counter">
+          <CharCount current={body.length} max={1000} />
+        </div>
 
         <div className="selected-tags">
           {selectedTags.map((tag) => (
@@ -213,10 +217,6 @@ function PostComposePage({ onClose, onPosted }) {
           <div className="tag-count">
             <CharCount current={tagsInput.length} max={30} />
           </div>
-        </div>
-
-        <div className="modal-counter">
-          <CharCount current={body.length} max={1000} />
         </div>
 
         {error && <p className="modal-error">{error}</p>}

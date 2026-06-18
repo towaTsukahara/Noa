@@ -7,7 +7,7 @@
   padding: 0;
 }
 .comments h3 {
-  padding: 14px 22px 6px;
+  padding: 14px 20px 6px;
   font-size: 12.5px;
   font-weight: 600;
   color: var(--soft);
@@ -15,16 +15,20 @@
 }
 
 .comment {
-  padding: 13px 22px;
+  display: flex;
+  gap: 11px;
+  padding: 13px 20px;
   border-bottom: 1px solid var(--line2);
 }
+.comment-main {
+  flex: 1;
+  min-width: 0;
+}
 .comment-author {
-  display: block;
   font-family: var(--mono-font);
   font-size: 11.5px;
   font-weight: 500;
   color: var(--mono);
-  margin-bottom: 4px;
 }
 .comment-body {
   font-size: 14px;
@@ -32,6 +36,19 @@
   color: #2b3038;
   white-space: pre-wrap;
   overflow-wrap: anywhere;
+  margin-top: 3px;
+}
+/* 操作（返信 / 返信を読む）を flex+gap でまとめる */
+.comment-actions {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-top: 8px;
+}
+/* 返信ツリー：左レール＋一定インデント（margin の積み増しをやめる） */
+.comment-children {
+  margin-left: 15px;
+  border-left: 2px solid var(--line);
 }
 
 /* 削除ボタン（自分のコメントのみ表示） */
@@ -55,7 +72,7 @@
 
 /* 返信フォーム */
 .comment-form {
-  padding: 16px 22px 24px;
+  padding: 16px 20px 24px;
 }
 .comment-form textarea {
   width: 100%;
@@ -79,22 +96,7 @@
   border-color: var(--accent);
   box-shadow: 0 0 0 3px var(--accent-bg);
 }
-.comment-form button {
-  margin-top: 10px;
-  font-family: inherit;
-  font-weight: 600;
-  font-size: 13.5px;
-  padding: 9px 20px;
-  border-radius: var(--r-md);
-  border: 1px solid var(--accent);
-  background: var(--accent);
-  color: #fff;
-  cursor: pointer;
-  transition: background 0.14s;
-}
-.comment-form button:hover {
-  background: var(--accent-d);
-}
+/* フォームの送信・キャンセルボタンは .btn / .btn-quiet で統一（個別の上書きはしない） */
 
 .comment-head-row {
     display: flex;
@@ -110,10 +112,27 @@
   cursor: pointer;
   font-size: 12.5px;
   font-weight: 600;
-  padding: 4px 0;
+  padding: 0;
+  font-family: inherit;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
 }
 .comment-more:hover {
   text-decoration: underline;
+}
+.comment-reply-btn {
+  border: none;
+  background: none;
+  color: var(--soft);
+  cursor: pointer;
+  font-size: 12.5px;
+  font-weight: 600;
+  padding: 0;
+  font-family: inherit;
+}
+.comment-reply-btn:hover {
+  color: var(--accent);
 }
 
 .comment-form-footer {
@@ -121,4 +140,23 @@
     align-items: center;
     justify-content: space-between;
     margin-top: 6px;
+}
+
+.comment-del {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  padding: 4px;
+  border-radius: var(--r-sm);
+}
+.comment-del:hover {
+  background: rgba(176, 106, 90, 0.1);
+}
+.comment-del .icon-delete {
+  width: 16px;
+  height: 16px;
+  display: block;
 }

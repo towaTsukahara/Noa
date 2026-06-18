@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import "./LoginPage.css";
+import noaLogo from "../../public/icons/noa-logo.png";
 
 function LoginPage() {
   const [email, setEmail] = useState("");
@@ -23,7 +24,9 @@ function LoginPage() {
   return (
     <div className="auth">
       <div className="auth-card">
-        <h1 className="auth-logo">N<span>o</span>a</h1>
+        <h1 className="auth-logo">
+          <img src={noaLogo} alt="Noa" />
+        </h1>
         <p className="auth-sub">Noaアカウントにログイン</p>
 
         <input

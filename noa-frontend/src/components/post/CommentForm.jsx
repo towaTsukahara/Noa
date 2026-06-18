@@ -1,38 +1,57 @@
 import { useState, forwardRef } from "react";
 import CharCount from "../common/CharCount";
 
-const CommentForm = forwardRef(function CommentForm({ onAddComment }, ref) {
-  const [text, setText] = useState("");
-  const [submitting, setSubmitting] = useState(false);
+// コメント・返信の入力フォーム。
+// onAddComment(text) … 送信時に呼ぶ
+// onCancel … キャンセルボタン（任意。あれば表示）
+// placeholder … 入力欄のプレースホルダ（既定「返信を書く」）
+// submitLabel … 送信ボタンの文言（既定「返信する」）
+const CommentForm = forwardRef(function CommentForm(
+    { onAddComment, onCancel, placeholder = "返信を書く", submitLabel = "返信する" },
+    ref
+) {
+    const [text, setText] = useState("");
+    const [submitting, setSubmitting] = useState(false);
 
-  const handleSubmit = async () => {
-    if (!text.trim()) return;
-    setSubmitting(true);
-    try {
-      await onAddComment(text);
-      setText("");
-    } finally {
-      setSubmitting(false);
-    }
-  };
+    const handleSubmit = async () => {
+        if (!text.trim()) return;
+        setSubmitting(true);
+        try {
+            await onAddComment(text);
+            setText("");
+        } finally {
+            setSubmitting(false);
+        }
+    };
 
-  return (
-    <div className="comment-form">
-      <textarea
-        ref={ref}
-        placeholder="返信を書く"
-        value={text}
-        onChange={(e) => setText(e.target.value)}
-        maxLength={500}
-      />
-      <div className="comment-form-footer">
-        <CharCount current={text.length} max={500} />
-        <button onClick={handleSubmit} disabled={submitting || text.trim() === ""}>
-          {submitting ? "送信中..." : "返信する"}
-        </button>
-      </div>
-    </div>
-  );
+    return (
+        <div className="comment-form">
+            <textarea
+                ref={ref}
+                placeholder={placeholder}
+                value={text}
+                onChange={(e) => setText(e.target.value)}
+                maxLength={500}
+            />
+            <div className="comment-form-footer">
+                <CharCount current={text.length} max={500} />
+                <div className="comment-form-actions">
+                    {onCancel && (
+                        <button className="btn btn-quiet" onClick={onCancel} disabled={submitting}>
+                            キャンセル
+                        </button>
+                    )}
+                    <button
+                        className="btn"
+                        onClick={handleSubmit}
+                        disabled={submitting || text.trim() === ""}
+                    >
+                        {submitting ? "送信中..." : submitLabel}
+                    </button>
+                </div>
+            </div>
+        </div>
+    );
 });
 
 export default CommentForm;
