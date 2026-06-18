@@ -1,6 +1,8 @@
 import { useState } from "react";
 import { api } from "../../api/client";
 import "./LikeButton.css";
+import heart_filled from '/icons/heart_filled.svg';
+import heart from '/icons/heart.svg';
 
 // 投稿のいいねトグル（サーバに保存）。
 // props: postId（対象）, initialCount（初期数）, initialLiked（自分が押し済みか）
@@ -23,7 +25,6 @@ function LikeButton({ postId, initialCount = 0, initialLiked = false }) {
       // 失敗したら元に戻す
       setLiked(!nextLiked);
       setCount((c) => (nextLiked ? c - 1 : c + 1));
-      setError("いいねできませんでした。");
     } finally {
       setBusy(false);
     }
@@ -35,7 +36,8 @@ function LikeButton({ postId, initialCount = 0, initialLiked = false }) {
       onClick={handleClick}
       disabled={busy}
     >
-      {liked ? "♥" : "♡"} {count}
+      <img src={liked ? heart_filled : heart} alt="いいね" className="icon-like" />
+      <span>{count}</span>
     </button>
   );
 }

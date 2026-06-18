@@ -1,4 +1,5 @@
-import "./CommentList.css"; // 削除ボタンのスタイルも一覧CSSにまとめる
+import "./CommentList.css";
+import trashcan from '/icons/trashcan.svg';
 
 // コメント削除ボタン。確認ダイアログを挟んで onDelete を呼ぶだけ。
 function CommentDeleteButton({ onDelete }) {
@@ -9,8 +10,8 @@ function CommentDeleteButton({ onDelete }) {
   };
 
   return (
-    <button className="btn-danger comment-del" onClick={handleDelete}>
-      削除
+    <button className="comment-del" onClick={handleDelete} aria-label="削除">
+      <img src={trashcan} alt="削除" className="icon-delete" />
     </button>
   );
 }

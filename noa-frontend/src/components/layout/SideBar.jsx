@@ -2,7 +2,9 @@ import { useState, useEffect } from "react";
 import { NavLink, useLocation } from "react-router-dom";
 import { api } from "../../api/client";
 import { useAuth } from "../../context/AuthContext";
+
 import "./SideBar.css";
+import noaLogo from "../../../public/icons/noa-logo.png";
 
 // 左サイドバー（ログイン・登録以外の全画面に共通表示）
 function SideBar({ onCompose }) {
@@ -19,7 +21,9 @@ function SideBar({ onCompose }) {
 
   return (
     <aside className="sidebar">
-      <h1>Noa</h1>
+      <h1 className="sidebar-logo">
+        <img src={noaLogo} alt="Noa" />
+      </h1>
       <nav>
         <ul>
           <li>
@@ -27,7 +31,6 @@ function SideBar({ onCompose }) {
               <span>タイムライン</span>
             </NavLink>
           </li>
-          {/* TODO: 検索は未作成（F-116）。作成したらレイアウト内ルートに追加 */}
           <li>
             <NavLink to="/search">
               <span>検索</span>
@@ -57,7 +60,7 @@ function SideBar({ onCompose }) {
               </NavLink>
             </li>
           )}
-          
+
         </ul>
       </nav>
       <button className="compose-button" onClick={onCompose}>

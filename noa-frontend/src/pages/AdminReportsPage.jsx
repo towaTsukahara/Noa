@@ -75,9 +75,9 @@ export default function AdminReportsPage() {
 
     return (
         <div className="admin page">
-            <button className="backbtn" onClick={() => navigate("/admin")}>← 管理トップへ</button>
             <h2 className="page-title">通報管理</h2>
             <div className="sub-note">通報された投稿・コメントを確認し、削除または対応済みにできます。</div>
+            <button className="backbtn" onClick={() => navigate("/admin")}>管理トップへ</button>
 
             <ErrorBanner message={error} onClose={() => setError(null)} />
 
