@@ -1,27 +1,118 @@
-import { useEffect, useState } from 'react';
-import { api } from '../api/client';
+import { useState, useEffect } from "react";
+import "./TimelinePage.css";
+import MiniPostCard from "../components/post/MiniPostCard";
+import "../components/post/LikeButton.css"; // インラインの .like-button 用
+import { api } from "../api/client";
+import UserHandle from "../components/user/UserHandle";
+import ExpandableText from "../components/common/ExpandableText";
+import { relativeTime } from "../utils/relativeTime";
+import { Link, useOutletContext, useSearchParams, useNavigate } from "react-router-dom";
+import heart_filled from '/icons/heart_filled.svg';
+import heart from '/icons/heart.svg';
+import reply from '/icons/reply.svg';
 
 function TimelinePage() {
   const [posts, setPosts] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [nextCursor, setNextCursor] = useState(null);
+  const [loadingMore, setLoadingMore] = useState(false);
+  const PAGE_SIZE = 10; // 1ページの件数。動作確認しやすいよう10に（後で20に戻してOK）
 
+  // レイアウト（投稿モーダル）から「投稿があった」通知を受け取る
+  const { lastPostedAt } = useOutletContext();
+  const [searchParams, setSearchParams] = useSearchParams();
+  const selectedId = searchParams.get("post"); // 今開いている投稿id（文字列）
+  const navigate = useNavigate();
+
+  // 投稿を右パネルで開く（?post=123 を付ける）
+  const openDetail = (postId) => {
+    const next = new URLSearchParams(searchParams);
+    next.set("post", postId);
+    setSearchParams(next);
+  };
+
+  // タイムライン取得（1ページ目）
+  const loadTimeline = async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const data = await api(`/timeline?limit=${PAGE_SIZE}`);
+      setPosts(data.items);
+      setNextCursor(data.nextCursor);
+    } catch (e) {
+      setError("タイムラインの取得に失敗しました。");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // 続きを読み込む（カーソルページング）
+  const loadMore = async () => {
+    if (!nextCursor) return;
+    setLoadingMore(true);
+    try {
+      const data = await api(`/timeline?cursor=${nextCursor}&limit=${PAGE_SIZE}`);
+      setPosts((prev) => [...prev, ...data.items]); // 既存の下に継ぎ足す
+      setNextCursor(data.nextCursor);
+    } catch (e) {
+      setError("読み込みに失敗しました。");
+    } finally {
+      setLoadingMore(false);
+    }
+  };
+
+  // いいねのトグル（likedByMe に応じて POST / DELETE を出し分け）
+  const handleLikeToggle = async (post) => {
+    try {
+      await api(`/posts/${post.id}/like`, {
+        method: post.likedByMe ? "DELETE" : "POST",
+      });
+      setPosts((prev) =>
+        prev.map((p) =>
+          p.id === post.id
+            ? {
+              ...p,
+              likedByMe: !p.likedByMe,
+              likeCount: p.likedByMe ? p.likeCount - 1 : p.likeCount + 1,
+            }
+            : p
+        )
+      );
+    } catch (e) {
+      setError("いいねできませんでした。");
+    }
+  };
+
+  // 初回表示時＋投稿があったときに読み込む
   useEffect(() => {
-    api('/timeline')
-      .then((data) => setPosts(data.items))
-      .catch((e) => setError(e.message));
-  }, []);
+    loadTimeline();
+  }, [lastPostedAt]);
 
   return (
-    <div style={{ padding: 16 }}>
-      <h1>タイムライン</h1>
-      {error && <p style={{ color: 'red' }}>エラー: {error}</p>}
+    <section className="timeline">
+      {loading && <p>読み込み中...</p>}
+      {error && <p>{error}</p>}
+      {!loading && !error && posts.length === 0 && <p>まだ投稿がありません。</p>}
+
       {posts.map((post) => (
-        <div key={post.id} style={{ border: '1px solid #ddd', borderRadius: 8, padding: 12, marginBottom: 8 }}>
-          <p>{post.body}</p>
-          <small>♡ {post.likeCount}</small>
-        </div>
+        <MiniPostCard
+          key={post.id}
+          post={post}
+          onLike={handleLikeToggle}
+          isSelected={String(selectedId) === String(post.id)}
+        />
       ))}
-    </div>
+
+      {nextCursor && !loading && (
+        <button className="load-more" onClick={loadMore} disabled={loadingMore}>
+          {loadingMore ? "読み込み中..." : "もっと見る"}
+        </button>
+      )}
+      {!loading && !error && posts.length > 0 && !nextCursor && (
+        <p className="timeline-end">これ以上の投稿はありません</p>
+      )}
+    </section>
   );
 }
 

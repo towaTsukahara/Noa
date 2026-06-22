@@ -1,0 +1,125 @@
+import { useState, useEffect, useRef } from "react";
+import { useParams, useSearchParams } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
+import { api } from "../api/client";
+import "./PostDetailPage.css";
+
+import LikeButton from "../components/post/LikeButton";
+import CommentList from "../components/post/CommentList";
+import CommentForm from "../components/post/CommentForm";
+import MoreMenu from "../components/common/MoreMenu";
+import ReportModal from "../components/report/ReportModal";
+
+function PostDetailPage() {
+    const { id } = useParams();
+    const [searchParams] = useSearchParams();
+
+    const [post, setPost] = useState(null);
+    const [loading, setLoading] = useState(true);
+    const [comments, setComments] = useState([]);
+    const [reportTarget, setReportTarget] = useState(null); // { type, id } or null
+
+    const commentRef = useRef(null); // 返信欄への参照（フォーカス用）
+    const { user } = useAuth();
+
+    const loadComments = async () => {
+        const data = await api(`/comments?postId=${postId}`);
+        setComments(
+            data.map((c) => ({
+                id: c.id,
+                authorHandle: c.authorName,
+                authorNickname: c.authorNickname,
+                body: c.body,
+                parentCommentId: c.parentCommentId, // 親コメントid（ツリー用）
+                mine: user && c.authorName === user.handle,
+            }))
+        );
+    };
+
+    useEffect(() => {
+        const fetchAll = async () => {
+            try {
+                const data = await api(`/posts/${id}`);
+                setPost(data);
+                await loadComments();
+            } catch (error) {
+                console.error("投稿取得失敗", error);
+            } finally {
+                setLoading(false);
+            }
+        };
+        fetchAll();
+    }, [id]);
+
+    // ?reply=1 で来たら返信欄にフォーカス＋スクロール
+    useEffect(() => {
+        if (!loading && searchParams.get("reply") === "1" && commentRef.current) {
+            commentRef.current.focus();
+            commentRef.current.scrollIntoView({ behavior: "smooth", block: "center" });
+        }
+    }, [loading, searchParams]);
+
+    const handleAddComment = async (text) => {
+        try {
+            await api(`/comments`, {
+                method: "POST",
+                body: JSON.stringify({ postId: Number(id), body: text }),
+            });
+            await loadComments(); // 投稿後に再読込
+        } catch (error) {
+            console.error("コメント投稿失敗", error);
+            alert("返信できませんでした。");
+        }
+    };
+
+    const handleDeleteComment = async (commentId) => {
+        try {
+            await api(`/comments/${commentId}`, { method: "DELETE" });
+            await loadComments(); // 削除後に再読込
+        } catch (e) {
+            alert("削除できませんでした。");
+        }
+    };
+
+    if (loading) {
+        return <div className="post-detail page"><p className="empty-note">読み込み中...</p></div>;
+    }
+    if (!post) {
+        return <div className="post-detail page"><p className="empty-note">投稿が見つかりません</p></div>;
+    }
+
+    return (
+        <div className="post-detail page">
+            <div className="page-pad detail-main">
+                <div className="detail-author">
+                    <span className="user-handle">{post.author.handle}</span>
+                    <MoreMenu items={[
+                        { label: "通報する", danger: true, onClick: () => setReportTarget({ type: "POST", id: post.id }) },
+                    ]} />
+                </div>
+
+                <p className="detail-body">{post.body}</p>
+
+                <div className="detail-tags">
+                    {post.tags?.map((tag) => (
+                        <span key={tag.id} className="tag">
+                            #{tag.name}
+                        </span>
+                    ))}
+                </div>
+                <div className="detail-actions">
+                    <LikeButton
+                        postId={post.id}
+                        initialCount={post.likeCount}
+                        initialLiked={post.likedByMe}
+                    />
+                </div>
+            </div>
+
+            <CommentList comments={comments} onDeleteComment={handleDeleteComment} />
+            <CommentForm ref={commentRef} onAddComment={handleAddComment} />
+        </div>
+    );
+}
+
+export default PostDetailPage;

@@ -1,0 +1,162 @@
+/* Comments — CommentList / CommentForm / CommentDeleteButton
+   構造:
+     .comments > h3 + .comment(> strong.comment-author + p.comment-body + button.comment-delete)
+     .comment-form > textarea.field + button.btn */
+
+.comments {
+  padding: 0;
+}
+.comments h3 {
+  padding: 14px 20px 6px;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--soft);
+  letter-spacing: 0.02em;
+}
+
+.comment {
+  display: flex;
+  gap: 11px;
+  padding: 13px 20px;
+  border-bottom: 1px solid var(--line2);
+}
+.comment-main {
+  flex: 1;
+  min-width: 0;
+}
+.comment-author {
+  font-family: var(--mono-font);
+  font-size: 11.5px;
+  font-weight: 500;
+  color: var(--mono);
+}
+.comment-body {
+  font-size: 14px;
+  line-height: 1.7;
+  color: #2b3038;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  margin-top: 3px;
+}
+/* 操作（返信 / 返信を読む）を flex+gap でまとめる */
+.comment-actions {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-top: 8px;
+}
+/* 返信ツリー：左レール＋一定インデント（margin の積み増しをやめる） */
+.comment-children {
+  margin-left: 15px;
+  border-left: 2px solid var(--line);
+}
+
+/* 削除ボタン（自分のコメントのみ表示） */
+.comment-delete {
+  margin-top: 8px;
+  border: 1px solid #e7d4d1;
+  background: #fff;
+  color: var(--danger);
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 500;
+  padding: 5px 12px;
+  border-radius: var(--r-sm);
+  cursor: pointer;
+  transition: background 0.12s, border-color 0.12s;
+}
+.comment-delete:hover {
+  background: #f7ece9;
+  border-color: var(--danger);
+}
+
+/* 返信フォーム */
+.comment-form {
+  padding: 16px 20px 24px;
+}
+.comment-form textarea {
+  width: 100%;
+  min-height: 84px;
+  font-family: inherit;
+  font-size: 14px;
+  line-height: 1.7;
+  color: var(--ink);
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: var(--r-md);
+  padding: 11px 14px;
+  outline: none;
+  resize: vertical;
+  transition: border-color 0.13s, box-shadow 0.13s;
+}
+.comment-form textarea::placeholder {
+  color: var(--faint);
+}
+.comment-form textarea:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-bg);
+}
+/* フォームの送信・キャンセルボタンは .btn / .btn-quiet で統一（個別の上書きはしない） */
+
+.comment-head-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+}
+
+.comment-more {
+  border: none;
+  background: none;
+  color: var(--accent);
+  cursor: pointer;
+  font-size: 12.5px;
+  font-weight: 600;
+  padding: 0;
+  font-family: inherit;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+.comment-more:hover {
+  text-decoration: underline;
+}
+.comment-reply-btn {
+  border: none;
+  background: none;
+  color: var(--soft);
+  cursor: pointer;
+  font-size: 12.5px;
+  font-weight: 600;
+  padding: 0;
+  font-family: inherit;
+}
+.comment-reply-btn:hover {
+  color: var(--accent);
+}
+
+.comment-form-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 6px;
+}
+
+.comment-del {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  padding: 4px;
+  border-radius: var(--r-sm);
+}
+.comment-del:hover {
+  background: rgba(176, 106, 90, 0.1);
+}
+.comment-del .icon-delete {
+  width: 16px;
+  height: 16px;
+  display: block;
+}

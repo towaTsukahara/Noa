@@ -1,0 +1,50 @@
+/* FollowTagEditPage — タグをフォロー/解除（フラット）
+   構造（リファクタ後）:
+     .follow-tag-edit.page
+       > h2.page-title
+       > .page-pad > input.field
+       > .tag-cloud > span.tag-toggle(.is-on)
+       > .edit-actions (戻る) */
+
+.tag-cloud {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 4px 22px 20px;
+}
+
+.tag-cloud>p {
+  font-size: 13px;
+  color: var(--faint);
+}
+
+.create-tag-box {
+  padding: 0 22px;
+}
+
+.create-tag-btn {
+  width: 100%;
+  text-align: left;
+
+  padding: 10px 14px;
+
+  border: 1px solid var(--line);
+  border-radius: var(--r-md);
+
+  background: #fff;
+  cursor: pointer;
+
+  font-size: 14px;
+  color: var(--accent);
+
+  transition: background .15s;
+}
+
+.create-tag-btn:hover {
+  background: var(--accent-bg);
+}
+
+.create-tag-btn.active {
+  background: var(--accent-bg);
+  border-color: var(--accent);
+}

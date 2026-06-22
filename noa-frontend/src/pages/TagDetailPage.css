@@ -1,0 +1,111 @@
+/* TagDetailPage — タグ詳細（そのタグの投稿一覧）
+   構造（リファクタ後）:
+     .tag-detail.page
+       > .tag-hero (> .tag-hero-name + button.btn[.btn-ghost])
+       > .section-title「投稿」
+       > .mini-post(> .search-title + .search-snippet) */
+
+.timeline {
+  max-width: 646px;
+  margin: 0 auto;
+  min-height: calc(100vh - 60px);
+  border-left: 1px solid var(--line2);
+  border-right: 1px solid var(--line2);
+}
+
+.tag-hero {
+  padding: 24px 22px 20px;
+  border-bottom: 1px solid var(--line2);
+}
+
+.tag-hero-name {
+  font-family: var(--mono-font);
+  font-size: 26px;
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.tag-hero-desc {
+  font-size: 13px;
+  color: var(--soft);
+  margin: 7px 0 16px;
+}
+
+.tag-hero .btn {
+  margin-top: 4px;
+}
+
+.section-title {
+  padding: 16px 22px 8px;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.tag-post-card-wrap {
+  cursor: pointer;
+}
+
+.tag-post-card-wrap>.post-card {
+  pointer-events: none;
+}
+
+.tag-post-card-wrap .post-header .avatar,
+.tag-post-card-wrap .post-header a,
+.tag-post-card-wrap .tags span,
+.tag-post-card-wrap .actions,
+.tag-post-card-wrap .actions * {
+  pointer-events: auto;
+}
+
+.tag-post-card-wrap:hover>.post-card:not(.is-selected) {
+  background: #f6f3ec;
+}
+
+.tag-post-card-wrap>.post-card.is-selected {
+  background: var(--accent-bg);
+}
+
+.tag-post-card-wrap>.post-card.is-selected::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 3px;
+  background: var(--accent);
+}
+
+.tag-results {
+  padding-top: 4px;
+}
+
+.tag-title {
+  display: inline-block;
+  margin-top: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--accent);
+  text-decoration: none;
+}
+
+.tag-title:hover {
+  text-decoration: underline;
+}
+
+.tag-snippet {
+  font-size: 13.5px;
+  line-height: 1.65;
+  color: #3a4047;
+  margin-top: 6px;
+}
+
+.tag-date {
+  font-family: var(--mono-font);
+  font-size: 11px;
+  color: var(--faint);
+}
+
+.empty-note {
+  padding: 16px 22px;
+  color: var(--soft);
+}

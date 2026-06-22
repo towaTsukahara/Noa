@@ -1,0 +1,17 @@
+/* TagPage — 登録フロー中のタグ選択（興味 / 技術スタック）
+   構造（リファクタ後）:
+     .tag-select.page
+       > h2.page-title
+       > .page-pad > button.btn-quiet（← 戻る）
+       > .tag-cloud > span.tag-toggle(.is-on)
+       > .edit-actions > button.btn（次へ） */
+
+.tag-select .tag-cloud {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 6px 22px 20px;
+}
+.tag-select .back-row {
+  padding: 14px 22px 0;
+}

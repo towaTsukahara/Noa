@@ -1,0 +1,199 @@
+/* TimelinePage — 中央集中の1カラムフィード
+   投稿カードは枠線ではなく区切り線で連結し、本文はアバター下にインデント。
+   構造: section.timeline > article.post-card
+           > .post-header(.avatar + div(.nickname>.author-link>.user-handle, .date))
+           > p.content
+           > a.post-detail-link
+           > .tags > span
+           > .actions > (button.like-button[.liked], span) */
+
+.timeline {
+  max-width: 646px;
+  margin: 0 auto;
+  min-height: calc(100vh - 60px);
+  border-left: 1px solid var(--line2);
+  border-right: 1px solid var(--line2);
+}
+
+/* 取得中 / エラー / 空 の素のメッセージ */
+.timeline > p {
+  padding: 22px 20px;
+  font-size: 13px;
+  color: var(--faint);
+}
+
+/* ---- 投稿カード ---- */
+.post-card {
+  padding: 16px 20px;
+  border: none;
+  border-bottom: 1px solid var(--line2);
+  border-radius: 0;
+  margin: 0;
+  cursor: pointer;
+  transition: background 0.12s;
+}
+.post-card:hover {
+  background: #f6f3ec;
+}
+
+.post-header {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  margin-bottom: 8px;
+}
+
+/* ヘッダー右側の氏名・日時ブロック（JSXでは無名の div）。
+   アバターも div なので :not(.avatar) で除外する。 */
+.post-header > div:not(.avatar) {
+  min-width: 0;
+  flex: 1;
+}
+
+.nickname {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--ink);
+  display: flex;
+  gap: 7px;
+  align-items: center;
+}
+.author-link {
+  color: inherit;
+}
+.author-link:hover .user-handle {
+  color: var(--accent);
+}
+
+.date {
+  font-size: 11.5px;
+  color: var(--faint);
+  margin-top: 1px;
+  text-align: right;
+}
+
+.content {
+  font-size: 14.5px;
+  line-height: 1.76;
+  color: #2b3038;
+  padding-left: 53px;
+}
+
+.post-detail-link {
+  display: inline-block;
+  margin: 6px 0 0 53px;
+  font-size: 12px;
+  color: var(--accent);
+  font-weight: 500;
+  white-space: nowrap;
+}
+.post-detail-link:hover {
+  text-decoration: underline;
+}
+
+/* タグ列 */
+.tags {
+  display: flex;
+  gap: 7px;
+  flex-wrap: wrap;
+  margin-top: 10px;
+  padding-left: 53px;
+}
+.tags span {
+  font-family: var(--mono-font);
+  font-size: 11.5px;
+  color: var(--accent);
+  border: 1px solid var(--line);
+  background: #fff;
+  padding: 2px 10px;
+  border-radius: var(--r-pill);
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background 0.12s;
+}
+.tags span:hover {
+  background: var(--accent-bg);
+}
+
+/* アクション行（いいね・返信数） */
+.actions {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  margin-top: 12px;
+  padding-left: 53px;
+  font-size: 12.5px;
+  color: var(--soft);
+}
+.actions > span {
+  font-variant-numeric: tabular-nums;
+  color: var(--soft);
+  white-space: nowrap;
+}
+
+/* ---- もっと見る / 終端 ---- */
+.load-more {
+  display: block;
+  width: calc(100% - 40px);
+  margin: 16px 20px 24px;
+  padding: 12px;
+  border: 1px solid var(--line);
+  border-radius: var(--r-md);
+  background: #fff;
+  color: var(--accent);
+  font-family: inherit;
+  font-weight: 600;
+  font-size: 13.5px;
+  cursor: pointer;
+  transition: background 0.13s;
+}
+.load-more:hover {
+  background: var(--accent-bg);
+}
+.load-more:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+.timeline-end {
+  text-align: center;
+  color: var(--faint);
+  font-family: var(--mono-font);
+  font-size: 11.5px;
+  margin: 16px 0 24px;
+}
+
+/* いいね、コメントのアイコン */
+.icon-like,
+.icon-reply {
+  width: 17px;
+  height: 17px;
+  object-fit: contain;
+}
+
+.actions button,
+.actions .reply {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/* カード全体クリックで詳細を開く */
+.post-card {
+  cursor: pointer;
+  position: relative;
+}
+
+/* 選択中（右パネルで開いている）投稿 */
+.post-card.is-selected {
+  background: var(--accent-bg);
+}
+.post-card.is-selected::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 3px;
+  background: var(--accent);
+}

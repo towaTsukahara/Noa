@@ -1,0 +1,138 @@
+/* AdminDashboardPage — 管理ダッシュボード（管理者専用） */
+
+.admin-table-wrap {
+  padding: 8px 20px 20px;
+  overflow-x: auto;
+}
+
+.admin-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+.admin-table th {
+  text-align: left;
+  padding: 10px 12px;
+  border-bottom: 2px solid var(--line);
+  color: var(--soft);
+  font-weight: 600;
+  white-space: nowrap;
+}
+.admin-table td {
+  padding: 11px 12px;
+  border-bottom: 1px solid var(--line2);
+  color: var(--ink);
+  white-space: nowrap;
+}
+.admin-table tr:hover td {
+  background: #f1eee6;
+}
+
+.admin-status {
+  font-family: var(--mono-font);
+  font-size: 11px;
+  padding: 2px 9px;
+  border-radius: var(--r-pill);
+}
+.admin-status.is-active {
+  background: var(--accent-bg);
+  color: var(--accent);
+}
+.admin-status.is-suspended {
+  background: #f7ece9;
+  color: var(--danger);
+}
+
+.admin-btn-sm {
+  font-size: 12px;
+  padding: 5px 12px;
+  line-height: 1.1;
+  border-radius: var(--r-sm);
+}
+/* 行内の操作ボタン群（margin-left のインライン指定をやめ flex+gap で組む） */
+.admin-actions {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+.admin-muted {
+  color: var(--faint);
+}
+
+.admin-post-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 6px;
+}
+
+/* 通報一覧 */
+.admin-filter {
+    padding: 8px 20px;
+    font-size: 13px;
+    color: var(--soft);
+}
+.admin-filter label {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    cursor: pointer;
+}
+
+.report-item {
+    padding: 14px 20px;
+    border-bottom: 1px solid var(--line2);
+}
+.report-item-head {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 8px;
+}
+.report-type {
+    font-family: var(--mono-font);
+    font-size: 11px;
+    padding: 2px 9px;
+    border-radius: var(--r-pill);
+}
+.report-type.is-post {
+    background: var(--accent-bg);
+    color: var(--accent);
+}
+.report-type.is-comment {
+    background: #f0ebe0;
+    color: var(--soft);
+}
+.report-time {
+    margin-left: auto;
+    font-size: 11px;
+    color: var(--faint);
+    font-family: var(--mono-font);
+}
+.report-target-body {
+    font-size: 14px;
+    line-height: 1.7;
+    color: #2b3038;
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+    padding: 10px 12px;
+    background: #faf8f2;
+    border-radius: var(--r-sm);
+    margin-bottom: 8px;
+}
+.report-meta {
+    display: flex;
+    gap: 16px;
+    font-size: 12px;
+    color: var(--soft);
+    margin-bottom: 10px;
+    flex-wrap: wrap;
+}
+.report-item-actions {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+.admin-nav {
+    padding: 8px 20px 0;
+}

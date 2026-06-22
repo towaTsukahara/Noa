@@ -1,0 +1,479 @@
+/* =========================================================================
+   Noa — theme.css
+   デザインシステムの土台：トークン / リセット / フォント / 共通プリミティブ
+   すべてのコンポーネント・ページCSSはこのファイルを前提にする。
+   App のエントリ（main.jsx など）で一度だけ import すること:
+       import "./styles/theme.css";
+   ========================================================================= */
+
+@import url("https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans+JP:wght@400;500;600;700&display=swap");
+
+:root {
+  /* ---- color tokens ---- */
+  --bg: #e9e6de;          /* アプリ背景（キャンバス） */
+  --panel: #fbf9f3;       /* 面（中央 / サイド / ヘッダ） */
+  --card: #ffffff;        /* カード・入力欄 */
+
+  --ink: #23272e;         /* 本文テキスト */
+  --soft: #6b7178;        /* 補助テキスト */
+  --faint: #9aa0a6;       /* 微弱・プレースホルダ */
+
+  --line: #e6e2d7;        /* 境界線（強） */
+  --line2: #efece3;       /* 境界線（弱・投稿区切り） */
+
+  --accent: #2f6b5e;      /* ブランド・操作・リンク・選択 */
+  --accent-bg: #e7efeb;   /* アクセント淡背景 */
+  --accent-d: #27574c;    /* アクセント濃（hover） */
+
+  --like: #b06a5a;        /* いいね（オン） */
+  --mono: #5a616a;        /* ハンドル / 等幅テキスト */
+  --danger: #b0564f;      /* 削除など破壊的操作 */
+
+  /* ---- radius tokens ---- */
+  --r-sm: 8px;
+  --r-md: 11px;
+  --r-lg: 14px;
+  --r-pill: 999px;
+
+  /* ---- typography ---- */
+  --font: "IBM Plex Sans JP", system-ui, sans-serif;
+  --mono-font: "IBM Plex Mono", ui-monospace, monospace;
+
+  /* ---- elevation ---- */
+  --shadow-modal: 0 30px 70px rgba(0, 0, 0, 0.3);
+  --shadow-soft: 0 2px 10px rgba(35, 39, 46, 0.05);
+}
+
+/* ---------------------------------------------------------------- reset */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html,
+body {
+  height: 100%;
+}
+
+body {
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--font);
+  font-size: 14px;
+  line-height: 1.62;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+button {
+  font-family: inherit;
+}
+
+::-webkit-scrollbar {
+  width: 9px;
+  height: 9px;
+}
+::-webkit-scrollbar-thumb {
+  background: #d4d0c5;
+  border-radius: 9px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+/* =========================================================================
+   共通プリミティブ
+   ページ / コンポーネント CSS から再利用する最小単位。
+   ========================================================================= */
+
+/* ---- buttons -------------------------------------------------------- */
+/* 基底スタイルはバリアント単体（.btn-ghost 等）でも完成するよう全クラスに付与 */
+.btn,
+.btn-ghost,
+.btn-quiet,
+.btn-danger {
+  font-family: inherit;
+  font-weight: 600;
+  font-size: 13.5px;
+  padding: 10px 20px;
+  border-radius: var(--r-md);
+  border: 1px solid var(--accent);
+  background: var(--accent);
+  color: #fff;
+  cursor: pointer;
+  transition: background 0.14s, border-color 0.14s, color 0.14s, opacity 0.14s;
+  white-space: nowrap;
+}
+.btn:hover {
+  background: var(--accent-d);
+  border-color: var(--accent-d);
+}
+.btn:disabled,
+.btn-ghost:disabled,
+.btn-quiet:disabled,
+.btn-danger:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.btn-ghost {
+  background: #fff;
+  color: var(--accent);
+}
+.btn-ghost:hover {
+  background: var(--accent-bg);
+  border-color: var(--accent);
+}
+
+.btn-quiet {
+  background: transparent;
+  border-color: var(--line);
+  color: var(--soft);
+}
+.btn-quiet:hover {
+  background: #f1eee6;
+  border-color: var(--line);
+  color: var(--ink);
+}
+
+.btn-danger {
+  background: #fff;
+  border-color: #e7d4d1;
+  color: var(--danger);
+}
+.btn-danger:hover {
+  background: #f7ece9;
+  border-color: var(--danger);
+}
+
+/* small text-only link button */
+.btn-link {
+  border: none;
+  background: none;
+  color: var(--accent);
+  font-weight: 600;
+  font-size: 13px;
+  cursor: pointer;
+  padding: 0;
+}
+.btn-link:hover {
+  color: var(--accent-d);
+  text-decoration: underline;
+}
+
+/* back button (history pane / detail) */
+.backbtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--accent);
+  background: var(--accent-bg);
+  border: none;
+  border-radius: var(--r-sm);
+  padding: 8px 13px;
+  cursor: pointer;
+  font-family: inherit;
+  transition: background 0.14s;
+}
+.backbtn:hover {
+  background: #dcece6;
+}
+
+/* ---- tags & chips --------------------------------------------------- */
+/* 投稿に付くタグ（白地・枠線） */
+.tag {
+  font-family: var(--mono-font);
+  font-size: 11.5px;
+  color: var(--accent);
+  border: 1px solid var(--line);
+  background: #fff;
+  padding: 2px 10px;
+  border-radius: var(--r-pill);
+  cursor: pointer;
+  transition: background 0.12s;
+  white-space: nowrap;
+}
+.tag:hover {
+  background: var(--accent-bg);
+}
+
+/* フォロー中トピックなどの淡色チップ */
+.chip {
+  font-family: var(--mono-font);
+  font-size: 11.5px;
+  color: var(--accent);
+  background: var(--accent-bg);
+  padding: 4px 11px;
+  border-radius: var(--r-pill);
+  white-space: nowrap;
+  cursor: pointer;
+  border: none;
+}
+
+/* トグル可能なタグ（フォロー編集など）。.is-on でアクティブ */
+.tag-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--mono-font);
+  font-size: 12.5px;
+  padding: 6px 14px;
+  border-radius: var(--r-pill);
+  border: 1px solid var(--line);
+  background: #fff;
+  color: var(--soft);
+  cursor: pointer;
+  user-select: none;
+  transition: all 0.13s;
+}
+.tag-toggle:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+.tag-toggle.is-on {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #fff;
+}
+
+/* ---- avatar placeholder -------------------------------------------- */
+/* 顔写真は使わない原則。生成アイコン導入までは低彩度の抽象プレースホルダ。 */
+.avatar {
+  flex: none;
+  width: 42px;
+  height: 42px;
+  border-radius: 30%;
+  background:
+    radial-gradient(120% 120% at 28% 22%, rgba(255, 255, 255, 0.35), transparent 55%),
+    linear-gradient(150deg, #6f7a5b 0%, #566f86 100%);
+  box-shadow: inset 0 0 0 1px rgba(35, 39, 46, 0.06);
+}
+.avatar.is-round {
+  border-radius: 50%;
+}
+.avatar.is-lg {
+  width: 84px;
+  height: 84px;
+}
+.avatar.is-sm {
+  width: 32px;
+  height: 32px;
+}
+/* 序列を含意しない7配色。data-tone か modifier で振り分け可能 */
+.avatar.tone-1 { background: radial-gradient(120% 120% at 28% 22%, rgba(255,255,255,.35), transparent 55%), linear-gradient(150deg, #5b7a6f, #3f5d56); }
+.avatar.tone-2 { background: radial-gradient(120% 120% at 28% 22%, rgba(255,255,255,.35), transparent 55%), linear-gradient(150deg, #8a7a52, #6e6240); }
+.avatar.tone-3 { background: radial-gradient(120% 120% at 28% 22%, rgba(255,255,255,.35), transparent 55%), linear-gradient(150deg, #6f5b7a, #54456b); }
+.avatar.tone-4 { background: radial-gradient(120% 120% at 28% 22%, rgba(255,255,255,.35), transparent 55%), linear-gradient(150deg, #566f86, #41566a); }
+.avatar.tone-5 { background: radial-gradient(120% 120% at 28% 22%, rgba(255,255,255,.35), transparent 55%), linear-gradient(150deg, #8a5f63, #6f4a4e); }
+.avatar.tone-6 { background: radial-gradient(120% 120% at 28% 22%, rgba(255,255,255,.35), transparent 55%), linear-gradient(150deg, #6f7a5b, #566142); }
+.avatar.tone-7 { background: radial-gradient(120% 120% at 28% 22%, rgba(255,255,255,.35), transparent 55%), linear-gradient(150deg, #52808a, #3d626b); }
+
+/* ---- handle / mono text -------------------------------------------- */
+.user-handle {
+  font-family: var(--mono-font);
+  font-size: 11.5px;
+  color: var(--mono);
+}
+
+/* ---- form fields ---------------------------------------------------- */
+.field {
+  width: 100%;
+  font-family: inherit;
+  font-size: 14px;
+  color: var(--ink);
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: var(--r-md);
+  padding: 11px 14px;
+  outline: none;
+  transition: border-color 0.13s, box-shadow 0.13s;
+}
+.field::placeholder {
+  color: var(--faint);
+}
+.field:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-bg);
+}
+textarea.field {
+  resize: vertical;
+  line-height: 1.7;
+}
+
+.field-label {
+  display: block;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--soft);
+  margin-bottom: 6px;
+}
+
+/* ---- section heading inside a column ------------------------------- */
+.view-head {
+  position: sticky;
+  top: 0;
+  z-index: 5;
+  background: rgba(251, 249, 243, 0.93);
+  backdrop-filter: blur(8px);
+  border-bottom: 1px solid var(--line);
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  padding: 15px 20px;
+}
+.view-head h2 {
+  font-size: 18px;
+  font-weight: 600;
+}
+.view-head .view-head-sub {
+  margin-left: auto;
+  font-family: var(--mono-font);
+  font-size: 11px;
+  color: var(--faint);
+}
+
+/* small caption / helper note */
+.sub-note {
+  padding: 13px 20px;
+  font-size: 11.5px;
+  color: var(--faint);
+  font-family: var(--mono-font);
+}
+
+.empty-note {
+  padding: 26px 20px;
+  font-size: 13px;
+  color: var(--faint);
+  text-align: center;
+}
+
+/* ---- shared layout patterns ---------------------------------------- */
+/* 中央寄せのコンテンツ列（プロフィール・フォロー・タグ編集など） */
+.page {
+  max-width: 646px;
+  margin: 0 auto;
+  min-height: calc(100vh - 60px);
+  border-left: 1px solid var(--line2);
+  border-right: 1px solid var(--line2);
+  padding-bottom: 32px;
+}
+.page-pad {
+  padding: 20px 20px;
+}
+
+/* 列内の大見出し（h1/h2 にも付与可） */
+.page-title {
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--ink);
+  padding: 20px 20px 0;
+}
+
+/* 区切りラベル（投稿 / コメント などの小見出し） */
+.section-title {
+  padding: 14px 20px 6px;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--soft);
+  letter-spacing: 0.02em;
+}
+
+/* 一覧の行（フォロー中ユーザー・タグなど） */
+.row-between {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 13px 20px;
+  border-bottom: 1px solid var(--line2);
+}
+
+/* タブ */
+.tabs {
+  display: flex;
+  gap: 4px;
+  padding: 6px 20px 0;
+  border-bottom: 1px solid var(--line2);
+}
+.tab {
+  border: none;
+  background: none;
+  font-family: inherit;
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--soft);
+  padding: 11px 14px;
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -1px;
+  transition: color 0.13s, border-color 0.13s;
+}
+.tab:hover {
+  color: var(--ink);
+}
+.tab.active {
+  color: var(--accent);
+  border-bottom-color: var(--accent);
+}
+
+/* コンパクトな投稿カード（プロフィール等のリスト用） */
+.mini-post {
+  padding: 14px 20px;
+  border-bottom: 1px solid var(--line2);
+}
+.mini-post .mini-body {
+  font-size: 14px;
+  line-height: 1.7;
+  color: #2b3038;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+.mini-post .mini-meta {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-top: 8px;
+  font-size: 12.5px;
+  color: var(--soft);
+  font-variant-numeric: tabular-nums;
+}
+
+/* タグのまとまり（技術スタック / 趣味 / 資格 など） */
+.tag-group-label {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--soft);
+  letter-spacing: 0.04em;
+  margin-bottom: 8px;
+}
+.tag-row {
+  display: flex;
+  gap: 7px;
+  flex-wrap: wrap;
+}
+
+/* 画面下の操作ボタン列（キャンセル / 保存 / 戻る など） */
+.edit-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  padding: 20px 20px;
+}
+
+/* utility */
+.mono {
+  font-family: var(--mono-font);
+}
+.divider {
+  height: 1px;
+  background: var(--line2);
+  border: none;
+}

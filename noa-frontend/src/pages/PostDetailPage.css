@@ -1,0 +1,43 @@
+/* PostDetailPage — 投稿詳細（中央1カラム）
+   ※「履歴＋スレッド」の2カラム版は別途。ここは現行の単一カラム構造に対応。
+   構造: .post-detail.page
+           > .page-pad.detail-main
+               > .detail-author > .user-handle
+               > p.detail-body
+               > .detail-tags > span.tag
+               > .detail-actions (LikeButton)
+           > .section-title「コメント」
+           > CommentList / CommentForm */
+
+.detail-main {
+  border-bottom: 1px solid var(--line2);
+}
+
+.detail-author {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+.detail-author .user-handle {
+  font-size: 13px;
+}
+
+.detail-body {
+  font-size: 15.5px;
+  line-height: 1.85;
+  color: #2b3038;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.detail-tags {
+  display: flex;
+  gap: 7px;
+  flex-wrap: wrap;
+  margin-top: 16px;
+}
+
+.detail-actions {
+  margin-top: 18px;
+}

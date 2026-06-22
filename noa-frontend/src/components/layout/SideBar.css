@@ -1,0 +1,155 @@
+/* SideBar — 左ナビゲーションレール
+   構造: aside.sidebar > h1 + nav>ul>li>Link + button.compose-button
+   Link を NavLink にすると .active / aria-current が付き、選択状態が出る。 */
+
+/* サイドバーの土台：本文(--panel)と同色に統一し、右に区切り線で仕切る */
+.sidebar {
+  background: var(--panel);
+  border-right: 1px solid var(--line);
+  padding: 16px 12px;
+  display: flex;
+  flex-direction: column;
+}
+
+.sidebar h1 {
+  padding: 8px 14px;
+  margin-bottom: 12px;
+  text-align: center;
+}
+
+.sidebar-logo img {
+  height: 52px;
+  width: auto;
+  display: block;
+  margin: 0 auto;
+}
+
+.sidebar nav ul {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.sidebar nav li a {
+  display: flex;
+  align-items: center;
+  gap: 13px;
+  padding: 11px 14px;
+  border-radius: var(--r-md);
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--ink);
+  cursor: pointer;
+  transition: background 0.14s, color 0.14s;
+}
+
+.sidebar nav li a:hover {
+  background: #f1eee6;
+}
+
+/* NavLink のアクティブ状態 */
+.sidebar nav li a.active,
+.sidebar nav li a[aria-current="page"] {
+  background: var(--accent-bg);
+  color: var(--accent);
+  font-weight: 600;
+}
+
+/* 行頭アイコンを使う場合（svg を Link の先頭に置く） */
+.sidebar nav li a svg {
+  width: 22px;
+  height: 22px;
+  stroke: currentColor;
+  fill: none;
+  stroke-width: 1.7;
+  flex: none;
+}
+
+/* 投稿ボタン（モーダルを開く）。幅はサイドバーの内側いっぱい＝ナビ項目と揃える */
+.compose-button {
+  margin: 14px 0 0;
+  width: 100%;
+  background: var(--accent);
+  color: #fff;
+  border: none;
+  border-radius: var(--r-lg);
+  padding: 13px;
+  font-family: inherit;
+  font-weight: 600;
+  font-size: 15px;
+  cursor: pointer;
+  transition: background 0.14s;
+}
+
+.compose-button:hover {
+  background: var(--accent-d);
+}
+
+/* 画面下に寄せる “自分” フッターを置く場合に使う（任意） */
+.sidebar .sidebar-me {
+  margin-top: auto;
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  padding: 9px 12px;
+  border-radius: var(--r-lg);
+  cursor: pointer;
+}
+
+.sidebar .sidebar-me:hover {
+  background: #f1eee6;
+}
+
+/* ナローでラベルを隠し、アイコンレールにする */
+@media (max-width: 1000px) {
+  .sidebar {
+    padding: 12px 8px;
+  }
+
+  .sidebar h1 {
+    text-align: center;
+    padding: 2px 0;
+  }
+
+  .sidebar-logo img {
+    height: 32px;
+    margin: 0 auto;
+  }
+
+  .sidebar nav li a {
+    justify-content: center;
+    gap: 0;
+  }
+
+  .sidebar nav li a span {
+    display: none;
+  }
+
+  .compose-button {
+    font-size: 0;
+    padding: 13px 0;
+  }
+
+  .compose-button::after {
+    content: "＋";
+    font-size: 20px;
+  }
+}
+
+/* 通知の未読バッジ（「通知」リンクの右に出る件数） */
+.nav-badge {
+  margin-left: auto;
+  min-width: 19px;
+  height: 19px;
+  padding: 0 6px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  font-weight: 700;
+  color: #fff;
+  background: var(--accent);
+  border-radius: var(--r-pill);
+  font-family: var(--mono-font);
+}
